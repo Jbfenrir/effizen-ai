@@ -1,0 +1,10 @@
+Pour tester l'application en local : 
+1- se positionner dans le dossier effizen-ai
+2- ouvrir dans le terminaal (PowerShell)
+3- copier et executer la commande suivante :
+
+  npm run dev
+
+(lancer l'app depuis le raccourci si besoin.)
+
+4- Puis mentionner "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"

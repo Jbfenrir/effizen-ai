@@ -1,0 +1,119 @@
+{
+  "app": {
+    "title": "EffiZen-AI",
+    "description": "Wellbeing and productivity app for teams"
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Sign in with your work email",
+    "email": "Email address",
+    "submit": "Send magic link",
+    "success": "A login link has been sent to your email address.",
+    "error": "Error sending the link. Please try again."
+  },
+  "header": {
+    "dashboard": "Dashboard",
+    "entry": "Daily entry",
+    "logout": "Logout"
+  },
+  "focus": {
+    "title": "Focus & Fatigue",
+    "morningHours": "Morning work hours",
+    "afternoonHours": "Afternoon work hours",
+    "drivingHours": "Driving hours",
+    "totalHours": "Total hours worked",
+    "warning": "Warning: high workload (> 8h)",
+    "fatigue": "Fatigue level",
+    "fatigueLevels": {
+      "1": "Very low",
+      "2": "Low",
+      "3": "Moderate",
+      "4": "High",
+      "5": "Very high"
+    }
+  },
+  "tasks": {
+    "title": "Task distribution",
+    "addTask": "Add a task",
+    "taskName": "Task name",
+    "duration": "Duration (h)",
+    "highValue": "High value",
+    "lowValue": "Low value",
+    "totalDuration": "Total duration",
+    "hvRatio": "High value ratio",
+    "tips": {
+      "good": "Great! You dedicate most of your time to high value tasks.",
+      "low": "Try to increase the share of high value tasks for more impact.",
+      "overwork": "Warning: overwork (> 8h/day)!"
+    }
+  },
+  "wellbeing": {
+    "title": "Wellbeing & Activities",
+    "meditations": {
+      "title": "Meditation",
+      "am": "Morning",
+      "pm": "Afternoon"
+    },
+    "breaks": "Breaks during the day (%)",
+    "sportHours": "Sport hours",
+    "manualHours": "Manual activity hours",
+    "energy": "Current energy",
+    "tips": {
+      "meditation": "Regular meditation helps reduce stress.",
+      "breaks": "Taking regular breaks improves focus.",
+      "activity": "One physical or manual activity per day is recommended."
+    }
+  },
+  "sleep": {
+    "title": "Sleep",
+    "bedTime": "Bedtime",
+    "wakeTime": "Wake-up time",
+    "insomniaDuration": "Insomnia duration (min)",
+    "duration": "Total sleep duration (h)",
+    "tips": {
+      "good": "Your sleep is optimal.",
+      "improve": "Try to sleep at least 7h per night for better wellbeing."
+    }
+  },
+  "entry": {
+    "save": "Save",
+    "saved": "Data saved!",
+    "continue": "Save and continue",
+    "dashboard": "View dashboard"
+  },
+  "notifications": {
+    "saveSuccess": "Data saved successfully!",
+    "saveError": "Error while saving. Please try again."
+  },
+  "dashboard": {
+    "employee": {
+      "title": "My dashboard",
+      "today": "Today",
+      "week": "Week",
+      "month": "Month",
+      "wellbeingScore": "Wellbeing score",
+      "energyLevel": "Energy level",
+      "sleepQuality": "Sleep quality",
+      "productivity": "Productivity",
+      "charts": {
+        "radar": "Wellbeing profile",
+        "sleepTrend": "Sleep & fatigue trend",
+        "meditationBars": "Meditations & breaks"
+      },
+      "aiTip": "AI tip"
+    },
+    "manager": {
+      "title": "Manager dashboard",
+      "period": "Period",
+      "team": "Team",
+      "allTeams": "All teams",
+      "exportReport": "Export PDF report",
+      "avgEnergy": "Average energy",
+      "avgSleep": "Average sleep",
+      "avgFatigue": "Average fatigue",
+      "hvRatio": "High value ratio",
+      "participants": "Participants",
+      "heatmap": "Risk map"
+    }
+  }
+} 

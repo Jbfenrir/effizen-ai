@@ -1,0 +1,279 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "submit": "Submit",
+    "reset": "Reset",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "refresh": "Refresh",
+    "sync": "Sync",
+    "offline": "Offline",
+    "online": "Online",
+    "apply": "Apply"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "entry": "Daily Entry",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "auth": {
+    "signInTitle": "Sign in to EffiZen-AI",
+    "signInSubtitle": "Enter your email to receive a sign-in link",
+    "email": "Email",
+    "emailPlaceholder": "your.email@company.com",
+    "sendMagicLink": "Send sign-in link",
+    "magicLinkSent": "Sign-in link sent! Check your email.",
+    "magicLinkError": "Error sending sign-in link",
+    "signOut": "Sign out",
+    "signOutConfirm": "Are you sure you want to sign out?"
+  },
+  "sleep": {
+    "title": "Sleep",
+    "bedTime": "Bedtime",
+    "wakeTime": "Wake time",
+    "insomniaDuration": "Insomnia duration (hours)",
+    "duration": "Total duration",
+    "hours": "hours",
+    "minutes": "minutes",
+    "quality": "Sleep quality",
+    "tips": {
+      "good": "Excellent! You're respecting the recommended 8 hours.",
+      "short": "Your sleep seems insufficient. Try going to bed earlier.",
+      "long": "You're sleeping a lot. Check your sleep quality."
+    }
+  },
+  "focus": {
+    "title": "Focus & Fatigue",
+    "morningHours": "Morning work hours (≤ 6h)",
+    "afternoonHours": "Afternoon work hours (≤ 6h)",
+    "drivingHours": "Driving hours",
+    "fatigue": "Fatigue level",
+    "fatigueLevels": {
+      "1": "Very energetic",
+      "2": "Energetic",
+      "3": "Normal",
+      "4": "Tired",
+      "5": "Very tired"
+    },
+    "totalHours": "Total hours",
+    "warning": "Warning: you've entered more than 8 hours of work."
+  },
+  "tasks": {
+    "title": "Task Distribution",
+    "addTask": "Add task",
+    "taskName": "Task name",
+    "duration": "Duration (hours)",
+    "highValue": "High value",
+    "lowValue": "Low value",
+    "totalDuration": "Total duration",
+    "hvRatio": "High value ratio",
+    "tips": {
+      "good": "Excellent high-value task ratio!",
+      "low": "Consider automating or delegating your low-value tasks.",
+      "overwork": "Limit yourself to 8 hours of work per day to maintain your well-being."
+    },
+    "delete": "Delete"
+  },
+  "wellbeing": {
+    "title": "Well-being & Energy",
+    "meditations": {
+      "title": "Meditations",
+      "am": "Morning",
+      "pm": "Evening"
+    },
+    "breaks": "Breaks taken (morning, noon, afternoon)",
+    "sportHours": "Sport hours",
+    "manualHours": "Manual activity hours",
+    "energy": "Energy level",
+    "energyLevel": "Current energy level",
+    "tips": {
+      "meditation": "Regular meditation improves concentration and reduces stress.",
+      "breaks": "Take regular breaks (morning, noon, afternoon) to maintain your productivity.",
+      "activity": "Physical and manual activity balances your day."
+    }
+  },
+  "dashboard": {
+    "employee": {
+      "title": "My Dashboard",
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "wellbeingScore": "Well-being Score",
+      "energyLevel": "Energy Level",
+      "sleepQuality": "Sleep Quality",
+      "productivity": "Productivity",
+      "aiTip": "AI Tip of the Day",
+      "charts": {
+        "radar": "Well-being Profile",
+        "sleepTrend": "Sleep Trend",
+        "fatigueTrend": "Fatigue Trend",
+        "meditationBars": "Meditations",
+        "breaksBars": "Breaks"
+      },
+      "seeDashboard": "See dashboard",
+      "saveAndContinue": "Save and continue"
+    },
+    "manager": {
+      "title": "Manager Dashboard",
+      "teamHealth": "Team Health",
+      "companyHealth": "Company Health",
+      "period": "Period",
+      "team": "Team",
+      "allTeams": "All teams",
+      "riskLevel": "Risk Level",
+      "avgEnergy": "Average Energy",
+      "avgSleep": "Average Sleep",
+      "avgFatigue": "Average Fatigue",
+      "hvRatio": "High Value Ratio",
+      "participants": "Participants",
+      "exportReport": "Export Report",
+      "heatmap": "Risk Map",
+      "noData": "No data available for this period"
+    },
+    "admin": {
+      "title": "Administrator Dashboard",
+      "subtitle": "Global system management EffiZen-AI",
+      "overview": "Overview",
+      "users": "Users",
+      "teams": "Teams",
+      "newUser": "New User",
+      "newTeam": "New Team",
+      "globalExport": "Global Export",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "systemHealth": "System Health",
+      "entriesToday": "Entries Today",
+      "systemAlerts": "System Alerts",
+      "criticalHealth": "Critical system health",
+      "lowEngagement": "Low user engagement rate. Check notifications and communication.",
+      "inactiveUsers": "Inactive users detected",
+      "excellentHealth": "System in excellent health",
+      "excellentEngagement": "Excellent user engagement rate. Keep it up!",
+      "searchUsers": "Search by email or team...",
+      "allRoles": "All roles",
+      "employees": "Employees",
+      "managers": "Managers",
+      "administrators": "Administrators",
+      "email": "Email",
+      "role": "Role",
+      "team": "Team",
+      "lastEntry": "Last Entry",
+      "entries": "Entries",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "never": "Never",
+      "viewDetails": "View details",
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "confirmDeactivateUser": "Are you sure you want to deactivate this user?",
+      "confirmDeactivateTeam": "Are you sure you want to deactivate this team?",
+      "employee": "Employee",
+      "manager": "Manager",
+      "administrator": "Administrator",
+      "members": "member(s)"
+    }
+  },
+  "ai": {
+    "recommendations": {
+      "energy": {
+        "low": "Your energy has been low for several days. Consider active rest or a micro-nap.",
+        "improving": "Your energy is improving! Keep it up."
+      },
+      "productivity": {
+        "hvLow": "Automate or delegate your low-value tasks to improve your productivity.",
+        "hvGood": "Excellent balance between high and low-value tasks!"
+      },
+      "sleep": {
+        "insufficient": "Your sleep seems insufficient. Try going to bed 30 minutes earlier.",
+        "good": "Your sleep rhythm is optimal!"
+      },
+      "breaks": {
+        "insufficient": "Take more breaks to maintain your concentration.",
+        "good": "You're taking your breaks well, keep it up!"
+      }
+    }
+  },
+  "notifications": {
+    "syncSuccess": "Data synchronized successfully",
+    "syncError": "Synchronization error",
+    "saveSuccess": "Data saved",
+    "saveError": "Save error",
+    "offlineMode": "Offline mode activated",
+    "onlineMode": "Connection restored"
+  },
+  "errors": {
+    "network": "Network error",
+    "unauthorized": "Unauthorized",
+    "notFound": "Not found",
+    "serverError": "Server error",
+    "validation": "Validation error",
+    "unknown": "Unknown error"
+  },
+  "userModal": {
+    "createTitle": "Create new user",
+    "editTitle": "Edit user",
+    "viewTitle": "User details",
+    "email": "Email address",
+    "role": "Role",
+    "team": "Team",
+    "noTeam": "No team",
+    "isActive": "Active user",
+    "sendInvitation": "Send email invitation",
+    "createdOn": "Created on:",
+    "lastEntry": "Last entry:",
+    "entriesCount": "Number of entries:",
+    "close": "Close",
+    "create": "Create",
+    "save": "Save",
+    "saving": "Saving..."
+  },
+  "teamModal": {
+    "createTitle": "Create new team",
+    "editTitle": "Edit team",
+    "viewTitle": "Team details",
+    "teamName": "Team name",
+    "description": "Description (optional)",
+    "responsibleManager": "Responsible manager",
+    "noManager": "No assigned manager",
+    "isActive": "Active team",
+    "createdOn": "Created on:",
+    "lastModified": "Last modified:",
+    "membersCount": "Number of members:",
+    "teamMembers": "Team members:",
+    "close": "Close",
+    "create": "Create",
+    "save": "Save",
+    "saving": "Saving..."
+  },
+  "entry": {
+    "dailyEntry": "Daily Entry",
+    "wellbeingScore": "Well-being score",
+    "save": "Save",
+    "saveAndContinue": "Save and continue",
+    "seeDashboard": "See dashboard"
+  }
+} 

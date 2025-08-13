@@ -1,0 +1,188 @@
+{
+  "common": {
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Attention",
+    "info": "Information",
+    "yes": "Oui",
+    "no": "Non",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "submit": "Valider",
+    "reset": "Réinitialiser",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "refresh": "Actualiser",
+    "sync": "Synchroniser",
+    "offline": "Hors ligne",
+    "online": "En ligne"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "entry": "Saisie",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "Inscription"
+  },
+  "auth": {
+    "signInTitle": "Connexion à EffiZen-AI",
+    "signInSubtitle": "Entrez votre email pour recevoir un lien de connexion",
+    "email": "Email",
+    "emailPlaceholder": "votre.email@entreprise.com",
+    "sendMagicLink": "Envoyer le lien de connexion",
+    "magicLinkSent": "Lien de connexion envoyé ! Vérifiez votre email.",
+    "magicLinkError": "Erreur lors de l'envoi du lien de connexion",
+    "signOut": "Se déconnecter",
+    "signOutConfirm": "Êtes-vous sûr de vouloir vous déconnecter ?"
+  },
+  "sleep": {
+    "title": "Sommeil",
+    "bedTime": "Heure du coucher",
+    "wakeTime": "Heure du lever",
+    "insomniaDuration": "Durée d'insomnie (heures)",
+    "duration": "Durée totale",
+    "hours": "heures",
+    "minutes": "minutes",
+    "quality": "Qualité du sommeil",
+    "tips": {
+      "good": "Excellent ! Vous respectez les 8h recommandées.",
+      "short": "Votre sommeil semble insuffisant. Essayez de vous coucher plus tôt.",
+      "long": "Vous dormez beaucoup. Vérifiez votre qualité de sommeil."
+    }
+  },
+  "focus": {
+    "title": "Focus & Fatigue",
+    "morningHours": "Heures de travail matin (≤ 6h)",
+    "afternoonHours": "Heures de travail après-midi (≤ 6h)",
+    "drivingHours": "Heures de conduite",
+    "fatigue": "Niveau de fatigue",
+    "fatigueLevels": {
+      "1": "Très énergique",
+      "2": "Énergique",
+      "3": "Normal",
+      "4": "Fatigué",
+      "5": "Très fatigué"
+    },
+    "totalHours": "Total des heures",
+    "warning": "Attention : vous avez saisi plus de 8h de travail."
+  },
+  "tasks": {
+    "title": "Répartition des tâches",
+    "addTask": "Ajouter une tâche",
+    "taskName": "Nom de la tâche",
+    "duration": "Durée (heures)",
+    "highValue": "Haute valeur",
+    "lowValue": "Faible valeur",
+    "totalDuration": "Durée totale",
+    "hvRatio": "Ratio haute valeur",
+    "tips": {
+      "good": "Excellent ratio de tâches à haute valeur !",
+      "low": "Considérez automatiser ou déléguer vos tâches à faible valeur.",
+      "overwork": "Limitez-vous à 8h de travail par jour pour maintenir votre bien-être."
+    }
+  },
+  "wellbeing": {
+    "title": "Bien-être & Énergie",
+    "meditations": {
+      "title": "Méditations",
+      "am": "Matin",
+      "pm": "Soir"
+    },
+    "breaks": "Pauses prises (%)",
+    "sportHours": "Heures de sport",
+    "manualHours": "Heures d'activité manuelle",
+    "energy": "Niveau d'énergie",
+    "energyLevel": "Niveau d'énergie actuel",
+    "tips": {
+      "meditation": "La méditation régulière améliore la concentration et réduit le stress.",
+      "breaks": "Prenez des pauses régulières pour maintenir votre productivité.",
+      "activity": "L'activité physique et manuelle équilibre votre journée."
+    }
+  },
+  "dashboard": {
+    "employee": {
+      "title": "Mon Tableau de Bord",
+      "today": "Aujourd'hui",
+      "week": "Cette semaine",
+      "month": "Ce mois",
+      "wellbeingScore": "Score Bien-être",
+      "energyLevel": "Niveau d'Énergie",
+      "sleepQuality": "Qualité du Sommeil",
+      "productivity": "Productivité",
+      "aiTip": "Conseil IA du jour",
+      "charts": {
+        "radar": "Profil Bien-être",
+        "sleepTrend": "Évolution Sommeil",
+        "fatigueTrend": "Évolution Fatigue",
+        "meditationBars": "Méditations",
+        "breaksBars": "Pauses"
+      }
+    },
+    "manager": {
+      "title": "Tableau de Bord Manager",
+      "teamHealth": "Santé de l'Équipe",
+      "companyHealth": "Santé Globale",
+      "period": "Période",
+      "team": "Équipe",
+      "allTeams": "Toutes les équipes",
+      "riskLevel": "Niveau de Risque",
+      "avgEnergy": "Énergie Moyenne",
+      "avgSleep": "Sommeil Moyen",
+      "avgFatigue": "Fatigue Moyenne",
+      "hvRatio": "Ratio Haute Valeur",
+      "participants": "Participants",
+      "exportReport": "Exporter Rapport",
+      "heatmap": "Carte de Risques",
+      "noData": "Aucune donnée disponible pour cette période"
+    }
+  },
+  "ai": {
+    "recommendations": {
+      "energy": {
+        "low": "Votre énergie est faible depuis plusieurs jours. Considérez un repos actif ou une micro-sieste.",
+        "improving": "Votre énergie s'améliore ! Continuez sur cette voie."
+      },
+      "productivity": {
+        "hvLow": "Automatisez ou déléguez vos tâches à faible valeur pour améliorer votre productivité.",
+        "hvGood": "Excellent équilibre entre tâches à haute et faible valeur !"
+      },
+      "sleep": {
+        "insufficient": "Votre sommeil semble insuffisant. Essayez de vous coucher 30 minutes plus tôt.",
+        "good": "Votre rythme de sommeil est optimal !"
+      },
+      "breaks": {
+        "insufficient": "Prenez plus de pauses pour maintenir votre concentration.",
+        "good": "Vous prenez bien vos pauses, continuez ainsi !"
+      }
+    }
+  },
+  "notifications": {
+    "syncSuccess": "Données synchronisées avec succès",
+    "syncError": "Erreur de synchronisation",
+    "saveSuccess": "Données sauvegardées",
+    "saveError": "Erreur de sauvegarde",
+    "offlineMode": "Mode hors ligne activé",
+    "onlineMode": "Connexion rétablie"
+  },
+  "errors": {
+    "network": "Erreur de réseau",
+    "unauthorized": "Non autorisé",
+    "notFound": "Non trouvé",
+    "serverError": "Erreur serveur",
+    "validation": "Erreur de validation",
+    "unknown": "Erreur inconnue"
+  }
+} 

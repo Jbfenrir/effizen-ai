@@ -1,0 +1,119 @@
+{
+  "app": {
+    "title": "EffiZen-AI",
+    "description": "Application de bien-être et productivité pour équipes"
+  },
+  "login": {
+    "title": "Connexion",
+    "subtitle": "Connectez-vous avec votre email professionnel",
+    "email": "Adresse email",
+    "submit": "Recevoir le lien magique",
+    "success": "Un lien de connexion a été envoyé à votre adresse email.",
+    "error": "Erreur lors de l'envoi du lien. Veuillez réessayer."
+  },
+  "header": {
+    "dashboard": "Tableau de bord",
+    "entry": "Saisie quotidienne",
+    "logout": "Déconnexion"
+  },
+  "focus": {
+    "title": "Focus & Fatigue",
+    "morningHours": "Heures de travail matin",
+    "afternoonHours": "Heures de travail après-midi",
+    "drivingHours": "Heures de conduite",
+    "totalHours": "Total heures travaillées",
+    "warning": "Attention : charge de travail élevée (> 8h)",
+    "fatigue": "Niveau de fatigue",
+    "fatigueLevels": {
+      "1": "Très faible",
+      "2": "Faible",
+      "3": "Modérée",
+      "4": "Élevée",
+      "5": "Très élevée"
+    }
+  },
+  "tasks": {
+    "title": "Répartition des tâches",
+    "addTask": "Ajouter une tâche",
+    "taskName": "Nom de la tâche",
+    "duration": "Durée (h)",
+    "highValue": "Haute valeur",
+    "lowValue": "Faible valeur",
+    "totalDuration": "Durée totale",
+    "hvRatio": "Ratio haute valeur",
+    "tips": {
+      "good": "Bravo ! Vous consacrez la majorité de votre temps à des tâches à forte valeur ajoutée.",
+      "low": "Essayez d'augmenter la part de tâches à haute valeur pour plus d'impact.",
+      "overwork": "Attention à la surcharge de travail (> 8h/jour) !"
+    }
+  },
+  "wellbeing": {
+    "title": "Bien-être & Activités",
+    "meditations": {
+      "title": "Méditation",
+      "am": "Matin",
+      "pm": "Après-midi"
+    },
+    "breaks": "Pauses dans la journée (%)",
+    "sportHours": "Heures de sport",
+    "manualHours": "Heures d'activité manuelle",
+    "energy": "Énergie actuelle",
+    "tips": {
+      "meditation": "La méditation régulière aide à réduire le stress.",
+      "breaks": "Prendre des pauses régulières améliore la concentration.",
+      "activity": "Une activité physique ou manuelle par jour est recommandée."
+    }
+  },
+  "sleep": {
+    "title": "Sommeil",
+    "bedTime": "Heure du coucher",
+    "wakeTime": "Heure du réveil",
+    "insomniaDuration": "Durée d'insomnie (min)",
+    "duration": "Durée totale de sommeil (h)",
+    "tips": {
+      "good": "Votre sommeil est optimal.",
+      "improve": "Essayez de dormir au moins 7h par nuit pour un meilleur bien-être."
+    }
+  },
+  "entry": {
+    "save": "Sauvegarder",
+    "saved": "Données sauvegardées !",
+    "continue": "Sauvegarder et continuer",
+    "dashboard": "Voir le tableau de bord"
+  },
+  "notifications": {
+    "saveSuccess": "Données sauvegardées avec succès !",
+    "saveError": "Erreur lors de la sauvegarde. Veuillez réessayer."
+  },
+  "dashboard": {
+    "employee": {
+      "title": "Mon tableau de bord",
+      "today": "Aujourd'hui",
+      "week": "Semaine",
+      "month": "Mois",
+      "wellbeingScore": "Score bien-être",
+      "energyLevel": "Niveau d'énergie",
+      "sleepQuality": "Qualité du sommeil",
+      "productivity": "Productivité",
+      "charts": {
+        "radar": "Profil bien-être",
+        "sleepTrend": "Évolution sommeil & fatigue",
+        "meditationBars": "Méditations & pauses"
+      },
+      "aiTip": "Conseil IA"
+    },
+    "manager": {
+      "title": "Tableau de bord manager",
+      "period": "Période",
+      "team": "Équipe",
+      "allTeams": "Toutes les équipes",
+      "exportReport": "Exporter le rapport PDF",
+      "avgEnergy": "Énergie moyenne",
+      "avgSleep": "Sommeil moyen",
+      "avgFatigue": "Fatigue moyenne",
+      "hvRatio": "Ratio haute valeur",
+      "participants": "Participants",
+      "heatmap": "Carte des risques"
+    }
+  }
+} 
