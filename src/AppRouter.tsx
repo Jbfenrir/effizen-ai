@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 import './index.css';
@@ -20,6 +20,14 @@ function AppRouter() {
   const { user, loading, signOut, isAdmin, isManager, isAuthenticated } = useAuth();
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
+  const navigate = useCallback((path: string) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      setCurrentPath(path);
+    }
+  }, []);
+
+  // Hook pour écouter les changements d'URL
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
@@ -29,12 +37,24 @@ function AppRouter() {
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
-  const navigate = (path: string) => {
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, '', path);
-      setCurrentPath(path);
+  // Hook pour gérer les redirections
+  useEffect(() => {
+    // Ne pas rediriger pendant le chargement ou si pas prêt
+    if (loading || !ready) return;
+    
+    // Ne pas rediriger si on est sur la page de callback
+    if (currentPath === '/auth/callback' || currentPath.includes('access_token')) return;
+    
+    // Redirection si non authentifié et pas sur login
+    if (!isAuthenticated && currentPath !== '/login') {
+      navigate('/login');
     }
-  };
+    
+    // Redirection si authentifié et sur login ou racine
+    if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, currentPath, loading, ready, navigate]);
 
   console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'User:', user);
 
@@ -54,19 +74,6 @@ function AppRouter() {
   if (currentPath === '/auth/callback' || currentPath.includes('access_token')) {
     return <AuthCallback />;
   }
-
-  // Utiliser useEffect pour les redirections pour éviter les boucles infinies
-  useEffect(() => {
-    // Redirection si non authentifié et pas sur login
-    if (!isAuthenticated && currentPath !== '/login' && !currentPath.includes('/auth')) {
-      navigate('/login');
-    }
-    
-    // Redirection si authentifié et sur login
-    if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, currentPath]);
 
   return (
     <div className="min-h-screen bg-off-white">
