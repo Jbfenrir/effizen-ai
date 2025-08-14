@@ -7,4 +7,4 @@ Pour tester l'application en local :
 
 (lancer l'app depuis le raccourci si besoin.)
 
-4- Puis mentionner "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"
+4- Puis mentionner à claude code "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"

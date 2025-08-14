@@ -23,7 +23,7 @@ export const useAuth = () => {
       const timeoutId = setTimeout(() => {
         console.warn('⏱️ useAuth: Timeout - Passage en mode non authentifié');
         setAuthState({ user: null, loading: false, error: null });
-      }, 5000); // 5 secondes de timeout
+      }, 10000); // 10 secondes de timeout pour laisser plus de temps à Supabase
       
       try {
         console.log('📡 useAuth: Appel à getSession...');
@@ -82,16 +82,21 @@ export const useAuth = () => {
         try {
           if (event === 'SIGNED_IN' && session?.user) {
             console.log('✅ useAuth: User signed in');
+            // Forcer un refresh de la page après connexion réussie
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 100);
             try {
               const user = await authService.getCurrentUser();
               setAuthState({ user, loading: false, error: null });
             } catch (userError) {
               // Fallback si le profil n'existe pas
+              const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
               setAuthState({ 
                 user: {
                   id: session.user.id,
                   email: session.user.email!,
-                  role: 'admin' // Pour jbgerberon@gmail.com, on sait que c'est admin
+                  role: isAdminEmail ? 'admin' : 'employee'
                 }, 
                 loading: false, 
                 error: null 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import SleepForm from '../components/SleepForm';
 import FocusForm from '../components/FocusForm';
 import TasksForm from '../components/TasksForm';
@@ -18,7 +17,10 @@ interface Toast {
 
 const EntryForm: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const navigate = (path: string) => {
+    window.history.pushState({}, '', path);
+    window.location.href = path;
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);

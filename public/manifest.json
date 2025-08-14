@@ -1,0 +1,17 @@
+{
+  "name": "EffiZen-AI",
+  "short_name": "EffiZen",
+  "description": "Application de bien-être au travail",
+  "theme_color": "#071827",
+  "background_color": "#EAEDE4",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

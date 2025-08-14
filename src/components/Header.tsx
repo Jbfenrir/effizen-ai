@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Menu, 
@@ -17,7 +16,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
+  const currentPath = window.location.pathname;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // SUPPRESSION: const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -69,24 +68,37 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2">
+          <a 
+            href="/dashboard" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/dashboard');
+              window.location.href = '/dashboard';
+            }}
+            className="flex items-center space-x-2 cursor-pointer"
+          >
             <div className="w-8 h-8 bg-lime-green rounded-lg flex items-center justify-center">
               <span className="text-dark-blue font-bold text-sm">E</span>
             </div>
             <span className="text-xl font-bold">EffiZen-AI</span>
-          </Link>
+          </a>
 
           {/* Navigation desktop */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
+              const isActive = currentPath === item.href;
               
               return (
-                <Link
+                <a
                   key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 ${
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.history.pushState({}, '', item.href);
+                    window.location.href = item.href;
+                  }}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer ${
                     isActive 
                       ? 'bg-blue-gray text-white' 
                       : 'text-metallic-gray hover:text-white hover:bg-blue-gray'
@@ -94,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
                 >
                   <Icon size={18} />
                   <span>{item.name}</span>
-                </Link>
+                </a>
               );
             })}
           </nav>
@@ -158,14 +170,19 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
             <nav className="flex flex-col space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.href;
+                const isActive = currentPath === item.href;
                 
                 return (
-                  <Link
+                  <a
                     key={item.name}
-                    to={item.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 ${
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMenuOpen(false);
+                      window.history.pushState({}, '', item.href);
+                      window.location.href = item.href;
+                    }}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer ${
                       isActive 
                         ? 'bg-blue-gray text-white' 
                         : 'text-metallic-gray hover:text-white hover:bg-blue-gray'
@@ -173,7 +190,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
                   >
                     <Icon size={18} />
                     <span>{item.name}</span>
-                  </Link>
+                  </a>
                 );
               })}
             </nav>
