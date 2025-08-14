@@ -62,9 +62,10 @@ public.team_stats (id, team, date, avg_metrics, risk_level, timestamps)
 - **Email :** jbgerberon@gmail.com
 - **Rôle :** admin
 - **Accès :** Dashboard administrateur complet
-- **Connexion :** Password recovery via Supabase (compte existant)
+- **Connexion :** Password: mtuw xsol vahe sgkn (clé d'application Gmail)
 - **User ID Supabase :** 8ac44380-8445-49a8-b4a9-16f602d0e7d4
 - **Statut :** ✅ Compte créé et fonctionnel
+- **Dashboard Supabase :** https://supabase.com/dashboard (accès disponible)
 
 ## 🎨 CHARTE GRAPHIQUE
 
@@ -209,11 +210,13 @@ npm run lint
 7. **PWA en développement :** Désactivé pour éviter conflits
 8. **Authentification :** Double mode (mot de passe + magic link)
 9. **Rate limit email :** Résolu avec connexion par mot de passe
-10. **Chargement infini :** Timeout de sécurité ajouté
+10. **Chargement infini :** Timeout de sécurité ajouté (10s)
 11. **Build TypeScript errors :** Modifié package.json pour build sans vérification TS
 12. **Conflits Git merge :** Résolu avec git reset --hard et push --force
 13. **Nom projet Vercel :** Utilisé "effizen-ai-prod" pour éviter conflits existants
 14. **Token GitHub :** Authentification réussie avec Personal Access Token
+15. **useLocation error (14/08/2025) :** Supprimé React Router DOM dans Header et EntryForm
+16. **Erreurs 404 PWA :** Ajouté manifest.json et corrigé les références
 
 ### Problèmes spécifiques Windows/WSL
 - **npm install :** Problèmes de permissions → utiliser WSL uniquement
@@ -421,7 +424,7 @@ git push -u origin main --force  # Forcer le push
 
 ---
 
-**Dernière mise à jour :** 2025-08-13  
-**Version :** 1.2 - Déployé en Production + Guide complet  
+**Dernière mise à jour :** 2025-08-14  
+**Version :** 1.3 - Correction Router et PWA + Auth améliorée  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)
