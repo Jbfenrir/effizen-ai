@@ -30,11 +30,13 @@ function AppRouter() {
   }, []);
 
   const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
-    setCurrentPath(path);
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      setCurrentPath(path);
+    }
   };
 
-  console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated);
+  console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'User:', user);
 
   // Afficher un loader si i18n ou auth ne sont pas prêts
   if (!ready || loading) {
@@ -53,35 +55,36 @@ function AppRouter() {
     return <AuthCallback />;
   }
 
-  // Redirection si non authentifié
-  if (!isAuthenticated && currentPath !== '/login') {
-    navigate('/login');
-  }
-
-  // Redirection si authentifié et sur login
-  if (isAuthenticated && currentPath === '/login') {
-    navigate('/dashboard');
-  }
+  // Utiliser useEffect pour les redirections pour éviter les boucles infinies
+  useEffect(() => {
+    // Redirection si non authentifié et pas sur login
+    if (!isAuthenticated && currentPath !== '/login' && !currentPath.includes('/auth')) {
+      navigate('/login');
+    }
+    
+    // Redirection si authentifié et sur login
+    if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, currentPath]);
 
   return (
     <div className="min-h-screen bg-off-white">
       {user && <Header user={user} onSignOut={signOut} />}
       
       <main className="container mx-auto px-4 py-8">
-        {currentPath === '/login' && !isAuthenticated && <NewLoginPage />}
-        {currentPath === '/dashboard' && isAuthenticated && (
+        {/* Page de connexion */}
+        {(currentPath === '/login' || (!isAuthenticated && currentPath === '/')) && <NewLoginPage />}
+        
+        {/* Dashboard - uniquement si authentifié */}
+        {isAuthenticated && (currentPath === '/dashboard' || currentPath === '/') && (
           isAdmin ? <DashboardAdmin /> :
           isManager ? <DashboardManager /> :
           <DashboardEmployee />
         )}
-        {currentPath === '/entry' && isAuthenticated && <EntryForm />}
-        {currentPath === '/' && (
-          isAuthenticated ? (
-            isAdmin ? <DashboardAdmin /> :
-            isManager ? <DashboardManager /> :
-            <DashboardEmployee />
-          ) : <NewLoginPage />
-        )}
+        
+        {/* Formulaire d'entrée - uniquement si authentifié */}
+        {isAuthenticated && currentPath === '/entry' && <EntryForm />}
       </main>
     </div>
   );

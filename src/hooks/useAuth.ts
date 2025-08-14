@@ -82,10 +82,7 @@ export const useAuth = () => {
         try {
           if (event === 'SIGNED_IN' && session?.user) {
             console.log('✅ useAuth: User signed in');
-            // Forcer un refresh de la page après connexion réussie
-            setTimeout(() => {
-              window.location.href = '/dashboard';
-            }, 100);
+            // Ne pas forcer de redirection ici, laisser AppRouter gérer
             try {
               const user = await authService.getCurrentUser();
               setAuthState({ user, loading: false, error: null });
