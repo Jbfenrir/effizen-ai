@@ -19,7 +19,7 @@ const EntryForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
-    window.location.href = path;
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
   const [isLoading, setIsLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);

@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
             onClick={(e) => {
               e.preventDefault();
               window.history.pushState({}, '', '/dashboard');
-              window.location.href = '/dashboard';
+              window.dispatchEvent(new PopStateEvent('popstate'));
             }}
             className="flex items-center space-x-2 cursor-pointer"
           >
@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     window.history.pushState({}, '', item.href);
-                    window.location.href = item.href;
+                    window.dispatchEvent(new PopStateEvent('popstate'));
                   }}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer ${
                     isActive 
@@ -180,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
                       e.preventDefault();
                       setIsMenuOpen(false);
                       window.history.pushState({}, '', item.href);
-                      window.location.href = item.href;
+                      window.dispatchEvent(new PopStateEvent('popstate'));
                     }}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer ${
                       isActive 

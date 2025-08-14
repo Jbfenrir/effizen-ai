@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import AppRouter from './AppRouter'; // Utiliser AppRouter au lieu de App
 import ErrorBoundary from './components/ErrorBoundary';
 import './services/debug-auth';
+import './utils/navigation'; // Import pour rendre navigateTo global
 
 console.log('🚀 Application EffiZen-AI démarrage...');
 
