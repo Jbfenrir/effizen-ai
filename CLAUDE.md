@@ -217,6 +217,8 @@ npm run lint
 14. **Token GitHub :** Authentification réussie avec Personal Access Token
 15. **useLocation error (14/08/2025) :** Supprimé React Router DOM dans Header et EntryForm
 16. **Erreurs 404 PWA :** Ajouté manifest.json et corrigé les références
+17. **Hooks React errors :** Réorganisé les hooks dans AppRouter avec useCallback
+18. **Navigation SPA :** Remplacé window.location.href par PopStateEvent
 
 ### Problèmes spécifiques Windows/WSL
 - **npm install :** Problèmes de permissions → utiliser WSL uniquement
@@ -319,21 +321,47 @@ npm run lint
 1. **"npm not found"** → Utiliser WSL : `wsl bash -c "commandes"`
 2. **"Invalid login credentials"** → Utiliser password recovery Supabase
 3. **"Rate limit exceeded"** → Utiliser connexion par mot de passe
-4. **Chargement infini** → Vérifier timeout dans useAuth (5s)
+4. **Chargement infini** → Vérifier timeout dans useAuth (10s)
 5. **React Router errors** → AppRouter personnalisé est utilisé
 6. **"Project name already exists" Vercel** → Utiliser nom unique (effizen-ai-prod)
 7. **Build TypeScript errors** → Utiliser `npm run build` (sans vérification TS)
 8. **Git authentication failed** → Utiliser Personal Access Token GitHub
 9. **Merge conflicts divergent branches** → `git reset --hard HEAD` + `git push --force`
 
-### Architecture actuelle
-- **Router :** AppRouter personnalisé (pas React Router v7)
-- **Auth :** Double mode (password + magic link)
+### ⚠️ PROBLÈME CRITIQUE NON RÉSOLU (14/08/2025)
+
+**Symptôme :** Boucle d'authentification infinie
+- Connexion → Chargement infini (timeout 10s) → Retour login
+- Compte admin existe dans Supabase (confirmé)
+- Variables d'environnement Vercel OK (confirmé)
+- Même comportement local et production
+
+**Diagnostic final :** Le problème n'est PAS dans la navigation ou les hooks React.
+L'authentification Supabase réussit mais la récupération du profil utilisateur depuis la table `profiles` échoue probablement à cause des politiques RLS (Row Level Security).
+
+**Actions tentées sans succès :**
+- ✅ Correction erreurs Router (useLocation)
+- ✅ Correction erreurs PWA (manifest.json)
+- ✅ Réorganisation hooks React
+- ✅ Navigation SPA sans rechargement
+- ✅ Timeout augmenté à 10 secondes
+- ✅ Vérification variables d'environnement Vercel
+
+**PROCHAINES ÉTAPES PRIORITAIRES :**
+1. **Créer un utilisateur test** dans Supabase (autre que admin)
+2. **Tester avec le nouvel utilisateur** pour isoler si le problème est spécifique à l'admin
+3. **Vérifier les politiques RLS** sur la table `profiles`
+4. **Envisager contournement temporaire** : authentification sans table profiles
+
+### Architecture actuelle (14/08/2025)
+- **Router :** AppRouter personnalisé avec navigation SPA (PopStateEvent)
+- **Auth :** Double mode (password + magic link), timeout 10s
 - **UI :** NewLoginPage avec onglets
-- **PWA :** Désactivé en développement, actif en production
-- **Base :** Supabase avec RLS configuré
-- **Production :** Vercel avec build automatique depuis GitHub
+- **PWA :** manifest.json configuré, icônes PWA ajoutées
+- **Base :** Supabase avec RLS configuré (potentiel point de blocage)
+- **Production :** Vercel avec build automatique + rewrites SPA
 - **Repository :** GitHub avec authentification par token
+- **Navigation :** utils/navigation.ts pour éviter rechargements de page
 
 ### Workflow de debugging
 1. Vérifier les logs console (F12)
@@ -424,7 +452,82 @@ git push -u origin main --force  # Forcer le push
 
 ---
 
+---
+
+## 📋 SESSION DU 14/08/2025 - RÉCAPITULATIF COMPLET
+
+### 🎯 Objectif de la session
+Résoudre le problème de chargement infini après authentification qui empêche l'accès au dashboard.
+
+### 🔍 Diagnostic réalisé
+1. **Problème identifié** : Boucle Connexion → Chargement infini → Timeout → Retour login
+2. **Éléments vérifiés** :
+   - ✅ Utilisateur admin existe dans Supabase (statut: Confirmed)
+   - ✅ Profil admin existe dans table `profiles` (rôle: admin)
+   - ✅ Variables d'environnement Vercel configurées
+   - ✅ Même comportement en local et production
+
+### 🛠️ Actions correctives réalisées
+1. **Corrections techniques** :
+   - Suppression erreurs React Router (useLocation/Link)
+   - Ajout manifest.json et corrections PWA
+   - Réorganisation hooks React dans AppRouter
+   - Navigation SPA sans rechargement (PopStateEvent)
+   - Timeout auth augmenté de 5s à 10s
+   - Ajout vercel.json rewrites pour SPA
+
+2. **Fichiers modifiés** :
+   - `src/components/Header.tsx` : Navigation SPA
+   - `src/pages/EntryForm.tsx` : Navigation SPA
+   - `src/AppRouter.tsx` : Hooks réorganisés + useCallback
+   - `src/hooks/useAuth.ts` : Timeout 10s + gestion améliorée
+   - `vercel.json` : Rewrites SPA
+   - `public/manifest.json` : Nouveau fichier PWA
+   - `src/utils/navigation.ts` : Nouveau système de navigation
+   - `index.html` : Références manifest corrigées
+
+### 📊 Résultats obtenus
+- ❌ **Problème persistant** : Boucle d'authentification non résolue
+- ✅ **Améliorations** : Navigation SPA, corrections techniques
+- ✅ **Stabilité** : Application plus robuste techniquement
+
+### 🔬 Diagnostic final
+**Hypothèse principale** : Le problème réside dans les politiques RLS (Row Level Security) de Supabase qui bloquent la récupération du profil utilisateur depuis la table `profiles`.
+
+L'authentification Supabase fonctionne (utilisateur connecté) mais l'application n'arrive pas à récupérer les métadonnées du profil, ce qui maintient l'état `loading: true`.
+
+### 🎯 PLAN POUR LA PROCHAINE SESSION
+
+**Action #1 - Test utilisateur (PRIORITÉ 1)**
+```bash
+# Dans Supabase Dashboard → Authentication → Users
+1. Cliquer "Invite user"
+2. Email: test@effizen-ai.com
+3. Role: employee (pas admin)
+4. Créer entrée dans table profiles
+5. Tester connexion avec ce nouvel utilisateur
+```
+
+**Action #2 - Vérification RLS**
+```sql
+# Dans Supabase → SQL Editor
+SELECT * FROM profiles WHERE id = 'USER_ID_TEST';
+# Vérifier si les politiques RLS bloquent la récupération
+```
+
+**Action #3 - Contournement temporaire**
+Si RLS est le problème, modifier `useAuth.ts` pour utiliser un fallback sans table `profiles` pour débloquer l'application.
+
+### 📁 État des fichiers
+- **Repository** : https://github.com/Jbfenrir/effizen-ai
+- **Dernier commit** : Fix navigation SPA (19e74d8)
+- **Build Vercel** : Succès, déployé automatiquement
+- **Local** : http://localhost:3001/ (npm run dev)
+
+---
+
 **Dernière mise à jour :** 2025-08-14  
-**Version :** 1.3 - Correction Router et PWA + Auth améliorée  
+**Version :** 1.4 - Session debugging complète + Plan résolution  
 **URL Production :** https://effizen-ai-prod.vercel.app  
-**Maintainer :** JB Gerberon (jbgerberon@gmail.com)
+**Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
+**Status :** 🚨 Problème critique d'authentification non résolu
