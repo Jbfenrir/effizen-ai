@@ -119,4 +119,17 @@ playwright-report/
 playwright/.cache/
 
 # Vite
-.vite/ 
+.vite/
+
+# Security - Scripts contenant des données sensibles
+setup-database-*.sql
+fix-rls-*.sql
+fix-database-*.sql
+test-*.js
+*-READY.sql
+*-FIXED.sql
+*.secret.sql
+
+# Documentation sensible
+*-credentials.*
+*-secrets.* 
