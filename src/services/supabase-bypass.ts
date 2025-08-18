@@ -8,11 +8,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Variables Supabase manquantes, utilisation des valeurs par défaut');
 }
 
+// Créer une clé de stockage différente pour local vs production
+const storageKey = window.location.hostname === 'localhost' 
+  ? 'supabase.auth.token.local' 
+  : 'supabase.auth.token.prod';
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
+    storageKey: storageKey, // Clé de stockage séparée
   },
 });
 
