@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { authService, type AuthUser } from '../services/supabase';
+// TEMPORAIRE: Utilisation du service bypass pour contourner les problèmes RLS
+import { authService, type AuthUser } from '../services/supabase-bypass';
+// import { authService, type AuthUser } from '../services/supabase';
 
 interface AuthState {
   user: AuthUser | null;

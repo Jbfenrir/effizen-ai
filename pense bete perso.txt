@@ -8,3 +8,5 @@ Pour tester l'application en local :
 (lancer l'app depuis le raccourci si besoin.)
 
 4- Puis mentionner à claude code "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"
+
+- - - -  claude_runbook.md m (Il s'agit de l'analyse et des suggestions effectuées par Tchat GPT sur la base du code fourni par claude code).

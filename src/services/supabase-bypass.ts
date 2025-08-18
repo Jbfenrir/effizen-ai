@@ -24,7 +24,7 @@ export interface AuthUser {
   team?: string;
 }
 
-// Service d'authentification
+// Service d'authentification avec BYPASS de la table profiles
 export const authService = {
   // Connexion avec email/mot de passe
   async signInWithPassword(email: string, password: string): Promise<{ error: any }> {
@@ -75,96 +75,41 @@ export const authService = {
     return supabase.auth.onAuthStateChange(callback);
   },
 
-  // Obtenir l'utilisateur actuel
+  // VERSION BYPASS - Obtenir l'utilisateur actuel SANS accéder à la table profiles
   async getCurrentUser(): Promise<AuthUser | null> {
+    console.log('🚀 BYPASS MODE: getCurrentUser sans table profiles');
+    
     const { data: { user }, error } = await supabase.auth.getUser();
     
     if (error || !user) {
-      console.log('❌ getCurrentUser: Pas d\'utilisateur Supabase', error);
+      console.log('❌ BYPASS: Pas d\'utilisateur Supabase', error);
       return null;
     }
 
-    console.log('✅ getCurrentUser: Utilisateur Supabase trouvé:', user.email);
+    console.log('✅ BYPASS: Utilisateur Supabase trouvé:', user.email);
 
-    // Essayer de récupérer les métadonnées utilisateur depuis la table profiles
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, team')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.warn('⚠️ getCurrentUser: Erreur récupération profil:', profileError);
-        
-        // Si le profil n'existe pas, créer un profil par défaut
-        if (profileError.code === 'PGRST116') { // Code pour "no rows found"
-          console.log('📝 getCurrentUser: Création du profil par défaut');
-          
-          // Déterminer le rôle par défaut basé sur l'email
-          const defaultRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-          
-          // Créer le profil
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              email: user.email!,
-              role: defaultRole,
-              is_active: true,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('❌ getCurrentUser: Échec création profil:', createError);
-            // Fallback sans profil
-            return {
-              id: user.id,
-              email: user.email!,
-              role: defaultRole as 'employee' | 'manager' | 'admin',
-              team: undefined,
-            };
-          }
-
-          return {
-            id: user.id,
-            email: user.email!,
-            role: newProfile.role || defaultRole,
-            team: newProfile.team,
-          };
-        }
-
-        // Pour toute autre erreur, utiliser le fallback
-        const fallbackRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-        return {
-          id: user.id,
-          email: user.email!,
-          role: fallbackRole as 'employee' | 'manager' | 'admin',
-          team: undefined,
-        };
-      }
-
-      console.log('✅ getCurrentUser: Profil trouvé:', profile);
-      
-      return {
-        id: user.id,
-        email: user.email!,
-        role: profile?.role || 'employee',
-        team: profile?.team,
-      };
-    } catch (err) {
-      console.error('🚨 getCurrentUser: Erreur inattendue:', err);
-      
-      // Fallback complet
-      const fallbackRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-      return {
-        id: user.id,
-        email: user.email!,
-        role: fallbackRole as 'employee' | 'manager' | 'admin',
-        team: undefined,
-      };
+    // BYPASS: Déterminer le rôle basé sur l'email uniquement
+    // Pas d'accès à la table profiles pour éviter les problèmes RLS
+    let role: 'employee' | 'manager' | 'admin' = 'employee';
+    
+    // Liste des emails admin (à adapter selon vos besoins)
+    const adminEmails = ['jbgerberon@gmail.com'];
+    const managerEmails: string[] = []; // Ajouter les emails des managers si nécessaire
+    
+    if (adminEmails.includes(user.email || '')) {
+      role = 'admin';
+    } else if (managerEmails.includes(user.email || '')) {
+      role = 'manager';
     }
+
+    console.log('✅ BYPASS: Rôle déterminé:', role);
+
+    return {
+      id: user.id,
+      email: user.email!,
+      role: role,
+      team: undefined, // Pas d'équipe en mode bypass
+    };
   },
 };
 
@@ -241,29 +186,19 @@ export const entriesService = {
   },
 };
 
-// Service pour les profils utilisateur
+// Service pour les profils utilisateur (gardé pour compatibilité mais éviter de l'utiliser)
 export const profilesService = {
   // Créer ou mettre à jour un profil
   async upsertProfile(profile: Database['public']['Tables']['profiles']['Insert']) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .upsert(profile)
-      .select()
-      .single();
-
-    return { data, error };
+    console.warn('⚠️ BYPASS MODE: upsertProfile appelé mais ignoré');
+    return { data: null, error: null };
   },
 
   // Récupérer un profil
   async getProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    return { data, error };
+    console.warn('⚠️ BYPASS MODE: getProfile appelé mais retourne null');
+    return { data: null, error: null };
   },
 };
 
-export default supabase; 
+export default supabase;
