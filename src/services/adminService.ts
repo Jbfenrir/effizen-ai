@@ -1,4 +1,6 @@
-import { supabase } from './supabase';
+// TEMPORAIRE: Utilisation du service bypass
+import { supabase } from './supabase-bypass';
+// import { supabase } from './supabase';
 import type { 
   User, 
   Team, 

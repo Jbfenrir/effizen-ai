@@ -21,17 +21,17 @@ export const useAuth = () => {
     const checkSession = async () => {
       console.log('🔍 useAuth: Début de la vérification de session');
       
-      // Timeout pour éviter le blocage infini
-      const timeoutId = setTimeout(() => {
-        console.warn('⏱️ useAuth: Timeout - Passage en mode non authentifié');
-        setAuthState({ user: null, loading: false, error: null });
-      }, 10000); // 10 secondes de timeout pour laisser plus de temps à Supabase
+      // Timeout désactivé temporairement pour éviter la déconnexion automatique
+      // const timeoutId = setTimeout(() => {
+      //   console.warn('⏱️ useAuth: Timeout - Passage en mode non authentifié');
+      //   setAuthState({ user: null, loading: false, error: null });
+      // }, 10000); // 10 secondes de timeout pour laisser plus de temps à Supabase
       
       try {
         console.log('📡 useAuth: Appel à getSession...');
         const { session, error } = await authService.getSession();
         
-        clearTimeout(timeoutId);
+        // clearTimeout(timeoutId);
         
         if (error) {
           console.error('❌ useAuth: Erreur getSession:', error);
@@ -64,7 +64,7 @@ export const useAuth = () => {
         }
       } catch (error) {
         console.error('🚨 useAuth: Erreur catch:', error);
-        clearTimeout(timeoutId);
+        // clearTimeout(timeoutId);
         setAuthState({ 
           user: null, 
           loading: false, 
