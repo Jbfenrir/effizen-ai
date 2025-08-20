@@ -9,6 +9,10 @@ interface AuthState {
   error: string | null;
 }
 
+// Variable globale pour éviter les vérifications multiples simultanées
+let globalCheckInProgress = false;
+let globalLastCheckTime = 0;
+
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -25,6 +29,34 @@ export const useAuth = () => {
     const checkSession = async () => {
       if (!isSubscribed) return;
       
+      // Éviter les vérifications simultanées (importantes avec StrictMode)
+      const now = Date.now();
+      if (globalCheckInProgress || (now - globalLastCheckTime < 500)) {
+        console.log('⏸️ useAuth: Vérification déjà en cours, ignorée');
+        // Si une vérification est déjà en cours, attendre un peu et récupérer l'état
+        setTimeout(() => {
+          if (isSubscribed) {
+            const cachedSession = sessionStorage.getItem('effizen_auth_cache');
+            if (cachedSession) {
+              try {
+                const cached = JSON.parse(cachedSession);
+                if (cached.user) {
+                  setAuthState({ user: cached.user, loading: false, error: null });
+                } else {
+                  setAuthState({ user: null, loading: false, error: null });
+                }
+              } catch {
+                setAuthState({ user: null, loading: false, error: null });
+              }
+            }
+          }
+        }, 100);
+        return;
+      }
+      
+      globalCheckInProgress = true;
+      globalLastCheckTime = now;
+      
       sessionCheckCount++;
       console.log(`🔍 useAuth: Vérification de session #${sessionCheckCount}/${maxSessionChecks}`);
       
@@ -32,6 +64,7 @@ export const useAuth = () => {
       if (sessionCheckCount > maxSessionChecks) {
         console.error('🚨 useAuth: Trop de tentatives de vérification de session');
         setAuthState({ user: null, loading: false, error: 'Session check limit exceeded' });
+        globalCheckInProgress = false;
         return;
       }
       
@@ -51,39 +84,57 @@ export const useAuth = () => {
           console.log('✅ useAuth: Session trouvée, récupération utilisateur...');
           try {
             const user = await authService.getCurrentUser();
-            if (!isSubscribed) return;
+            if (!isSubscribed) {
+              globalCheckInProgress = false;
+              return;
+            }
             
             console.log('👤 useAuth: Utilisateur récupéré:', user);
+            // Mettre en cache la session
+            sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user, timestamp: Date.now() }));
             setAuthState({ user, loading: false, error: null });
           } catch (userError) {
-            if (!isSubscribed) return;
+            if (!isSubscribed) {
+              globalCheckInProgress = false;
+              return;
+            }
             
             console.warn('⚠️ useAuth: Erreur récupération profil, utilisation des données de base');
             // Fallback si le profil n'existe pas
             const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
+            const fallbackUser = {
+              id: session.user.id,
+              email: session.user.email!,
+              role: isAdminEmail ? 'admin' : 'employee' as 'admin' | 'employee'
+            };
+            // Mettre en cache la session
+            sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user: fallbackUser, timestamp: Date.now() }));
             setAuthState({ 
-              user: {
-                id: session.user.id,
-                email: session.user.email!,
-                role: isAdminEmail ? 'admin' : 'employee'
-              }, 
+              user: fallbackUser, 
               loading: false, 
               error: null 
             });
           }
         } else {
           console.log('ℹ️ useAuth: Pas de session active');
+          sessionStorage.removeItem('effizen_auth_cache');
           setAuthState({ user: null, loading: false, error: null });
         }
       } catch (error) {
-        if (!isSubscribed) return;
+        if (!isSubscribed) {
+          globalCheckInProgress = false;
+          return;
+        }
         
         console.error('🚨 useAuth: Erreur catch:', error);
+        sessionStorage.removeItem('effizen_auth_cache');
         setAuthState({ 
           user: null, 
           loading: false, 
           error: error instanceof Error ? error.message : 'Authentication error' 
         });
+      } finally {
+        globalCheckInProgress = false;
       }
     };
 
@@ -93,6 +144,35 @@ export const useAuth = () => {
       isSubscribed = false;
     };
   }, []); // Fin du premier useEffect
+
+  // Gestionnaire pour les changements de visibilité de l'onglet
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('👁️ useAuth: Onglet redevenu visible');
+        // Vérifier le cache avant de faire une nouvelle vérification
+        const cachedSession = sessionStorage.getItem('effizen_auth_cache');
+        if (cachedSession) {
+          try {
+            const cached = JSON.parse(cachedSession);
+            // Si le cache a moins de 5 minutes, l'utiliser
+            if (cached.timestamp && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+              console.log('📦 useAuth: Utilisation du cache de session');
+              if (cached.user) {
+                setAuthState({ user: cached.user, loading: false, error: null });
+              }
+              return;
+            }
+          } catch {
+            // Ignorer les erreurs de parsing
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Second useEffect pour écouter les changements d'authentification
   useEffect(() => {
