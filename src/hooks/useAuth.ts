@@ -17,21 +17,29 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
+    let isSubscribed = true;
+    let sessionCheckCount = 0;
+    const maxSessionChecks = 3; // Limite pour éviter les boucles infinies
+    
     // Vérifier la session au chargement
     const checkSession = async () => {
-      console.log('🔍 useAuth: Début de la vérification de session');
+      if (!isSubscribed) return;
       
-      // Timeout désactivé temporairement pour éviter la déconnexion automatique
-      // const timeoutId = setTimeout(() => {
-      //   console.warn('⏱️ useAuth: Timeout - Passage en mode non authentifié');
-      //   setAuthState({ user: null, loading: false, error: null });
-      // }, 10000); // 10 secondes de timeout pour laisser plus de temps à Supabase
+      sessionCheckCount++;
+      console.log(`🔍 useAuth: Vérification de session #${sessionCheckCount}/${maxSessionChecks}`);
+      
+      // Protection contre les boucles infinies
+      if (sessionCheckCount > maxSessionChecks) {
+        console.error('🚨 useAuth: Trop de tentatives de vérification de session');
+        setAuthState({ user: null, loading: false, error: 'Session check limit exceeded' });
+        return;
+      }
       
       try {
         console.log('📡 useAuth: Appel à getSession...');
         const { session, error } = await authService.getSession();
         
-        // clearTimeout(timeoutId);
+        if (!isSubscribed) return;
         
         if (error) {
           console.error('❌ useAuth: Erreur getSession:', error);
@@ -43,16 +51,21 @@ export const useAuth = () => {
           console.log('✅ useAuth: Session trouvée, récupération utilisateur...');
           try {
             const user = await authService.getCurrentUser();
+            if (!isSubscribed) return;
+            
             console.log('👤 useAuth: Utilisateur récupéré:', user);
             setAuthState({ user, loading: false, error: null });
           } catch (userError) {
+            if (!isSubscribed) return;
+            
             console.warn('⚠️ useAuth: Erreur récupération profil, utilisation des données de base');
             // Fallback si le profil n'existe pas
+            const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
             setAuthState({ 
               user: {
                 id: session.user.id,
                 email: session.user.email!,
-                role: 'employee' // Rôle par défaut
+                role: isAdminEmail ? 'admin' : 'employee'
               }, 
               loading: false, 
               error: null 
@@ -63,8 +76,9 @@ export const useAuth = () => {
           setAuthState({ user: null, loading: false, error: null });
         }
       } catch (error) {
+        if (!isSubscribed) return;
+        
         console.error('🚨 useAuth: Erreur catch:', error);
-        // clearTimeout(timeoutId);
         setAuthState({ 
           user: null, 
           loading: false, 
@@ -74,12 +88,36 @@ export const useAuth = () => {
     };
 
     checkSession();
+    
+    return () => {
+      isSubscribed = false;
+    };
+  }, []); // Fin du premier useEffect
 
-    // Écouter les changements d'authentification
+  // Second useEffect pour écouter les changements d'authentification
+  useEffect(() => {
+    let isSubscribed = true;
+    let lastEventTime = 0;
+    const eventDebounceTime = 1000; // 1 seconde entre événements identiques
+    
     const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
+        if (!isSubscribed) return;
+        
+        // Debounce pour éviter les événements répétés
+        const now = Date.now();
+        if (now - lastEventTime < eventDebounceTime && event !== 'SIGNED_OUT') {
+          console.log('🔕 useAuth: Événement ignoré (trop rapide):', event);
+          return;
+        }
+        lastEventTime = now;
+        
         console.log('🔔 useAuth: Auth state change:', event);
-        setAuthState(prev => ({ ...prev, loading: true }));
+        
+        // Ne pas mettre loading à true pour TOKEN_REFRESHED
+        if (event !== 'TOKEN_REFRESHED') {
+          setAuthState(prev => ({ ...prev, loading: true }));
+        }
 
         try {
           if (event === 'SIGNED_IN' && session?.user) {
@@ -87,8 +125,12 @@ export const useAuth = () => {
             // Ne pas forcer de redirection ici, laisser AppRouter gérer
             try {
               const user = await authService.getCurrentUser();
-              setAuthState({ user, loading: false, error: null });
+              if (isSubscribed) {
+                setAuthState({ user, loading: false, error: null });
+              }
             } catch (userError) {
+              if (!isSubscribed) return;
+              
               // Fallback si le profil n'existe pas
               const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
               setAuthState({ 
@@ -103,14 +145,23 @@ export const useAuth = () => {
             }
           } else if (event === 'SIGNED_OUT') {
             console.log('👋 useAuth: User signed out');
-            setAuthState({ user: null, loading: false, error: null });
+            if (isSubscribed) {
+              setAuthState({ user: null, loading: false, error: null });
+            }
           } else if (event === 'TOKEN_REFRESHED') {
             console.log('🔄 useAuth: Token refreshed');
-            setAuthState(prev => ({ ...prev, loading: false }));
+            // Ne rien faire, garder l'état actuel
+          } else if (event === 'INITIAL_SESSION') {
+            console.log('🎯 useAuth: Initial session detected');
+            // Session initiale déjà gérée par checkSession
           } else {
-            setAuthState(prev => ({ ...prev, loading: false }));
+            if (isSubscribed) {
+              setAuthState(prev => ({ ...prev, loading: false }));
+            }
           }
         } catch (error) {
+          if (!isSubscribed) return;
+          
           console.error('🚨 useAuth: Error in auth state change:', error);
           setAuthState({ 
             user: null, 
@@ -121,7 +172,10 @@ export const useAuth = () => {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isSubscribed = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signInWithPassword = async (email: string, password: string) => {

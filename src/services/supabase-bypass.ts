@@ -8,17 +8,72 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Variables Supabase manquantes, utilisation des valeurs par défaut');
 }
 
-// Créer une clé de stockage différente pour local vs production
-const storageKey = window.location.hostname === 'localhost' 
-  ? 'supabase.auth.token.local' 
-  : 'supabase.auth.token.prod';
+// Créer une clé de stockage unique basée sur le hostname ET le port
+// Cela évite les conflits entre différentes instances
+const getStorageKey = () => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // Pour localhost, inclure le port dans la clé
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `supabase.auth.token.local.${port || '3000'}`;
+  }
+  
+  // Pour production, utiliser le hostname complet
+  return `supabase.auth.token.${hostname.replace(/\./g, '_')}`;
+};
+
+const storageKey = getStorageKey();
+
+// Nettoyer les anciennes clés de stockage qui pourraient causer des conflits
+const cleanupOldStorageKeys = () => {
+  const keysToClean = [
+    'supabase.auth.token',
+    'sb-qzvrkqmwzdaffpknuozl-auth-token', // Ancienne clé par défaut Supabase
+  ];
+  
+  keysToClean.forEach(key => {
+    if (localStorage.getItem(key)) {
+      console.log(`🧹 Nettoyage ancienne clé: ${key}`);
+      localStorage.removeItem(key);
+    }
+  });
+};
+
+// Nettoyer au démarrage
+cleanupOldStorageKeys();
+
+console.log(`🔑 Storage key utilisée: ${storageKey}`);
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    storageKey: storageKey, // Clé de stockage séparée
+    storageKey: storageKey, // Clé de stockage unique par environnement
+    storage: {
+      getItem: (key: string) => {
+        const item = localStorage.getItem(key);
+        // Protection contre les données corrompues
+        if (item && item !== 'undefined' && item !== 'null') {
+          try {
+            JSON.parse(item);
+            return item;
+          } catch {
+            console.warn(`⚠️ Données corrompues pour ${key}, nettoyage...`);
+            localStorage.removeItem(key);
+            return null;
+          }
+        }
+        return null;
+      },
+      setItem: (key: string, value: string) => {
+        localStorage.setItem(key, value);
+      },
+      removeItem: (key: string) => {
+        localStorage.removeItem(key);
+      },
+    },
   },
 });
 

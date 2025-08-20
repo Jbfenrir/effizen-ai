@@ -1,5 +1,5 @@
 // Debug temporaire pour résoudre le problème de chargement infini
-import { authService } from './supabase';
+import { authService } from './supabase-bypass';
 
 export const debugAuth = async () => {
   console.log('🔍 Debug Auth - Début');

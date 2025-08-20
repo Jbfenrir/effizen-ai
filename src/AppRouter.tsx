@@ -37,23 +37,48 @@ function AppRouter() {
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
-  // Hook pour gérer les redirections
+  // Hook pour gérer les redirections - VERSION AMÉLIORÉE ANTI-BOUCLE
   useEffect(() => {
-    // Ne pas rediriger pendant le chargement ou si pas prêt
+    // Ne rien faire pendant le chargement
     if (loading || !ready) return;
     
     // Ne pas rediriger si on est sur la page de callback
     if (currentPath === '/auth/callback' || currentPath.includes('access_token')) return;
     
-    // Redirection si non authentifié et pas sur login
-    if (!isAuthenticated && currentPath !== '/login') {
-      navigate('/login');
+    // Tracker pour éviter les redirections multiples
+    const lastRedirect = sessionStorage.getItem('lastRedirect');
+    const now = Date.now();
+    
+    // Si une redirection a eu lieu il y a moins de 2 secondes, ne pas rediriger
+    if (lastRedirect) {
+      const lastRedirectTime = parseInt(lastRedirect, 10);
+      if (now - lastRedirectTime < 2000) {
+        console.log('🛑 AppRouter: Redirection ignorée (trop récente)');
+        return;
+      }
     }
     
-    // Redirection si authentifié et sur login ou racine
-    if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
-      navigate('/dashboard');
-    }
+    console.log('🎯 AppRouter navigation check:', { 
+      isAuthenticated, 
+      currentPath,
+      shouldRedirectToLogin: !isAuthenticated && currentPath !== '/login',
+      shouldRedirectToDashboard: isAuthenticated && (currentPath === '/login' || currentPath === '/')
+    });
+    
+    // Utiliser un timeout pour éviter les re-renders immédiats
+    const redirectTimeout = setTimeout(() => {
+      if (!isAuthenticated && currentPath !== '/login') {
+        console.log('🔄 AppRouter: Redirection vers /login');
+        sessionStorage.setItem('lastRedirect', now.toString());
+        navigate('/login');
+      } else if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
+        console.log('🔄 AppRouter: Redirection vers /dashboard');
+        sessionStorage.setItem('lastRedirect', now.toString());
+        navigate('/dashboard');
+      }
+    }, 300); // 300ms de délai pour stabilité
+    
+    return () => clearTimeout(redirectTimeout);
   }, [isAuthenticated, currentPath, loading, ready, navigate]);
 
   console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'User:', user);

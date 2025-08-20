@@ -530,7 +530,7 @@ Si RLS est le problème, modifier `useAuth.ts` pour utiliser un fallback sans ta
 
 ---
 
-## 📅 SESSION DU 18/08/2025 - RÉSOLUTION COMPLÈTE DES PROBLÈMES
+## 📅 SESSION DU 18/08/2025 - RÉSOLUTION PARTIELLE ET INVESTIGATIONS
 
 ### 🎯 Objectifs de la session
 1. Résoudre définitivement le problème d'authentification (boucle infinie)
@@ -685,8 +685,100 @@ Avant chaque action, Claude Code DOIT vérifier :
 
 ---
 
-**Dernière mise à jour :** 2025-08-18  
-**Version :** 2.0 - Résolution complète + Protocole de sécurité  
+---
+
+## 📅 SESSION DU 18/08/2025 PARTIE 2 - NOUVELLES INVESTIGATIONS
+
+### 🎯 Objectifs de la session
+1. Résoudre le problème de boucle infinie entre onglets (local ↔ production)
+2. Finaliser la stabilité de l'application
+3. Documenter les procédures pour futurs développements
+
+### 🔍 Problèmes identifiés et résolus
+
+#### 1. **Problème : Multiples instances GoTrueClient**
+**Cause :** Imports mixtes entre `supabase.ts` et `supabase-bypass.ts`
+**Solution appliquée :**
+- Unifié tous les services vers `supabase-bypass.ts` uniquement
+- `src/services/sync.ts` → utilise `supabase-bypass`
+- `src/services/debug-auth.ts` → utilise `supabase-bypass`
+
+#### 2. **Problème : Boucles infinies de navigation dans AppRouter**
+**Cause :** Re-renders immédiats dans les useEffect de redirection
+**Solution appliquée :**
+- Ajout d'un délai de 100ms pour les redirections (`setTimeout`)
+- Logs de debug détaillés pour surveiller la navigation
+- Amélioration de la logique de redirection
+
+#### 3. **Problème : Page blanche et serveur inaccessible**
+**Cause :** Problème d'environnement Windows/WSL
+**Solution identifiée :**
+- **OBLIGATOIRE :** Lancer `npm run dev` depuis WSL uniquement
+- PowerShell Windows → `wsl` → `npm run dev`
+- Ports alternatifs si nécessaire (3001, etc.)
+
+### ✅ Résultats partiels obtenus
+- **Authentification stable** : Connexion avec jbgerberon@gmail.com fonctionne
+- **Dashboard admin** : Accessible et fonctionnel
+- **Environnement de dev** : WSL identifié comme seul environnement viable
+- **Services unifiés** : Plus de conflits entre clients Supabase
+
+### ❌ Problème persistant
+**Boucle infinie entre onglets** : Le changement entre onglet local et production déclenche encore des boucles de chargement infini.
+
+**Status investigation :** En cours - Attente des logs console pour diagnostic précis.
+
+### 🛠️ Architecture actuelle (18/08/2025 soir)
+- **Services Supabase** : `supabase-bypass.ts` uniquement (unifié)
+- **Navigation** : AppRouter avec délais de redirection (100ms)
+- **Environnement dev** : WSL obligatoire
+- **Authentification** : Stable en session unique
+- **Problème résiduel** : Sessions cross-onglets instables
+
+### 📋 Actions pour prochaine session
+1. **Analyser logs console** du problème cross-onglets
+2. **Identifier source de conflit** entre local et production
+3. **Implémenter solution définitive** pour sessions multiples
+4. **Tester stabilité complète** sur tous scenarios
+
+---
+
+## 🤖 INSTRUCTIONS CLAUDE CODE - MISE À JOUR
+
+### 🚨 RÈGLE CRITIQUE SCREENSHOTS
+**NOUVELLE PROCÉDURE OBLIGATOIRE :**
+- Si Claude Code ne peut pas lire un screenshot fourni par l'utilisateur
+- **ARRÊTER IMMÉDIATEMENT** la réflexion
+- **DEMANDER EXPLICITEMENT** un copier-coller des textes/logs
+- **NE PAS continuer sans ces informations essentielles**
+
+### Environnement de développement WSL
+**CONFIGURATION OBLIGATOIRE (2025-08-18) :**
+- **Windows PowerShell** : Uniquement pour navigation (`cd`, `wsl`)
+- **WSL Linux** : Obligatoire pour tous les `npm` commands
+- **Workflow impératif** :
+  1. PowerShell : `cd C:\Users\FIAE\Desktop\effizen-ai`
+  2. PowerShell : `wsl`
+  3. WSL : `npm run dev`
+  4. Navigateur : URL affichée par Vite
+
+### Problèmes récurrents 2025-08-18
+1. **"Page blanche"** → Vérifier que `npm run dev` est lancé depuis WSL
+2. **"ERR_CONNECTION_REFUSED"** → Serveur non démarré ou mauvais port
+3. **"Multiple GoTrueClient"** → ✅ RÉSOLU (services unifiés)
+4. **"Boucle navigation AppRouter"** → ✅ RÉSOLU (délais 100ms)
+5. **"Boucle cross-onglets"** → ⚠️ EN COURS (investigation logs nécessaire)
+
+### Services architecture
+- **Service principal** : `supabase-bypass.ts` UNIQUEMENT
+- **Imports interdits** : `from './supabase'` (utiliser `supabase-bypass`)
+- **Clés stockage** : `supabase.auth.token.local` vs `supabase.auth.token.prod`
+- **Navigation** : `AppRouter.tsx` avec timeouts délais
+
+---
+
+**Dernière mise à jour :** 2025-08-18 SOIR  
+**Version :** 2.1 - Résolution partielle + Procédures WSL + Instructions screenshots  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** ✅ **PLEINEMENT FONCTIONNEL AVEC SÉCURITÉ RENFORCÉE**
+**Status :** ⚠️ **FONCTIONNEL AVEC PROBLÈME RÉSIDUEL CROSS-ONGLETS**

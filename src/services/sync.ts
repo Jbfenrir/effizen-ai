@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { supabase, entriesService } from './supabase';
+import { supabase, entriesService } from './supabase-bypass';
 import CryptoService from './crypto';
 import type { DailyEntry } from '../types';
 
