@@ -4,8 +4,10 @@ import AppRouter from './AppRouter'; // Utiliser AppRouter au lieu de App
 import ErrorBoundary from './components/ErrorBoundary';
 import './services/debug-auth';
 import './utils/navigation'; // Import pour rendre navigateTo global
+import { initDebugState } from './utils/debug-state';
 
 console.log('🚀 Application EffiZen-AI démarrage...');
+initDebugState();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
