@@ -29,34 +29,34 @@ export const useAuth = () => {
   useEffect(() => {
     let isSubscribed = true;
     let sessionCheckCount = 0;
-    const maxSessionChecks = 3; // Limite pour éviter les boucles infinies
+    const maxSessionChecks = 2; // Réduire pour éviter les boucles infinies
+    
+    // FORCE reset du flag global au démarrage pour éviter les blocages
+    globalCheckInProgress = false;
     
     // Vérifier la session au chargement
     const checkSession = async () => {
       if (!isSubscribed) return;
       
-      // Éviter les vérifications simultanées (importantes avec StrictMode)
+      // Protection contre les blocages permanents
       const now = Date.now();
+      if (globalCheckInProgress && (now - globalLastCheckTime > 5000)) {
+        console.warn('🚨 useAuth: Flag globalCheckInProgress bloqué depuis >5s, forçage reset');
+        globalCheckInProgress = false;
+      }
+      
+      // Éviter les vérifications simultanées (importantes avec StrictMode)
       if (globalCheckInProgress || (now - globalLastCheckTime < 500)) {
         console.log('⏸️ useAuth: Vérification déjà en cours, ignorée');
-        // Si une vérification est déjà en cours, attendre un peu et récupérer l'état
+        
+        // Timeout de secours : si bloqué trop longtemps, forcer l'état non-authentifié
         setTimeout(() => {
-          if (isSubscribed) {
-            const cachedSession = sessionStorage.getItem('effizen_auth_cache');
-            if (cachedSession) {
-              try {
-                const cached = JSON.parse(cachedSession);
-                if (cached.user) {
-                  setAuthState({ user: cached.user, loading: false, error: null });
-                } else {
-                  setAuthState({ user: null, loading: false, error: null });
-                }
-              } catch {
-                setAuthState({ user: null, loading: false, error: null });
-              }
-            }
+          if (isSubscribed && globalCheckInProgress) {
+            console.warn('🚨 useAuth: Timeout de secours - forçage état non-authentifié');
+            globalCheckInProgress = false;
+            setAuthState({ user: null, loading: false, error: null });
           }
-        }, 100);
+        }, 3000);
         return;
       }
       

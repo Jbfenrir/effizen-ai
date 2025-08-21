@@ -99,9 +99,21 @@ function AppRouter() {
             <button 
               onClick={() => {
                 console.log('🚨 Bouton d\'urgence activé!');
+                
+                // Reset complet de tous les états
                 localStorage.clear();
                 sessionStorage.clear();
-                window.location.href = '/login';
+                
+                // Force reset des flags globaux
+                if (window.globalCheckInProgress !== undefined) {
+                  window.globalCheckInProgress = false;
+                }
+                if (window.globalLastCheckTime !== undefined) {
+                  window.globalLastCheckTime = 0;
+                }
+                
+                // Force rechargement complet de la page
+                window.location.href = '/login?emergency=true';
               }}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
