@@ -11,6 +11,7 @@ import DashboardEmployee from './pages/DashboardEmployee';
 import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
+import TestLoadingPage from './pages/TestLoadingPage';
 
 // Import du hook d'authentification SIMPLIFIÉ pour debug
 // import { useAuth } from './hooks/useAuth';
@@ -134,6 +135,9 @@ function AppRouter() {
         
         {/* Formulaire d'entrée - uniquement si authentifié */}
         {isAuthenticated && currentPath === '/entry' && <EntryForm />}
+        
+        {/* Page de test du bouton d'urgence */}
+        {currentPath === '/test-loading' && <TestLoadingPage />}
       </main>
     </div>
   );
