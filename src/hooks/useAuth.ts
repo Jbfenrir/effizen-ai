@@ -13,6 +13,12 @@ interface AuthState {
 let globalCheckInProgress = false;
 let globalLastCheckTime = 0;
 
+// Exposer les flags pour le debug
+if (typeof window !== 'undefined') {
+  window.globalCheckInProgress = globalCheckInProgress;
+  window.globalLastCheckTime = globalLastCheckTime;
+}
+
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,

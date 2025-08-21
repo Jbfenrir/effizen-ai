@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Debug Functions</title>
+</head>
+<body>
+  <h1>Test des fonctions de debug</h1>
+  <button onclick="testDebug()">Test debugState</button>
+  <button onclick="testLogout()">Test forceLogout</button>
+  <pre id="output"></pre>
+  
+  <script>
+    // Attendre le chargement
+    setTimeout(() => {
+      const output = document.getElementById('output');
+      
+      // Vérifier la disponibilité
+      output.textContent = 'debugState disponible: ' + (typeof window.debugState !== 'undefined') + '\n';
+      output.textContent += 'forceLogout disponible: ' + (typeof window.forceLogout !== 'undefined') + '\n';
+      
+      // Si disponibles, les exécuter
+      if (typeof window.debugState === 'function') {
+        console.log('Exécution de debugState...');
+        window.debugState();
+      } else {
+        console.error('debugState non disponible');
+      }
+    }, 2000);
+    
+    function testDebug() {
+      if (typeof window.debugState === 'function') {
+        window.debugState();
+      } else {
+        alert('debugState non disponible');
+      }
+    }
+    
+    function testLogout() {
+      if (typeof window.forceLogout === 'function') {
+        window.forceLogout();
+      } else {
+        alert('forceLogout non disponible');
+      }
+    }
+  </script>
+</body>
+</html>

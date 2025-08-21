@@ -91,6 +91,22 @@ function AppRouter() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-green mx-auto"></div>
           <p className="mt-4 text-metallic-gray">Chargement...</p>
+          
+          {/* BOUTON D'URGENCE - Si bloqué plus de 5 secondes */}
+          <div className="mt-8 p-4 bg-red-50 rounded-lg">
+            <p className="text-sm text-red-600 mb-2">Bloqué sur cette page ?</p>
+            <button 
+              onClick={() => {
+                console.log('🚨 Bouton d\'urgence activé!');
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/login';
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Forcer la connexion
+            </button>
+          </div>
         </div>
       </div>
     );
