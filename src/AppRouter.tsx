@@ -13,9 +13,9 @@ import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
 import TestLoadingPage from './pages/TestLoadingPage';
 
-// Import du hook d'authentification SIMPLIFIÉ pour debug
-// import { useAuth } from './hooks/useAuth';
-import { useAuthSimple as useAuth } from './hooks/useAuthSimple';
+// Import du hook d'authentification ORIGINAL (corrigé)
+import { useAuth } from './hooks/useAuth';
+// import { useAuthSimple as useAuth } from './hooks/useAuthSimple';
 
 function AppRouter() {
   const { t, ready } = useTranslation();
