@@ -307,12 +307,21 @@ npm run lint
 1. **TOUJOURS lire CLAUDE.md en premier** pour comprendre le contexte
 2. **ANTICIPER les problèmes courants** basés sur l'historique du projet
 3. **Vérifier l'état actuel** des services (Vercel, GitHub) avant de procéder
-4. **⚠️ RÈGLE CRITIQUE : TESTER SYSTÉMATIQUEMENT toute solution AVANT de la proposer**
-   - Créer des tests automatisés (curl, scripts node, etc.)
-   - Vérifier que le code compile et fonctionne
-   - Analyser les logs et résultats des tests
-   - **NE JAMAIS demander à l'utilisateur de tester sans avoir vérifié soi-même**
-   - Si impossible de tester automatiquement, l'indiquer clairement
+4. **🚨 RÈGLE CRITIQUE : TESTER COMPLÈTEMENT ET EXHAUSTIVEMENT toute solution AVANT de la proposer**
+   - **OBLIGATION : Créer et exécuter des tests automatisés complets**
+   - **Vérifier TOUS les aspects** : compilation, fonctionnement, déploiement, accessibilité
+   - **Tester les deux environnements** : local ET production
+   - **Simuler le problème réel** de l'utilisateur et vérifier que la solution fonctionne
+   - **NE PAS s'arrêter à mi-chemin** - aller jusqu'au bout de TOUS les tests
+   - **NE JAMAIS demander à l'utilisateur de tester sans avoir vérifié INTÉGRALEMENT soi-même**
+   - **Créer des scripts de test complets** (ex: test-complete.cjs) qui vérifient :
+     * Serveur local accessible
+     * Page/fonctionnalité disponible
+     * Build production qui passe
+     * Présence de la solution dans les fichiers compilés
+     * Déploiement effectif en production
+     * Test du problème ET de la solution
+   - **Si impossible de tester automatiquement, l'indiquer clairement et expliquer pourquoi**
 5. **Proposer des solutions préventives** plutôt que correctives
 6. **Croiser les informations** du contexte avec les actions proposées
 7. **Utiliser WSL uniquement** pour les commandes npm/node sur Windows
