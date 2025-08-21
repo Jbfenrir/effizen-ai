@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix d'urgence EffiZen-AI</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #dc2626;
+        }
+        .success {
+            background: #10b981;
+        }
+        .success:hover {
+            background: #059669;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔧 Fix d'urgence - EffiZen AI</h1>
+        
+        <div class="info">
+            <p><strong>Problème détecté :</strong> Boucle de chargement infini</p>
+            <p>Cette page permet de réinitialiser complètement l'application.</p>
+        </div>
+
+        <h3>Actions disponibles :</h3>
+        
+        <button onclick="clearAll()">
+            🗑️ Nettoyer tout le cache
+        </button>
+        
+        <button onclick="clearAndRedirect()">
+            🚀 Nettoyer et aller à la connexion
+        </button>
+        
+        <button class="success" onclick="goToApp()">
+            ✅ Aller à l'application
+        </button>
+
+        <div id="output" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.innerHTML += `<p>• ${message}</p>`;
+        }
+        
+        function clearAll() {
+            log('Nettoyage en cours...');
+            
+            // Nettoyer localStorage
+            const localKeys = Object.keys(localStorage);
+            localKeys.forEach(key => {
+                localStorage.removeItem(key);
+                log(`Supprimé localStorage: ${key}`);
+            });
+            
+            // Nettoyer sessionStorage
+            const sessionKeys = Object.keys(sessionStorage);
+            sessionKeys.forEach(key => {
+                sessionStorage.removeItem(key);
+                log(`Supprimé sessionStorage: ${key}`);
+            });
+            
+            // Désinscrire Service Workers
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(reg => {
+                        reg.unregister();
+                        log('Service Worker désinstallé');
+                    });
+                });
+            }
+            
+            log('<strong style="color: green;">✅ Nettoyage terminé!</strong>');
+        }
+        
+        function clearAndRedirect() {
+            clearAll();
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1000);
+        }
+        
+        function goToApp() {
+            window.location.href = '/';
+        }
+        
+        // Afficher l'état actuel
+        window.onload = () => {
+            const hasAuth = localStorage.getItem('supabase.auth.token.local.3000') || 
+                           localStorage.getItem('supabase.auth.token.local.3001');
+            const hasCache = sessionStorage.getItem('effizen_auth_cache');
+            
+            if (hasAuth || hasCache) {
+                log('<span style="color: orange;">⚠️ Données de session détectées</span>');
+            } else {
+                log('<span style="color: green;">✅ Pas de session active</span>');
+            }
+        };
+    </script>
+</body>
+</html>
