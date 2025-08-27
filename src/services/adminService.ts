@@ -1,6 +1,5 @@
-// TEMPORAIRE: Utilisation du service bypass
-import { supabase, supabaseAdmin } from './supabase-bypass';
-// import { supabase } from './supabase';
+// Service unifié - Plus de conflit d'instances multiples
+import { supabase, supabaseAdmin } from './supabase';
 import type { 
   User, 
   Team, 

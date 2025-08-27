@@ -3,20 +3,94 @@ import type { Database } from '../types/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://qzvrkcmwzdaffpknuozl.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6dnJrY213emRhZmZwa251b3psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyMTM3OTgsImV4cCI6MjA2Nzc4OTc5OH0.GJXkGBy047Dx8cS-uOIQJSEJa5VHQRfdwWb-FkQVbIQ';
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Variables Supabase manquantes, utilisation des valeurs par défaut');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-});
+// UNIQUE clé de stockage sécurisée
+const getStorageKey = () => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `supabase.auth.token.local.${port || '3000'}`;
+  }
+  return `supabase.auth.token.${hostname.replace(/\./g, '_')}`;
+};
 
-// Types pour l'authentification
+// SINGLETON GLOBAL - Une seule instance pour toute l'app
+const GLOBAL_SUPABASE_KEY = '__effizen_supabase_client_unified__';
+const GLOBAL_ADMIN_KEY = '__effizen_supabase_admin_unified__';
+
+const getSupabaseClient = () => {
+  if (typeof window !== 'undefined' && (window as any)[GLOBAL_SUPABASE_KEY]) {
+    return (window as any)[GLOBAL_SUPABASE_KEY];
+  }
+  
+  console.log('🔧 Création client Supabase UNIQUE');
+  const client = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storageKey: getStorageKey(),
+      flowType: 'pkce',
+      storage: {
+        getItem: (key: string) => {
+          const item = localStorage.getItem(key);
+          if (item && item !== 'undefined' && item !== 'null') {
+            try {
+              JSON.parse(item);
+              return item;
+            } catch {
+              console.warn(`⚠️ Données corrompues ${key}, nettoyage...`);
+              localStorage.removeItem(key);
+              return null;
+            }
+          }
+          return null;
+        },
+        setItem: (key: string, value: string) => localStorage.setItem(key, value),
+        removeItem: (key: string) => localStorage.removeItem(key),
+      },
+    },
+  });
+  
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_SUPABASE_KEY] = client;
+  }
+  
+  return client;
+};
+
+const getSupabaseAdminClient = () => {
+  if (!supabaseServiceKey) return null;
+  
+  if (typeof window !== 'undefined' && (window as any)[GLOBAL_ADMIN_KEY]) {
+    return (window as any)[GLOBAL_ADMIN_KEY];
+  }
+  
+  console.log('🔧 Création client Supabase Admin UNIQUE');
+  const adminClient = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+  
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_ADMIN_KEY] = adminClient;
+  }
+  
+  return adminClient;
+};
+
+// CLIENTS UNIFIÉS - Une seule source de vérité
+export const supabase = getSupabaseClient();
+export const supabaseAdmin = getSupabaseAdminClient();
+
+// Types
 export interface AuthUser {
   id: string;
   email: string;
@@ -24,9 +98,8 @@ export interface AuthUser {
   team?: string;
 }
 
-// Service d'authentification
+// Service auth unifié
 export const authService = {
-  // Connexion avec email/mot de passe
   async signInWithPassword(email: string, password: string): Promise<{ error: any }> {
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -35,7 +108,6 @@ export const authService = {
     return { error };
   },
 
-  // Connexion avec magic link (gardé pour compatibilité)
   async signInWithMagicLink(email: string): Promise<{ error: any }> {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -46,7 +118,6 @@ export const authService = {
     return { error };
   },
 
-  // Inscription avec email/mot de passe
   async signUpWithPassword(email: string, password: string): Promise<{ error: any }> {
     const { error } = await supabase.auth.signUp({
       email,
@@ -58,212 +129,73 @@ export const authService = {
     return { error };
   },
 
-  // Déconnexion
   async signOut(): Promise<{ error: any }> {
     const { error } = await supabase.auth.signOut();
     return { error };
   },
 
-  // Obtenir la session actuelle
   async getSession() {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    return { session, error };
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.warn('⚠️ authService.getSession:', error.message);
+        return { session: null, error };
+      }
+      return { session, error: null };
+    } catch (error) {
+      console.error('🚨 authService.getSession catch:', error);
+      return { 
+        session: null, 
+        error: { message: 'Failed to get session', originalError: error }
+      };
+    }
   },
 
-  // Écouter les changements d'authentification
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return supabase.auth.onAuthStateChange(callback);
   },
 
-  // Obtenir l'utilisateur actuel
   async getCurrentUser(): Promise<AuthUser | null> {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    console.log('🚀 SERVICE UNIFIÉ: getCurrentUser');
     
-    if (error || !user) {
-      console.log('❌ getCurrentUser: Pas d\'utilisateur Supabase', error);
-      return null;
-    }
-
-    console.log('✅ getCurrentUser: Utilisateur Supabase trouvé:', user.email);
-
-    // Essayer de récupérer les métadonnées utilisateur depuis la table profiles
     try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, team')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.warn('⚠️ getCurrentUser: Erreur récupération profil:', profileError);
-        
-        // Si le profil n'existe pas, créer un profil par défaut
-        if (profileError.code === 'PGRST116') { // Code pour "no rows found"
-          console.log('📝 getCurrentUser: Création du profil par défaut');
-          
-          // Déterminer le rôle par défaut basé sur l'email
-          const defaultRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-          
-          // Créer le profil
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              email: user.email!,
-              role: defaultRole,
-              is_active: true,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('❌ getCurrentUser: Échec création profil:', createError);
-            // Fallback sans profil
-            return {
-              id: user.id,
-              email: user.email!,
-              role: defaultRole as 'employee' | 'manager' | 'admin',
-              team: undefined,
-            };
-          }
-
-          return {
-            id: user.id,
-            email: user.email!,
-            role: newProfile.role || defaultRole,
-            team: newProfile.team,
-          };
-        }
-
-        // Pour toute autre erreur, utiliser le fallback
-        const fallbackRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-        return {
-          id: user.id,
-          email: user.email!,
-          role: fallbackRole as 'employee' | 'manager' | 'admin',
-          team: undefined,
-        };
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.log('❌ SERVICE UNIFIÉ: Erreur session', sessionError);
+        return null;
+      }
+      
+      if (!session?.user) {
+        console.log('❌ SERVICE UNIFIÉ: Pas de session');
+        return null;
+      }
+      
+      console.log('✅ SERVICE UNIFIÉ: Session trouvée:', session.user.email);
+      
+      let role: 'employee' | 'manager' | 'admin' = 'employee';
+      const adminEmails = ['jbgerberon@gmail.com'];
+      const managerEmails: string[] = [];
+      
+      if (adminEmails.includes(session.user.email || '')) {
+        role = 'admin';
+      } else if (managerEmails.includes(session.user.email || '')) {
+        role = 'manager';
       }
 
-      console.log('✅ getCurrentUser: Profil trouvé:', profile);
-      
+      console.log('✅ SERVICE UNIFIÉ: Rôle déterminé:', role);
+
       return {
-        id: user.id,
-        email: user.email!,
-        role: profile?.role || 'employee',
-        team: profile?.team,
-      };
-    } catch (err) {
-      console.error('🚨 getCurrentUser: Erreur inattendue:', err);
-      
-      // Fallback complet
-      const fallbackRole = user.email === 'jbgerberon@gmail.com' ? 'admin' : 'employee';
-      return {
-        id: user.id,
-        email: user.email!,
-        role: fallbackRole as 'employee' | 'manager' | 'admin',
+        id: session.user.id,
+        email: session.user.email!,
+        role: role,
         team: undefined,
       };
+    } catch (error) {
+      console.error('🚨 SERVICE UNIFIÉ: Erreur getCurrentUser:', error);
+      return null;
     }
   },
 };
 
-// Service pour les entrées quotidiennes
-export const entriesService = {
-  // Créer une nouvelle entrée
-  async createEntry(entry: Omit<Database['public']['Tables']['daily_entries']['Insert'], 'id' | 'user_id' | 'created_at'>) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase
-      .from('daily_entries')
-      .insert({
-        ...entry,
-        user_id: user.id,
-      })
-      .select()
-      .single();
-
-    return { data, error };
-  },
-
-  // Mettre à jour une entrée existante
-  async updateEntry(id: string, updates: Partial<Database['public']['Tables']['daily_entries']['Update']>) {
-    const { data, error } = await supabase
-      .from('daily_entries')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    return { data, error };
-  },
-
-  // Récupérer les entrées d'un utilisateur
-  async getUserEntries(userId: string, limit = 30) {
-    const { data, error } = await supabase
-      .from('daily_entries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('entry_date', { ascending: false })
-      .limit(limit);
-
-    return { data, error };
-  },
-
-  // Récupérer les entrées d'une équipe (pour les managers)
-  async getTeamEntries(team: string, limit = 100) {
-    const { data, error } = await supabase
-      .from('daily_entries')
-      .select(`
-        *,
-        profiles!inner(team)
-      `)
-      .eq('profiles.team', team)
-      .order('entry_date', { ascending: false })
-      .limit(limit);
-
-    return { data, error };
-  },
-
-  // Récupérer les statistiques agrégées d'une équipe
-  async getTeamStats(team: string, period: 'week' | 'month' | 'quarter' = 'week') {
-    const { data, error } = await supabase
-      .rpc('get_team_stats', {
-        team_name: team,
-        period_type: period,
-      });
-
-    return { data, error };
-  },
-};
-
-// Service pour les profils utilisateur
-export const profilesService = {
-  // Créer ou mettre à jour un profil
-  async upsertProfile(profile: Database['public']['Tables']['profiles']['Insert']) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .upsert(profile)
-      .select()
-      .single();
-
-    return { data, error };
-  },
-
-  // Récupérer un profil
-  async getProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    return { data, error };
-  },
-};
-
-export default supabase; 
+export default supabase;

@@ -13,13 +13,17 @@ import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
 import TestLoadingPage from './pages/TestLoadingPage';
 
-// Import du hook d'authentification ORIGINAL (corrigé)
-import { useAuth } from './hooks/useAuth';
-// import { useAuthSimple as useAuth } from './hooks/useAuthSimple';
+// 🔄 SYSTÈME DE BASCULEMENT AUTH
+import { AUTH_CONFIG } from './config/auth-switch';
+import { useAuth } from './hooks/useAuth';          // Ancien système
+import { useAuthNew } from './hooks/useAuthNew';    // Nouveau système
+
+// Hook sélectionné selon la configuration
+const useSelectedAuth = AUTH_CONFIG.USE_AUTH_SYSTEM === 'NEW' ? useAuthNew : useAuth;
 
 function AppRouter() {
   const { t, ready } = useTranslation();
-  const { user, loading, signOut, isAdmin, isManager, isAuthenticated } = useAuth();
+  const { user, loading, signOut, isAdmin, isManager, isAuthenticated } = useSelectedAuth();
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   const navigate = useCallback((path: string) => {
@@ -63,27 +67,28 @@ function AppRouter() {
     console.log('🎯 AppRouter navigation check:', { 
       isAuthenticated, 
       currentPath,
+      user: user?.email || 'null',
       shouldRedirectToLogin: !isAuthenticated && currentPath !== '/login',
       shouldRedirectToDashboard: isAuthenticated && (currentPath === '/login' || currentPath === '/')
     });
     
-    // Utiliser un timeout pour éviter les re-renders immédiats
+    // NOUVEAU: Délai réduit pour redirection plus rapide après connexion
     const redirectTimeout = setTimeout(() => {
       if (!isAuthenticated && currentPath !== '/login') {
-        console.log('🔄 AppRouter: Redirection vers /login');
+        console.log('🔄 AppRouter: Redirection vers /login (non authentifié)');
         sessionStorage.setItem('lastRedirect', now.toString());
         navigate('/login');
       } else if (isAuthenticated && (currentPath === '/login' || currentPath === '/')) {
-        console.log('🔄 AppRouter: Redirection vers /dashboard');
+        console.log('🚀 AppRouter: REDIRECTION VERS DASHBOARD (utilisateur connecté:', user?.email || 'unknown', ')');
         sessionStorage.setItem('lastRedirect', now.toString());
         navigate('/dashboard');
       }
-    }, 300); // 300ms de délai pour stabilité
+    }, 100); // Délai réduit à 100ms pour réactivité
     
     return () => clearTimeout(redirectTimeout);
   }, [isAuthenticated, currentPath, loading, ready, navigate]);
 
-  console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'User:', user);
+  console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'Loading:', loading, 'User:', user?.email || 'null');
 
   // Afficher un loader si i18n ou auth ne sont pas prêts
   if (!ready || loading) {

@@ -12,3 +12,59 @@ Pour tester l'application en local :
 - - - -  claude_runbook.md m (Il s'agit de l'analyse et des suggestions effectuées par Tchat GPT sur la base du code fourni par claude code).
 
 Sinon, lancer PowerShell, puis Ubuntu, puis claude code.
+
+
+Pour RETOUR IMMÉDIAT
+
+  Une seule commande pour revenir à l'ancien système :
+  git reset --hard 57b058e
+
+  Ou basculer juste la config dans src/config/auth-switch.ts :
+  USE_AUTH_SYSTEM: 'OLD' // au lieu de 'NEW'
+
+OÙ SAISIR LA COMMANDE DE RESTAURATION
+
+  🖥️ MÉTHODE RECOMMANDÉE : PowerShell + WSL
+
+  1. Ouvrir PowerShell dans le dossier du projet :
+    - Aller dans C:\Users\FIAE\Desktop\effizen-ai
+    - Clic droit → "Ouvrir dans le terminal" ou "PowerShell ici"
+    - Ou ouvrir PowerShell et taper : cd C:\Users\FIAE\Desktop\effizen-ai
+  2. Entrer dans WSL :
+  wsl
+  3. Naviguer vers le projet (dans WSL) :
+  cd /mnt/c/Users/FIAE/Desktop/effizen-ai
+  4. Exécuter la commande de restauration :
+  git reset --hard 57b058e
+
+  🔄 PROCÉDURE COMPLÈTE EN CAS DE PROBLÈME
+
+  # 1. Dans PowerShell
+  cd C:\Users\FIAE\Desktop\effizen-ai
+  wsl
+
+  # 2. Dans WSL (après la commande wsl)
+  git reset --hard 57b058e
+  npm install
+  npm run dev
+
+  🌐 ALTERNATIVE : VS Code Terminal
+
+  Si vous utilisez VS Code :
+  1. Ouvrir le dossier effizen-ai dans VS Code
+  2. Terminal → Nouveau Terminal (Ctrl + `)
+  3. Sélectionner WSL dans le terminal (en bas à droite)
+  4. Taper : git reset --hard 57b058e
+
+  ⚠️ IMPORTANT
+
+  - TOUJOURS utiliser WSL pour les commandes git et npm (pas PowerShell directement)
+  - D'abord arrêter le serveur (Ctrl+C) avant la restauration
+  - Vider le cache navigateur après restauration
+
+  🎯 RACCOURCI ULTIME
+
+  Une seule ligne dans PowerShell (depuis le dossier effizen-ai) :
+  wsl bash -c "cd /mnt/c/Users/FIAE/Desktop/effizen-ai && git reset --hard 57b058e && npm install && npm run dev"
+
+  Cette commande fait tout d'un coup : restauration + installation + démarrage serveur.

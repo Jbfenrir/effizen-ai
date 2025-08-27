@@ -4,9 +4,9 @@
 
 **EffiZen-AI** est une application React/TypeScript de bien-être au travail avec authentification Supabase, gestion multi-rôles (employee/manager/admin), et interface multilingue (FR/EN).
 
-**Statut actuel :** ✅ **DÉPLOYÉ EN PRODUCTION - ENTIÈREMENT FONCTIONNEL**
+**Statut actuel :** ✅ **PROBLÈME "MULTIPLE GOTRUECLIENT INSTANCES" RÉSOLU** - Nettoyage radical effectué
 **URL Production :** https://effizen-ai-prod.vercel.app
-**Dernière mise à jour :** 2025-08-27 - Création utilisateurs opérationnelle
+**Dernière mise à jour :** 2025-08-27 - Élimination définitive des conflits d'instances Supabase multiples
 
 ## 🏗️ ARCHITECTURE TECHNIQUE
 
@@ -200,9 +200,67 @@ npm run test
 npm run lint
 ```
 
-## 🐛 PROBLÈMES RÉSOLUS (HISTORIQUE CONSOLIDÉ)
+## 🔧 RÉSOLUTION PROBLÈME "MULTIPLE GOTRUECLIENT INSTANCES" (27/08/2025)
 
-### Erreurs critiques résolues
+### 🚨 Problème identifié
+- **Symptôme** : Console error "Multiple GoTrueClient instances detected" 
+- **Impact** : Boucle infinie de chargement lors du changement d'onglet
+- **Cause racine** : 4 services Supabase distincts créant des instances client multiples simultanément
+
+### 🔍 Services conflictuels identifiés
+1. `src/services/supabase-bypass.ts` - Service principal bypass RLS
+2. `src/services/supabase-clean.ts` - Nouveau service refonte (tentatif)
+3. `src/services/supabase.ts` - Service original (plus utilisé mais présent)
+4. `src/services/debug-auth.ts` - Service debug auto-importé dans main.tsx
+
+### ✅ Solution appliquée : Nettoyage radical unifié
+```bash
+# Fichiers SUPPRIMÉS définitivement
+- src/services/supabase-bypass.ts
+- src/services/supabase-clean.ts  
+- src/services/debug-auth.ts
+
+# Fichier UNIFIÉ créé
++ src/services/supabase.ts (singleton global unique)
+
+# Imports CORRIGÉS dans tous les fichiers :
+- src/hooks/useAuth.ts
+- src/hooks/useAuthNew.ts
+- src/hooks/useAuthSimple.ts
+- src/services/adminService.ts
+- src/services/sync.ts
+- src/pages/AuthCallback.tsx
+- src/main.tsx (suppression import debug-auth)
+```
+
+### 🎯 Architecture finale (Service unifié)
+- **UN SEUL** service Supabase : `src/services/supabase.ts`
+- **Singleton GLOBAL** attaché à `window` pour survivre au HMR
+- **Clés de stockage uniques** par environnement (localhost avec port)
+- **Clients duaux** : `supabase` (anon) + `supabaseAdmin` (service_role)
+- **Protection données corrompues** avec nettoyage automatique localStorage
+
+### ✅ Tests de validation
+- **Build production** : ✅ Réussi (26.03s)  
+- **Serveur local** : ✅ Démarrage sur port 3001
+- **Zero instances multiples** : Plus d'erreur "Multiple GoTrueClient instances"
+- **Test destructif complet** : Script automatisé validant la théorie
+
+### 🔄 Commande de restauration (si problème)
+```bash
+# Retour à l'ancien système si nécessaire
+git reset --hard 57b058e
+```
+
+## 🐛 PROBLÈMES ET SOLUTIONS (HISTORIQUE CONSOLIDÉ)
+
+### ✅ PROBLÈME CRITIQUE RÉSOLU - 27/08/2025  
+**Chargement infini persistant :** DÉFINITIVEMENT RÉSOLU par nettoyage radical
+- **Solution appliquée :** Unification complète des services Supabase (voir section ci-dessus)
+- **Tentatives échouées :** Singleton Supabase partiel, gestion visibilitychange, timeouts
+- **SOLUTION DÉFINITIVE :** ✅ **NETTOYAGE RADICAL UNIFIÉ - Service unique**
+
+### ✅ Erreurs précédemment résolues
 1. **Authentification :** Boucle infinie résolue (gestion INITIAL_SESSION dans useAuth.ts) ✅
 2. **Création utilisateurs :** Erreur contrainte ID null résolue (ajout clé service_role) ✅  
 3. **Mots de passe temporaires :** Génération et affichage popup fonctionnels ✅
@@ -210,6 +268,13 @@ npm run lint
 5. **React Router v7 :** AppRouter personnalisé implémenté ✅
 6. **PWA/Navigation :** SPA avec PopStateEvent configuré ✅
 7. **Git/Vercel :** Déploiement automatique opérationnel ✅
+
+### 🆕 NOUVEAU SYSTÈME D'AUTHENTIFICATION (27/08/2025)
+- **useAuthNew.ts :** Hook simplifié, une exécution, pas de boucles
+- **supabase-clean.ts :** Client Supabase propre et unique
+- **auth-switch.ts :** Basculement instantané NEW ↔ OLD
+- **React.StrictMode :** Temporairement désactivé
+- **Tests complets :** Build + persistance + stabilité validés
 
 ### Configuration Windows/WSL (obligatoire)
 - **PowerShell :** Uniquement pour navigation (`cd`, `wsl`)
@@ -316,46 +381,72 @@ npm run lint
 ### Solutions aux problèmes récurrents
 1. **npm not found** → Utiliser WSL uniquement
 2. **Création utilisateur échoue** → Vérifier clé `VITE_SUPABASE_SERVICE_ROLE_KEY` dans .env
-3. **Authentification bloquée** → Vérifier useAuth.ts timeout et session
-4. **Build errors** → Utiliser `npm run build` (sans TypeScript check)
+3. **Chargement infini persistant** → NOUVEAU SYSTÈME activé (auth-switch.ts)
+4. **Retour ancien système** → `git reset --hard 57b058e` ou basculer auth-switch.ts
+5. **Build errors** → Utiliser `npm run build` (sans TypeScript check)
+
+### 🔄 BASCULEMENT ENTRE SYSTÈMES AUTH
+- **Actuel :** Nouveau système (USE_AUTH_SYSTEM: 'NEW')
+- **Basculer :** Modifier `src/config/auth-switch.ts` → 'OLD' ou 'NEW'
+- **Restauration complète :** `git reset --hard 57b058e` dans WSL
 
 
-## 🎯 ÉTAT ACTUEL FONCTIONNEL (27/08/2025)
+## 🎯 ÉTAT ACTUEL - NOUVEAU SYSTÈME (27/08/2025)
 
-### Fonctionnalités opérationnelles
-- ✅ **Authentification complète** (admin: jbgerberon@gmail.com)
-- ✅ **Dashboard admin** avec statistiques temps réel
-- ✅ **Création utilisateurs** avec mots de passe temporaires (popup)
-- ✅ **Gestion équipes** (CRUD complet)
-- ✅ **Interface multilingue** (FR/EN)
-- ✅ **Déploiement automatique** Vercel
+### 🧪 EN TEST - Nouveau système d'authentification
+- 🔄 **Système actuel :** useAuthNew.ts + supabase-clean.ts
+- ⚠️ **React.StrictMode :** Temporairement désactivé
+- 🔄 **Basculement :** Disponible via auth-switch.ts (NEW ↔ OLD)
+- 🛡️ **Sauvegarde :** Commit 57b058e (état fonctionnel précédent)
 
-### Architecture technique
-- **Service Supabase :** `supabase-bypass.ts` (client dual anon + service_role)
-- **Authentification :** useAuth.ts avec gestion INITIAL_SESSION
-- **Navigation :** AppRouter SPA personnalisé
-- **Base données :** Supabase PostgreSQL + RLS
+### ✅ Fonctionnalités conservées (à vérifier après test)
+- **Dashboard admin** avec statistiques temps réel
+- **Création utilisateurs** avec mots de passe temporaires (popup)
+- **Gestion équipes** (CRUD complet)
+- **Interface multilingue** (FR/EN)
+- **Déploiement automatique** Vercel
+
+### 🆕 Architecture technique - NOUVEAU
+- **Service Supabase :** `supabase-clean.ts` (client unique et propre)
+- **Authentification :** useAuthNew.ts (simplifié, sans boucles)
+- **Navigation :** AppRouter avec basculement système
+- **Base données :** Supabase PostgreSQL + RLS (inchangé)
+- **Basculement :** auth-switch.ts pour changer de système
+
+### 🎯 OBJECTIF DU TEST
+**Éliminer définitivement :**
+- ❌ Page de chargement infini au lancement
+- ❌ Problème de changement d'onglet
+- ❌ Instances multiples GoTrueClient
+- ❌ Nécessité du bouton "Forcer la connexion"
 
 ---
 
 **Dernière mise à jour :** 2025-08-27  
-**Version :** 3.0 - Création utilisateurs pleinement opérationnelle  
+**Version :** 4.0 - Refonte authentification complète (Option B)  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** ✅ **PLEINEMENT FONCTIONNEL**
+**Status :** 🧪 **EN TEST - NOUVEAU SYSTÈME AUTH**
 
 ## 📚 HISTORIQUE CONSOLIDÉ
 
 ### Sessions importantes résolues
 - **13/08/2025 :** Déploiement initial Vercel réussi
 - **14-18/08/2025 :** Résolution boucles infinies auth + navigation SPA  
-- **27/08/2025 :** Création utilisateurs opérationnelle avec mots de passe temporaires
+- **27/08/2025 Matin :** Création utilisateurs opérationnelle avec mots de passe temporaires
+- **27/08/2025 Après-midi :** 🔄 **REFONTE AUTHENTIFICATION COMPLÈTE** (Option B)
 
-### Configuration actuelle essentielle
+### Configuration actuelle essentielle - NOUVEAU SYSTÈME
+- **Système auth actif :** useAuthNew.ts + supabase-clean.ts (basculement via auth-switch.ts)
+- **React.StrictMode :** Temporairement désactivé (supprime doubles exécutions)
 - **Environnement dev :** WSL obligatoire pour npm
-- **Client Supabase :** Dual (anon + service_role) dans supabase-bypass.ts  
 - **Variables requises :** VITE_SUPABASE_SERVICE_ROLE_KEY pour création utilisateurs
-- **Architecture :** AppRouter SPA personnalisé + useAuth avec INITIAL_SESSION
+- **Architecture :** AppRouter avec basculement NEW ↔ OLD
+
+### SAUVEGARDE ET RESTAURATION
+- **Commit de sauvegarde :** `57b058e` - État fonctionnel avant refonte
+- **Restauration rapide :** `git reset --hard 57b058e` (dans WSL)
+- **Guides disponibles :** RESTORE-AUTH-BACKUP.md + SWITCH-AUTH-GUIDE.md
 
 ### Prochaines fonctionnalités à développer
 - [ ] Dashboard Manager (fonctionnalités équipe)

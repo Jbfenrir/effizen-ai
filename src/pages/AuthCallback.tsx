@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-// TEMPORAIRE: Utilisation du service bypass
-import { supabase } from '../services/supabase-bypass';
-// import { supabase } from '../services/supabase';
+// Service unifié - Plus de conflit d'instances multiples
+import { supabase } from '../services/supabase';
 
 const AuthCallback: React.FC = () => {
   useEffect(() => {

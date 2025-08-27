@@ -1,6 +1,6 @@
 // Version SIMPLIFIÉE de useAuth pour tester
 import { useState, useEffect } from 'react';
-import { authService, type AuthUser } from '../services/supabase-bypass';
+import { authService, type AuthUser } from '../services/supabase';
 
 export const useAuthSimple = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
