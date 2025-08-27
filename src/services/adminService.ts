@@ -1,5 +1,5 @@
 // TEMPORAIRE: Utilisation du service bypass
-import { supabase } from './supabase-bypass';
+import { supabase, supabaseAdmin } from './supabase-bypass';
 // import { supabase } from './supabase';
 import type { 
   User, 
@@ -25,19 +25,26 @@ export class AdminService {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          teams!profiles_team_fkey (
-            name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Enrichir avec statistiques d'activité
+      // Enrichir avec nom des équipes et statistiques d'activité
       const enrichedUsers: UserWithTeam[] = await Promise.all(
         data.map(async (user) => {
+          // Récupérer le nom de l'équipe si l'utilisateur en a une
+          let teamName = null;
+          if (user.team) {
+            const { data: teamData } = await supabase
+              .from('teams')
+              .select('name')
+              .eq('id', user.team)
+              .single();
+            teamName = teamData?.name || null;
+          }
+
+          // Récupérer la dernière entrée
           const { data: entries } = await supabase
             .from('daily_entries')
             .select('entry_date')
@@ -47,7 +54,7 @@ export class AdminService {
 
           return {
             ...user,
-            team_name: user.teams?.name,
+            team_name: teamName,
             last_entry_date: entries?.[0]?.entry_date || null,
             entries_count: await this.getUserEntriesCount(user.id)
           };
@@ -70,18 +77,40 @@ export class AdminService {
     try {
       const { data, error } = await supabase
         .from('teams')
-        .select(`
-          *,
-          profiles!profiles_team_fkey (count)
-        `)
+        .select('*')
+        .eq('is_active', true)
         .order('name');
 
       if (error) throw error;
 
-      const teamsWithCounts = data.map(team => ({
-        ...team,
-        members_count: team.profiles?.length || 0
-      }));
+      // Enrichir chaque équipe avec le nombre de membres
+      const teamsWithCounts = await Promise.all(
+        data.map(async (team) => {
+          // Compter les membres de l'équipe
+          const { count } = await supabase
+            .from('profiles')
+            .select('id', { count: 'exact' })
+            .eq('team', team.id)
+            .eq('is_active', true);
+
+          // Récupérer le nom du manager si il y en a un
+          let managerName = null;
+          if (team.manager_id) {
+            const { data: managerData } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('id', team.manager_id)
+              .single();
+            managerName = managerData?.email || null;
+          }
+
+          return {
+            ...team,
+            members_count: count || 0,
+            manager_name: managerName
+          };
+        })
+      );
 
       return { data: teamsWithCounts, error: null };
     } catch (error) {
@@ -97,7 +126,7 @@ export class AdminService {
    */
   async createUser(userData: UserCreateRequest): Promise<{ success: boolean; error?: string }> {
     try {
-      // Vérifier que l'email n'existe pas déjà
+      // Vérifier que l'email n'existe pas déjà dans profiles
       const { data: existing } = await supabase
         .from('profiles')
         .select('id')
@@ -108,24 +137,53 @@ export class AdminService {
         return { success: false, error: 'Un utilisateur avec cet email existe déjà' };
       }
 
-      // Créer le profil utilisateur
-      const { error } = await supabase
+      // Vérifier que le client admin est disponible
+      if (!supabaseAdmin) {
+        return { success: false, error: 'Configuration admin manquante. Ajoutez VITE_SUPABASE_SERVICE_ROLE_KEY dans .env' };
+      }
+
+      // Générer un mot de passe temporaire
+      const tempPassword = userData.temp_password || Math.random().toString(36).slice(-8);
+      
+      // Créer d'abord l'utilisateur dans Supabase Auth avec le client admin
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: userData.email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: {
+          role: userData.role,
+          team: userData.team_id
+        }
+      });
+
+      if (authError || !authUser.user) {
+        console.error('Erreur création Auth user:', authError);
+        return { success: false, error: 'Erreur lors de la création du compte d\'authentification' };
+      }
+
+      // Créer le profil utilisateur avec l'UUID généré
+      const { error: profileError } = await supabase
         .from('profiles')
         .insert({
+          id: authUser.user.id, // Utiliser l'UUID généré par Supabase Auth
           email: userData.email,
           role: userData.role,
-          team: userData.team_id || null, // Permettre team null
+          team: userData.team_id || null,
           is_active: true
         });
 
-      if (error) throw error;
+      if (profileError) {
+        // Si erreur profil, nettoyer l'utilisateur auth créé
+        await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+        throw profileError;
+      }
 
       // Envoyer invitation si demandé
       if (userData.send_invitation) {
-        await this.sendUserInvitation(userData.email);
+        await this.sendUserInvitation(userData.email, tempPassword);
       }
 
-      return { success: true };
+      return { success: true, tempPassword };
     } catch (error) {
       console.error('Erreur création utilisateur:', error);
       return { 
@@ -381,9 +439,27 @@ export class AdminService {
     return count || 0;
   }
 
-  private async sendUserInvitation(email: string): Promise<void> {
-    // Logique d'envoi d'invitation (à implémenter selon le système d'email)
-    console.log(`Invitation envoyée à ${email}`);
+  private async sendUserInvitation(email: string, tempPassword?: string): Promise<void> {
+    // Pour l'instant, utilisation du système de récupération de mot de passe Supabase
+    if (supabaseAdmin && tempPassword) {
+      try {
+        // Envoyer un email de récupération de mot de passe pour forcer le changement
+        const { error } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'recovery',
+          email: email,
+          options: {
+            redirectTo: `${window.location.origin}/auth/reset-password`
+          }
+        });
+        
+        if (!error) {
+          console.log(`Email de récupération envoyé à ${email}`);
+          console.log(`Mot de passe temporaire: ${tempPassword}`);
+        }
+      } catch (error) {
+        console.log(`Invitation manuelle à ${email} avec mot de passe temporaire: ${tempPassword}`);
+      }
+    }
   }
 
   private calculateWellbeingTrend(entries: DailyEntry[]): number[] {

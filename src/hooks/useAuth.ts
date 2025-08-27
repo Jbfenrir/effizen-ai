@@ -12,6 +12,7 @@ interface AuthState {
 // Variable globale pour éviter les vérifications multiples simultanées
 let globalCheckInProgress = false;
 let globalLastCheckTime = 0;
+let visibilityCheckTimeout: NodeJS.Timeout | null = null;
 
 // Exposer les flags pour le debug
 if (typeof window !== 'undefined') {
@@ -38,25 +39,25 @@ export const useAuth = () => {
     const checkSession = async () => {
       if (!isSubscribed) return;
       
-      // Protection contre les blocages permanents
+      // Protection contre les blocages permanents - réduite à 2 secondes
       const now = Date.now();
-      if (globalCheckInProgress && (now - globalLastCheckTime > 5000)) {
-        console.warn('🚨 useAuth: Flag globalCheckInProgress bloqué depuis >5s, forçage reset');
+      if (globalCheckInProgress && (now - globalLastCheckTime > 2000)) {
+        console.warn('🚨 useAuth: Flag globalCheckInProgress bloqué depuis >2s, forçage reset');
         globalCheckInProgress = false;
       }
       
-      // Éviter les vérifications simultanées (importantes avec StrictMode)
-      if (globalCheckInProgress || (now - globalLastCheckTime < 500)) {
+      // Éviter les vérifications simultanées avec délai réduit
+      if (globalCheckInProgress || (now - globalLastCheckTime < 300)) {
         console.log('⏸️ useAuth: Vérification déjà en cours, ignorée');
         
-        // Timeout de secours : si bloqué trop longtemps, forcer l'état non-authentifié
+        // Timeout de secours réduit
         setTimeout(() => {
           if (isSubscribed && globalCheckInProgress) {
             console.warn('🚨 useAuth: Timeout de secours - forçage état non-authentifié');
             globalCheckInProgress = false;
             setAuthState({ user: null, loading: false, error: null });
           }
-        }, 3000);
+        }, 1500);
         return;
       }
       
@@ -82,7 +83,7 @@ export const useAuth = () => {
         
         if (error) {
           console.error('❌ useAuth: Erreur getSession:', error);
-          setAuthState({ user: null, loading: false, error: error.message });
+          setAuthState({ user: null, loading: false, error: typeof error === 'string' ? error : 'Session error' });
           return;
         }
 
@@ -95,25 +96,31 @@ export const useAuth = () => {
               return;
             }
             
-            console.log('👤 useAuth: Utilisateur récupéré:', user);
-            // Mettre en cache la session
-            sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user, timestamp: Date.now() }));
-            setAuthState({ user, loading: false, error: null });
+            if (user) {
+              console.log('👤 useAuth: Utilisateur récupéré:', user.email, '- Rôle:', user.role);
+              // Mettre en cache la session
+              sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user, timestamp: Date.now() }));
+              setAuthState({ user, loading: false, error: null });
+            } else {
+              console.warn('⚠️ useAuth: getCurrentUser a retourné null');
+              setAuthState({ user: null, loading: false, error: 'Failed to load user data' });
+            }
           } catch (userError) {
             if (!isSubscribed) {
               globalCheckInProgress = false;
               return;
             }
             
-            console.warn('⚠️ useAuth: Erreur récupération profil, utilisation des données de base');
-            // Fallback si le profil n'existe pas
+            console.warn('⚠️ useAuth: Erreur récupération utilisateur:', userError);
+            // Fallback avec les données de session directement
             const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
             const fallbackUser = {
               id: session.user.id,
               email: session.user.email!,
               role: isAdminEmail ? 'admin' : 'employee' as 'admin' | 'employee'
             };
-            // Mettre en cache la session
+            
+            console.log('🚫 useAuth: Utilisation du fallback user:', fallbackUser);
             sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user: fallbackUser, timestamp: Date.now() }));
             setAuthState({ 
               user: fallbackUser, 
@@ -144,7 +151,51 @@ export const useAuth = () => {
       }
     };
 
-    checkSession();
+    // NOUVEAU: Vérifier d'abord le localStorage pour une session existante
+    const quickSessionCheck = () => {
+      if (!isSubscribed) return;
+      
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      const storageKey = (hostname === 'localhost' || hostname === '127.0.0.1')
+        ? `supabase.auth.token.local.${port || '3000'}`
+        : `supabase.auth.token.${hostname.replace(/\./g, '_')}`;
+      
+      const storedSession = localStorage.getItem(storageKey);
+      
+      if (storedSession && storedSession !== 'null' && storedSession !== 'undefined') {
+        try {
+          const sessionData = JSON.parse(storedSession);
+          
+          // Vérifier si le token n'est pas expiré
+          if (sessionData.expires_at && sessionData.expires_at * 1000 > Date.now()) {
+            console.log('⚡ useAuth: Session valide détectée au démarrage, chargement utilisateur...');
+            
+            // Démarrer la récupération utilisateur en arrière-plan
+            checkSession();
+            return;
+          } else {
+            console.log('⏰ useAuth: Session expirée détectée au démarrage');
+            localStorage.removeItem(storageKey);
+            sessionStorage.removeItem('effizen_auth_cache');
+          }
+        } catch (error) {
+          console.warn('⚠️ useAuth: Erreur parsing session au démarrage:', error);
+          localStorage.removeItem(storageKey);
+        }
+      }
+      
+      // Si pas de session valide, procéder normalement
+      console.log('ℹ️ useAuth: Pas de session existante, vérification classique...');
+      if (!document.hidden) {
+        checkSession();
+      } else {
+        console.log('😴 useAuth: Onglet invisible au démarrage, état non-authentifié');
+        setAuthState({ user: null, loading: false, error: null });
+      }
+    };
+    
+    quickSessionCheck();
     
     return () => {
       isSubscribed = false;
@@ -153,31 +204,97 @@ export const useAuth = () => {
 
   // Gestionnaire pour les changements de visibilité de l'onglet
   useEffect(() => {
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = async () => {
+      // Nettoyer tout timeout existant
+      if (visibilityCheckTimeout) {
+        clearTimeout(visibilityCheckTimeout);
+        visibilityCheckTimeout = null;
+      }
+      
       if (!document.hidden) {
         console.log('👁️ useAuth: Onglet redevenu visible');
-        // Vérifier le cache avant de faire une nouvelle vérification
-        const cachedSession = sessionStorage.getItem('effizen_auth_cache');
-        if (cachedSession) {
-          try {
-            const cached = JSON.parse(cachedSession);
-            // Si le cache a moins de 5 minutes, l'utiliser
-            if (cached.timestamp && Date.now() - cached.timestamp < 5 * 60 * 1000) {
-              console.log('📦 useAuth: Utilisation du cache de session');
-              if (cached.user) {
-                setAuthState({ user: cached.user, loading: false, error: null });
-              }
-              return;
-            }
-          } catch {
-            // Ignorer les erreurs de parsing
-          }
+        
+        // Forcer le reset du flag si bloqué
+        if (globalCheckInProgress) {
+          console.log('✨ useAuth: Reset du flag globalCheckInProgress au retour d\'onglet');
+          globalCheckInProgress = false;
         }
+        
+        // Vérifier d'abord le localStorage pour la session existante
+        const storageKey = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? `supabase.auth.token.local.${window.location.port || '3000'}`
+          : `supabase.auth.token.${window.location.hostname.replace(/\./g, '_')}`;
+        
+        const storedSession = localStorage.getItem(storageKey);
+        
+        if (storedSession && storedSession !== 'null' && storedSession !== 'undefined') {
+          try {
+            const sessionData = JSON.parse(storedSession);
+            
+            // Vérifier si le token n'est pas expiré
+            if (sessionData.expires_at && sessionData.expires_at * 1000 > Date.now()) {
+              console.log('✅ useAuth: Session valide trouvée dans localStorage au retour d\'onglet');
+              
+              // Vérifier le cache pour les données utilisateur
+              const cachedUser = sessionStorage.getItem('effizen_auth_cache');
+              if (cachedUser) {
+                try {
+                  const cached = JSON.parse(cachedUser);
+                  if (cached.user && cached.timestamp && Date.now() - cached.timestamp < 10 * 60 * 1000) {
+                    console.log('📦 useAuth: Réutilisation du cache utilisateur');
+                    setAuthState({ user: cached.user, loading: false, error: null });
+                    return;
+                  }
+                } catch {
+                  console.warn('⚠️ useAuth: Cache utilisateur invalide');
+                }
+              }
+              
+              // Si pas de cache valide, récupérer l'utilisateur
+              // Mais avec un délai pour éviter les appels simultanés
+              visibilityCheckTimeout = setTimeout(async () => {
+                if (!globalCheckInProgress) {
+                  try {
+                    globalCheckInProgress = true;
+                    const user = await authService.getCurrentUser();
+                    if (user) {
+                      console.log('👤 useAuth: Utilisateur récupéré au retour d\'onglet');
+                      sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user, timestamp: Date.now() }));
+                      setAuthState({ user, loading: false, error: null });
+                    }
+                  } catch (error) {
+                    console.error('🚨 useAuth: Erreur récupération utilisateur:', error);
+                  } finally {
+                    globalCheckInProgress = false;
+                  }
+                }
+              }, 100); // Délai de 100ms pour stabiliser
+            } else {
+              console.log('⏰ useAuth: Session expirée, besoin de réauthentification');
+              setAuthState({ user: null, loading: false, error: null });
+            }
+          } catch (error) {
+            console.error('🚨 useAuth: Erreur parsing session localStorage:', error);
+            setAuthState({ user: null, loading: false, error: null });
+          }
+        } else {
+          console.log('ℹ️ useAuth: Pas de session dans localStorage au retour d\'onglet');
+          setAuthState({ user: null, loading: false, error: null });
+        }
+      } else {
+        console.log('😴 useAuth: Onglet devenu invisible');
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (visibilityCheckTimeout) {
+        clearTimeout(visibilityCheckTimeout);
+      }
+    };
   }, []);
 
   // Second useEffect pour écouter les changements d'authentification
@@ -239,7 +356,39 @@ export const useAuth = () => {
             // Ne rien faire, garder l'état actuel
           } else if (event === 'INITIAL_SESSION') {
             console.log('🎯 useAuth: Initial session detected');
-            // Session initiale déjà gérée par checkSession
+            // Gérer explicitement la session initiale
+            if (session?.user) {
+              try {
+                const user = await authService.getCurrentUser();
+                if (isSubscribed) {
+                  console.log('✅ useAuth: Initial session user loaded:', user);
+                  sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user, timestamp: Date.now() }));
+                  setAuthState({ user, loading: false, error: null });
+                }
+              } catch (userError) {
+                if (!isSubscribed) return;
+                console.warn('⚠️ useAuth: Initial session - using fallback for profile');
+                // Fallback si le profil n'existe pas
+                const isAdminEmail = session.user.email === 'jbgerberon@gmail.com';
+                const fallbackUser = {
+                  id: session.user.id,
+                  email: session.user.email!,
+                  role: isAdminEmail ? 'admin' : 'employee' as 'admin' | 'employee'
+                };
+                sessionStorage.setItem('effizen_auth_cache', JSON.stringify({ user: fallbackUser, timestamp: Date.now() }));
+                setAuthState({ 
+                  user: fallbackUser, 
+                  loading: false, 
+                  error: null 
+                });
+              }
+            } else {
+              // Pas de session initiale
+              if (isSubscribed) {
+                console.log('ℹ️ useAuth: No initial session');
+                setAuthState({ user: null, loading: false, error: null });
+              }
+            }
           } else {
             if (isSubscribed) {
               setAuthState(prev => ({ ...prev, loading: false }));

@@ -82,6 +82,10 @@ const UserModal: React.FC<UserModalProps> = ({
       }
 
       if (result?.success) {
+        // Afficher le mot de passe temporaire si un utilisateur a été créé
+        if (mode === 'create' && result.tempPassword) {
+          alert(`Utilisateur créé avec succès!\n\nMot de passe temporaire: ${result.tempPassword}\n\n⚠️ Communiquez ce mot de passe à l'utilisateur pour sa première connexion.`);
+        }
         onSuccess();
         onClose();
       } else {

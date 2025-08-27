@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Manuel - Bug Changement Onglet</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .step { margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .step h3 { color: #2563eb; margin-top: 0; }
+        .success { background: #f0f9ff; border-color: #38bdf8; }
+        .warning { background: #fffbeb; border-color: #fbbf24; }
+        .error { background: #fef2f2; border-color: #f87171; }
+        .code { background: #f8f9fa; padding: 8px; border-radius: 4px; font-family: monospace; }
+        .button { 
+            display: inline-block; padding: 10px 20px; margin: 5px;
+            background: #2563eb; color: white; text-decoration: none;
+            border-radius: 6px; border: none; cursor: pointer;
+        }
+        .button:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Manuel - Correction Bug Changement d'Onglet</h1>
+    
+    <div class="step success">
+        <h3>✅ Corrections Appliquées</h3>
+        <ul>
+            <li><strong>Singleton Global</strong> : Client Supabase unique attaché à window (survit au HMR)</li>
+            <li><strong>Détection Session Rapide</strong> : Vérification localStorage au démarrage</li>
+            <li><strong>Timeouts Optimisés</strong> : Réduction des délais de 5s → 2s</li>
+            <li><strong>Gestion d'Erreur</strong> : Meilleure gestion des sessions expirées</li>
+        </ul>
+    </div>
+
+    <div class="step warning">
+        <h3>🔍 Procédure de Test</h3>
+        <ol>
+            <li><strong>Ouvrir l'application</strong> : <a href="http://localhost:3000" target="_blank" class="button">Ouvrir App</a></li>
+            <li><strong>Observer</strong> : Y a-t-il encore une page de chargement infini au démarrage ?</li>
+            <li><strong>Se connecter</strong> : Utiliser le bouton "Forcer la connexion" si nécessaire</li>
+            <li><strong>Vérifier la console</strong> : Messages "Multiple GoTrueClient" réduits ?</li>
+            <li><strong>Test changement onglet</strong> :
+                <ul>
+                    <li>Une fois connecté sur le dashboard</li>
+                    <li>Changer d'onglet pendant 5-10 secondes</li>
+                    <li>Revenir sur l'onglet de l'app</li>
+                    <li>Observer : Page de chargement infini ? Déconnexion ?</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="step">
+        <h3>🔧 Debug Console</h3>
+        <p>Commandes à tester dans la console (F12) :</p>
+        <div class="code">localStorage.getItem('supabase.auth.token.local.3000')</div>
+        <div class="code">sessionStorage.getItem('effizen_auth_cache')</div>
+        <div class="code">window.__effizen_supabase_client__ // Doit exister</div>
+        <div class="code">window.globalCheckInProgress // Doit être false</div>
+    </div>
+
+    <div class="step error">
+        <h3>🚨 Si le Problème Persiste</h3>
+        <ul>
+            <li><strong>Vider le cache</strong> : Ctrl+Shift+R (Chrome) ou Ctrl+Shift+Delete</li>
+            <li><strong>Vérifier la console</strong> : Copier tous les messages d'erreur</li>
+            <li><strong>Tester en navigation privée</strong> : Éliminer les données corrompues</li>
+            <li><strong>Redémarrer le serveur</strong> : npm run dev</li>
+        </ul>
+    </div>
+
+    <div class="step success">
+        <h3>✅ Résultat Attendu</h3>
+        <ul>
+            <li>Pas de page de chargement infini au démarrage</li>
+            <li>Session persistante lors du changement d'onglet</li>
+            <li>Messages "Multiple GoTrueClient" réduits (acceptable au premier chargement)</li>
+            <li>Application stable et responsive</li>
+        </ul>
+    </div>
+
+    <script>
+        // Automatiser quelques vérifications
+        console.log('🔍 Test Page - Vérifications automatiques:');
+        console.log('- Singleton Supabase:', !!window.__effizen_supabase_client__);
+        console.log('- LocalStorage session:', !!localStorage.getItem('supabase.auth.token.local.3000'));
+        console.log('- SessionStorage cache:', !!sessionStorage.getItem('effizen_auth_cache'));
+        
+        // Fonction pour tester la visibilité
+        window.testVisibilityChange = function() {
+            console.log('🧪 Test visibilityChange manuel...');
+            document.dispatchEvent(new Event('visibilitychange'));
+            console.log('✓ Événement visibilitychange déclenché');
+        };
+        
+        console.log('💡 Utilisez testVisibilityChange() pour tester manuellement');
+    </script>
+</body>
+</html>

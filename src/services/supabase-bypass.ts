@@ -3,6 +3,7 @@ import type { Database } from '../types/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://qzvrkcmwzdaffpknuozl.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6dnJrY213emRhZmZwa251b3psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyMTM3OTgsImV4cCI6MjA2Nzc4OTc5OH0.GJXkGBy047Dx8cS-uOIQJSEJa5VHQRfdwWb-FkQVbIQ';
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Variables Supabase manquantes, utilisation des valeurs par défaut');
@@ -45,37 +46,91 @@ cleanupOldStorageKeys();
 
 console.log(`🔑 Storage key utilisée: ${storageKey}`);
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    storageKey: storageKey, // Clé de stockage unique par environnement
-    storage: {
-      getItem: (key: string) => {
-        const item = localStorage.getItem(key);
-        // Protection contre les données corrompues
-        if (item && item !== 'undefined' && item !== 'null') {
-          try {
-            JSON.parse(item);
-            return item;
-          } catch {
-            console.warn(`⚠️ Données corrompues pour ${key}, nettoyage...`);
-            localStorage.removeItem(key);
-            return null;
+// VRAI SINGLETON GLOBAL attaché à window pour éviter les instances multiples avec HMR
+const GLOBAL_SUPABASE_KEY = '__effizen_supabase_client__';
+const GLOBAL_ADMIN_KEY = '__effizen_supabase_admin__';
+
+// Fonction pour obtenir ou créer l'instance GLOBALE du client Supabase
+const getSupabaseClient = () => {
+  // Vérifier si une instance existe déjà dans window (survit au HMR)
+  if (typeof window !== 'undefined' && (window as any)[GLOBAL_SUPABASE_KEY]) {
+    console.log('♻️ Réutilisation du client Supabase global existant (anti-HMR)');
+    return (window as any)[GLOBAL_SUPABASE_KEY];
+  }
+  
+  console.log('🔧 Création du client Supabase GLOBAL (singleton)');
+  const client = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storageKey: storageKey, // Clé de stockage unique par environnement
+      storage: {
+        getItem: (key: string) => {
+          const item = localStorage.getItem(key);
+          // Protection contre les données corrompues
+          if (item && item !== 'undefined' && item !== 'null') {
+            try {
+              JSON.parse(item);
+              return item;
+            } catch {
+              console.warn(`⚠️ Données corrompues pour ${key}, nettoyage...`);
+              localStorage.removeItem(key);
+              return null;
+            }
           }
-        }
-        return null;
+          return null;
+        },
+        setItem: (key: string, value: string) => {
+          localStorage.setItem(key, value);
+        },
+        removeItem: (key: string) => {
+          localStorage.removeItem(key);
+        },
       },
-      setItem: (key: string, value: string) => {
-        localStorage.setItem(key, value);
-      },
-      removeItem: (key: string) => {
-        localStorage.removeItem(key);
-      },
+      // Optimisations pour réduire les conflits
+      flowType: 'pkce',
     },
-  },
-});
+  });
+  
+  // Stocker dans window pour survivre au HMR de Vite
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_SUPABASE_KEY] = client;
+  }
+  
+  return client;
+};
+
+// Fonction pour obtenir ou créer l'instance admin GLOBALE
+const getSupabaseAdminClient = () => {
+  if (!supabaseServiceKey) return null;
+  
+  // Vérifier si une instance admin existe déjà dans window
+  if (typeof window !== 'undefined' && (window as any)[GLOBAL_ADMIN_KEY]) {
+    return (window as any)[GLOBAL_ADMIN_KEY];
+  }
+  
+  console.log('🔧 Création du client Supabase Admin GLOBAL (singleton)');
+  const adminClient = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+  
+  // Stocker dans window
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_ADMIN_KEY] = adminClient;
+  }
+  
+  return adminClient;
+};
+
+// Client normal pour auth utilisateur (anon key) - Utilise le singleton GLOBAL
+export const supabase = getSupabaseClient();
+
+// Client admin pour opérations administratives (service key) - Utilise le singleton GLOBAL
+export const supabaseAdmin = getSupabaseAdminClient();
 
 // Types pour l'authentification
 export interface AuthUser {
@@ -125,10 +180,24 @@ export const authService = {
     return { error };
   },
 
-  // Obtenir la session actuelle
+  // Obtenir la session actuelle avec gestion d'erreur améliorée
   async getSession() {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    return { session, error };
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.warn('⚠️ authService.getSession: Erreur Supabase:', error.message);
+        return { session: null, error };
+      }
+      
+      return { session, error: null };
+    } catch (error) {
+      console.error('🚨 authService.getSession: Erreur catch:', error);
+      return { 
+        session: null, 
+        error: { message: 'Failed to get session', originalError: error }
+      };
+    }
   },
 
   // Écouter les changements d'authentification
@@ -140,37 +209,47 @@ export const authService = {
   async getCurrentUser(): Promise<AuthUser | null> {
     console.log('🚀 BYPASS MODE: getCurrentUser sans table profiles');
     
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-      console.log('❌ BYPASS: Pas d\'utilisateur Supabase', error);
+    try {
+      // D'abord vérifier si on a une session existante
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.log('❌ BYPASS: Erreur récupération session', sessionError);
+        return null;
+      }
+      
+      if (!session?.user) {
+        console.log('❌ BYPASS: Pas de session active');
+        return null;
+      }
+      
+      console.log('✅ BYPASS: Session trouvée, utilisateur:', session.user.email);
+      
+      // BYPASS: Déterminer le rôle basé sur l'email uniquement
+      let role: 'employee' | 'manager' | 'admin' = 'employee';
+      
+      // Liste des emails admin
+      const adminEmails = ['jbgerberon@gmail.com'];
+      const managerEmails: string[] = [];
+      
+      if (adminEmails.includes(session.user.email || '')) {
+        role = 'admin';
+      } else if (managerEmails.includes(session.user.email || '')) {
+        role = 'manager';
+      }
+
+      console.log('✅ BYPASS: Rôle déterminé:', role);
+
+      return {
+        id: session.user.id,
+        email: session.user.email!,
+        role: role,
+        team: undefined,
+      };
+    } catch (error) {
+      console.error('🚨 BYPASS: Erreur dans getCurrentUser:', error);
       return null;
     }
-
-    console.log('✅ BYPASS: Utilisateur Supabase trouvé:', user.email);
-
-    // BYPASS: Déterminer le rôle basé sur l'email uniquement
-    // Pas d'accès à la table profiles pour éviter les problèmes RLS
-    let role: 'employee' | 'manager' | 'admin' = 'employee';
-    
-    // Liste des emails admin (à adapter selon vos besoins)
-    const adminEmails = ['jbgerberon@gmail.com'];
-    const managerEmails: string[] = []; // Ajouter les emails des managers si nécessaire
-    
-    if (adminEmails.includes(user.email || '')) {
-      role = 'admin';
-    } else if (managerEmails.includes(user.email || '')) {
-      role = 'manager';
-    }
-
-    console.log('✅ BYPASS: Rôle déterminé:', role);
-
-    return {
-      id: user.id,
-      email: user.email!,
-      role: role,
-      team: undefined, // Pas d'équipe en mode bypass
-    };
   },
 };
 

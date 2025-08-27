@@ -124,6 +124,7 @@ export interface UserCreateRequest {
   role: 'employee' | 'manager' | 'admin';
   team_id: string;
   send_invitation?: boolean;
+  temp_password?: string;
 }
 
 export interface TeamCreateRequest {
@@ -171,7 +172,7 @@ export interface UseAdminReturn {
   metrics: AdminMetrics;
   loading: boolean;
   error: string | null;
-  createUser: (userData: UserCreateRequest) => Promise<{ success: boolean; error?: string }>;
+  createUser: (userData: UserCreateRequest) => Promise<{ success: boolean; error?: string; tempPassword?: string }>;
   updateUser: (userId: string, updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   deleteUser: (userId: string) => Promise<{ success: boolean; error?: string }>;
   createTeam: (teamData: TeamCreateRequest) => Promise<{ success: boolean; error?: string }>;

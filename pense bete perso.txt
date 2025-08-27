@@ -10,3 +10,5 @@ Pour tester l'application en local :
 4- Puis mentionner à claude code "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"
 
 - - - -  claude_runbook.md m (Il s'agit de l'analyse et des suggestions effectuées par Tchat GPT sur la base du code fourni par claude code).
+
+Sinon, lancer PowerShell, puis Ubuntu, puis claude code.
