@@ -217,8 +217,8 @@ export const useAuthNew = () => {
     try {
       // Déterminer l'URL de redirection selon l'environnement
       const redirectUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? `${window.location.origin}/auth/callback?type=recovery`
-        : 'https://effizen-ai-prod.vercel.app/auth/callback?type=recovery';
+        ? `${window.location.origin}/reset-password`
+        : 'https://effizen-ai-prod.vercel.app/reset-password';
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,

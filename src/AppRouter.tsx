@@ -7,6 +7,7 @@ import './index.css';
 import Header from './components/Header';
 import NewLoginPage from './pages/NewLoginPage'; // Utiliser la nouvelle page
 import AuthCallback from './pages/AuthCallback';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardEmployee from './pages/DashboardEmployee';
 import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
@@ -133,6 +134,11 @@ function AppRouter() {
   // Gestion du callback
   if (currentPath === '/auth/callback' || currentPath.includes('access_token')) {
     return <AuthCallback />;
+  }
+
+  // Gestion de la réinitialisation de mot de passe
+  if (currentPath === '/reset-password') {
+    return <ResetPasswordPage />;
   }
 
   return (

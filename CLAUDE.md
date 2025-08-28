@@ -418,6 +418,7 @@ git reset --hard 57b058e
 4. **Retour ancien système** → `git reset --hard 57b058e` ou basculer auth-switch.ts
 5. **Build errors** → Utiliser `npm run build` (sans TypeScript check)
 6. **Lecture screenshots impossible** → Problème caractères spéciaux dans noms fichiers Windows/WSL
+7. **Modifications non visibles en local** → TOUJOURS relancer serveur après modifications code (Ctrl+C → `npm run dev`)
 
 ### 📸 GESTION SCREENSHOTS - PROTOCOLE CLAUDE CODE
 

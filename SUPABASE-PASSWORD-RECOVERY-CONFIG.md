@@ -22,12 +22,18 @@ Site URL: https://effizen-ai-prod.vercel.app
 
 Redirect URLs (ajoutez toutes ces URLs):
 - https://effizen-ai-prod.vercel.app/auth/callback
-- https://effizen-ai-prod.vercel.app/auth/callback?type=recovery
+- https://effizen-ai-prod.vercel.app/reset-password
 - https://effizen-ai-prod.vercel.app/dashboard
 - http://localhost:3000/auth/callback
+- http://localhost:3000/reset-password
 - http://localhost:3001/auth/callback
+- http://localhost:3001/reset-password
 - http://localhost:3002/auth/callback
+- http://localhost:3002/reset-password
+- http://localhost:3003/auth/callback
+- http://localhost:3003/reset-password
 - http://localhost:5173/auth/callback
+- http://localhost:5173/reset-password
 ```
 
 ### 3. Templates d'email (optionnel mais recommandé)
@@ -63,15 +69,15 @@ Sender name: EffiZen-AI
 ### Test en local :
 1. Lancez l'application : `npm run dev`
 2. Allez sur http://localhost:3002/login
-3. Cliquez sur "Mot de passe oublié" (une fois implémenté)
+3. Cliquez sur "Mot de passe oublié ?" 
 4. Entrez votre email et validez
 5. Vérifiez votre boîte mail
-6. Le lien devrait rediriger vers : `http://localhost:3002/auth/callback?type=recovery`
+6. Le lien devrait rediriger vers : `http://localhost:3002/reset-password`
 
 ### Test en production :
 1. Allez sur https://effizen-ai-prod.vercel.app/login
 2. Répétez les étapes 3-5 ci-dessus
-3. Le lien devrait rediriger vers : `https://effizen-ai-prod.vercel.app/auth/callback?type=recovery`
+3. Le lien devrait rediriger vers : `https://effizen-ai-prod.vercel.app/reset-password`
 
 ## 🔍 Dépannage
 
