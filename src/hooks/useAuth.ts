@@ -467,6 +467,39 @@ export const useAuth = () => {
     }
   };
 
+  const resetPasswordForEmail = async (email: string) => {
+    console.log('🔑 useAuth: Demande de réinitialisation pour:', email);
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
+    
+    try {
+      // Utiliser authService qui utilise lui-même supabase
+      const { error } = await authService.resetPasswordForEmail(email);
+      
+      if (error) {
+        console.error('❌ useAuth: Erreur réinitialisation:', error.message);
+        setAuthState(prev => ({ 
+          ...prev, 
+          loading: false, 
+          error: error.message 
+        }));
+        return { success: false, error: error.message };
+      }
+
+      console.log('✅ useAuth: Email de réinitialisation envoyé');
+      setAuthState(prev => ({ ...prev, loading: false }));
+      return { success: true };
+    } catch (error) {
+      console.error('🚨 useAuth: Erreur catch resetPassword:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+      setAuthState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: errorMessage 
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
   const signOut = async () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
     
@@ -505,6 +538,7 @@ export const useAuth = () => {
     error: authState.error,
     signInWithPassword,
     signInWithMagicLink,
+    resetPasswordForEmail,
     signOut,
     clearError,
     isAuthenticated: !!authState.user,

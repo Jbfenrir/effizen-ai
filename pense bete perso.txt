@@ -1,3 +1,17 @@
+LANCER CLAUDE CODE :
+
+- depuis le dossier de travail executer :
+wsl
+cd /mnt/c/Users/FIAE/Desktop/effizen-ai
+claude
+
+-----------------------------------
+SCREENSHOTS : 
+
+Au lieu de glisser-déposer, tapez directement dans Claude :
+  Lis cette capture : screenshots/Capture d'écran 2025-08-28 122859.png
+-----------------------------------
+
 Pour tester l'application en local : 
 1- se positionner dans le dossier effizen-ai
 2- ouvrir dans le terminaal (PowerShell)
@@ -9,9 +23,7 @@ Pour tester l'application en local :
 
 4- Puis mentionner à claude code "Je travaille sur "C:\Users\FIAE\Desktop\effizen-ai", lis le fichier CLAUDE.md d'abord"
 
-- - - -  claude_runbook.md m (Il s'agit de l'analyse et des suggestions effectuées par Tchat GPT sur la base du code fourni par claude code).
-
-Sinon, lancer PowerShell, puis Ubuntu, puis claude code.
+--------------------
 
 
 Pour RETOUR IMMÉDIAT

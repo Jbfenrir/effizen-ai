@@ -12,7 +12,8 @@ const NewLoginPage: React.FC = () => {
   const { t } = useTranslation();
   const { 
     signInWithPassword, 
-    signInWithMagicLink, 
+    signInWithMagicLink,
+    resetPasswordForEmail,
     loading, 
     error, 
     clearError, 
@@ -22,7 +23,7 @@ const NewLoginPage: React.FC = () => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginMode, setLoginMode] = useState<'password' | 'magic'>('password');
+  const [loginMode, setLoginMode] = useState<'password' | 'magic' | 'reset'>('password');
   const [message, setMessage] = useState<string | null>(null);
 
   // 🚀 CORRECTION: Redirection automatique après connexion
@@ -78,6 +79,29 @@ const NewLoginPage: React.FC = () => {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    setMessage(null);
+    
+    if (!email) {
+      setMessage('Veuillez entrer votre email');
+      return;
+    }
+
+    console.log('🔑 Demande de réinitialisation pour:', email);
+    const result = await resetPasswordForEmail(email);
+    
+    if (result.success) {
+      setMessage('Email de réinitialisation envoyé ! Vérifiez votre boîte de réception.');
+      // Revenir au mode connexion après succès
+      setTimeout(() => {
+        setLoginMode('password');
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-off-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -86,7 +110,7 @@ const NewLoginPage: React.FC = () => {
             EffiZen-AI
           </h2>
           <p className="mt-2 text-center text-sm text-metallic-gray">
-            {t('login.subtitle')}
+            Connexion à votre espace de bien-être
           </p>
         </div>
 
@@ -119,7 +143,48 @@ const NewLoginPage: React.FC = () => {
             </div>
           </div>
 
-          {loginMode === 'password' ? (
+          {loginMode === 'reset' ? (
+            <form onSubmit={handlePasswordReset} className="space-y-4">
+              <p className="text-sm text-metallic-gray mb-4">
+                Entrez votre adresse email pour recevoir un lien de réinitialisation.
+              </p>
+              <div>
+                <label htmlFor="reset-email" className="sr-only">
+                  Email
+                </label>
+                <input
+                  id="reset-email"
+                  name="reset-email"
+                  type="email"
+                  required
+                  className="form-input w-full"
+                  placeholder="Adresse email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full"
+              >
+                {loading ? 'Envoi...' : 'Envoyer le lien de réinitialisation'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginMode('password');
+                  setMessage(null);
+                  clearError();
+                }}
+                className="w-full text-sm text-metallic-gray hover:text-dark-blue"
+              >
+                Retour à la connexion
+              </button>
+            </form>
+          ) : loginMode === 'password' ? (
             <form onSubmit={handlePasswordLogin} className="space-y-4">
               <div>
                 <label htmlFor="email" className="sr-only">
@@ -159,6 +224,18 @@ const NewLoginPage: React.FC = () => {
                 className="btn-primary w-full"
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginMode('reset');
+                  setMessage(null);
+                  clearError();
+                }}
+                className="mt-2 w-full text-sm text-metallic-gray hover:text-dark-blue"
+              >
+                Mot de passe oublié ?
               </button>
             </form>
           ) : (
@@ -201,12 +278,6 @@ const NewLoginPage: React.FC = () => {
               {message}
             </div>
           )}
-
-          {/* Info admin */}
-          <div className="mt-6 text-xs text-center text-metallic-gray">
-            <p><strong>Admin:</strong> jbgerberon@gmail.com</p>
-            <p>Mot de passe temporaire: <code>admin123</code></p>
-          </div>
         </div>
       </div>
     </div>

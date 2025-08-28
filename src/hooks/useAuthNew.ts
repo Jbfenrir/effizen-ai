@@ -184,10 +184,15 @@ export const useAuthNew = () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
+      // Déterminer l'URL de redirection selon l'environnement
+      const redirectUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? `${window.location.origin}/auth/callback`
+        : 'https://effizen-ai-prod.vercel.app/auth/callback';
+        
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: redirectUrl,
         },
       });
       
@@ -200,6 +205,37 @@ export const useAuthNew = () => {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Sign in failed';
+      setAuthState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const resetPasswordForEmail = async (email: string) => {
+    console.log('🔑 useAuthNew: Demande de réinitialisation pour:', email);
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
+    
+    try {
+      // Déterminer l'URL de redirection selon l'environnement
+      const redirectUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? `${window.location.origin}/auth/callback?type=recovery`
+        : 'https://effizen-ai-prod.vercel.app/auth/callback?type=recovery';
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+      
+      if (error) {
+        console.error('❌ useAuthNew: Erreur réinitialisation:', error.message);
+        setAuthState(prev => ({ ...prev, loading: false, error: error.message }));
+        return { success: false, error: error.message };
+      }
+
+      console.log('✅ useAuthNew: Email de réinitialisation envoyé');
+      setAuthState(prev => ({ ...prev, loading: false }));
+      return { success: true };
+    } catch (error) {
+      console.error('🚨 useAuthNew: Erreur catch resetPassword:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
       setAuthState(prev => ({ ...prev, loading: false, error: errorMessage }));
       return { success: false, error: errorMessage };
     }
@@ -236,6 +272,7 @@ export const useAuthNew = () => {
     error: authState.error,
     signInWithPassword,
     signInWithMagicLink,
+    resetPasswordForEmail,
     signOut,
     clearError,
     // Propriétés dérivées

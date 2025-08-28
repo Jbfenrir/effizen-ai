@@ -109,11 +109,28 @@ export const authService = {
   },
 
   async signInWithMagicLink(email: string): Promise<{ error: any }> {
+    // Déterminer l'URL de redirection selon l'environnement
+    const redirectUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? `${window.location.origin}/auth/callback`
+      : 'https://effizen-ai-prod.vercel.app/auth/callback';
+      
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: redirectUrl,
       },
+    });
+    return { error };
+  },
+
+  async resetPasswordForEmail(email: string): Promise<{ error: any }> {
+    // Déterminer l'URL de redirection selon l'environnement
+    const redirectUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? `${window.location.origin}/auth/callback?type=recovery`
+      : 'https://effizen-ai-prod.vercel.app/auth/callback?type=recovery';
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
     });
     return { error };
   },

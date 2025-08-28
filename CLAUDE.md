@@ -417,6 +417,37 @@ git reset --hard 57b058e
 3. **Chargement infini persistant** → NOUVEAU SYSTÈME activé (auth-switch.ts)
 4. **Retour ancien système** → `git reset --hard 57b058e` ou basculer auth-switch.ts
 5. **Build errors** → Utiliser `npm run build` (sans TypeScript check)
+6. **Lecture screenshots impossible** → Problème caractères spéciaux dans noms fichiers Windows/WSL
+
+### 📸 GESTION SCREENSHOTS - PROTOCOLE CLAUDE CODE
+
+#### 🚨 Problème identifié : Lecture screenshots impossible
+- **Symptôme :** `File does not exist` lors de `Read("Capture d'écran 2025-XX-XX XXXXXX.png")`
+- **Cause racine :** Caractères spéciaux (apostrophe française `'`) dans noms fichiers Windows/WSL
+- **Impact :** Claude Code ne peut pas lire les screenshots utilisateur directement
+
+#### ✅ Solution de contournement validée
+```bash
+# Dans le dossier screenshots - créer copie avec nom simple
+cd "/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/"
+ls -1 | grep "2025-08-28.*122859" | head -1 | xargs -I{} cp '{}' temp-screenshot.png
+
+# Puis lire avec Claude Code
+Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
+```
+
+#### 🔄 Workflow recommandé pour futures sessions
+1. **Utilisateur indique screenshot :** "Lis cette capture : [nom-fichier]"
+2. **Claude identifie le pattern :** extraire date/heure du nom
+3. **Créer copie temporaire :** `cp 'nom-complexe' temp-screenshot.png`
+4. **Lire la copie :** `Read(temp-screenshot.png)`
+5. **Analyser et répondre** basé sur contenu visual
+
+#### 📋 Actions automatiques Claude Code
+- **TOUJOURS** essayer `Read()` direct en premier
+- **Si échec "File does not exist"** → appliquer protocole copie temporaire
+- **Utiliser `ls | grep | xargs cp`** pour gérer caractères spéciaux
+- **Nettoyer fichiers temporaires** après usage si nécessaire
 
 ### 🔄 BASCULEMENT ENTRE SYSTÈMES AUTH
 - **Actuel :** Nouveau système (USE_AUTH_SYSTEM: 'NEW')
