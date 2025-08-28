@@ -130,7 +130,8 @@ export const authService = {
   },
 
   async signOut(): Promise<{ error: any }> {
-    const { error } = await supabase.auth.signOut();
+    // Utiliser scope: 'local' pour éviter l'erreur 403 en production
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
     return { error };
   },
 

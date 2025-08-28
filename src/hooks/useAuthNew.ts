@@ -209,7 +209,8 @@ export const useAuthNew = () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const { error } = await supabase.auth.signOut();
+      // Utiliser scope: 'local' pour éviter l'erreur 403 en production
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
       
       if (error) {
         setAuthState(prev => ({ ...prev, loading: false, error: error.message }));

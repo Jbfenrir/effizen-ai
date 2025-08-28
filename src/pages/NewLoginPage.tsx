@@ -1,15 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+// 🔄 SYSTÈME DE BASCULEMENT AUTH - Utiliser la même logique que AppRouter
+import { AUTH_CONFIG } from '../config/auth-switch';
 import { useAuth } from '../hooks/useAuth';
+import { useAuthNew } from '../hooks/useAuthNew';
+
+// Hook sélectionné selon la configuration
+const useSelectedAuth = AUTH_CONFIG.USE_AUTH_SYSTEM === 'NEW' ? useAuthNew : useAuth;
 
 const NewLoginPage: React.FC = () => {
   const { t } = useTranslation();
-  const { signInWithPassword, signInWithMagicLink, loading, error, clearError } = useAuth();
+  const { 
+    signInWithPassword, 
+    signInWithMagicLink, 
+    loading, 
+    error, 
+    clearError, 
+    user, 
+    isAuthenticated 
+  } = useSelectedAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginMode, setLoginMode] = useState<'password' | 'magic'>('password');
   const [message, setMessage] = useState<string | null>(null);
+
+  // 🚀 CORRECTION: Redirection automatique après connexion
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('🚀 NewLoginPage: Utilisateur connecté détecté, redirection vers dashboard');
+      setMessage('Connexion réussie ! Redirection...');
+      
+      // Redirection immédiate
+      setTimeout(() => {
+        window.history.pushState({}, '', '/dashboard');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }, 500); // Petit délai pour montrer le message
+    }
+  }, [isAuthenticated, user]);
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,10 +49,15 @@ const NewLoginPage: React.FC = () => {
       return;
     }
 
+    console.log('🔐 NewLoginPage: Tentative de connexion pour:', email);
     const result = await signInWithPassword(email, password);
     
     if (result.success) {
-      setMessage('Connexion réussie !');
+      console.log('✅ NewLoginPage: Connexion réussie, en attente de redirection...');
+      setMessage('Connexion réussie ! Redirection en cours...');
+      // La redirection sera gérée par useEffect quand user sera défini
+    } else {
+      console.log('❌ NewLoginPage: Échec de connexion:', result.error);
     }
   };
 
