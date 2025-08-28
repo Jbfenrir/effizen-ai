@@ -4,9 +4,9 @@
 
 **EffiZen-AI** est une application React/TypeScript de bien-être au travail avec authentification Supabase, gestion multi-rôles (employee/manager/admin), et interface multilingue (FR/EN).
 
-**Statut actuel :** 🎉 **PRODUCTION STABLE - PROBLÈME BOUCLE INFINIE DÉFINITIVEMENT RÉSOLU**
-**URL Production :** https://effizen-ai-prod.vercel.app ✅ FONCTIONNEL
-**Dernière mise à jour :** 2025-08-27 - Solution validée en local ET production
+**Statut actuel :** 🚀 **PRODUCTION OPTIMALE - TOUS LES PROBLÈMES MAJEURS RÉSOLUS**
+**URL Production :** https://effizen-ai-prod.vercel.app ✅ PLEINEMENT FONCTIONNEL
+**Dernière mise à jour :** 2025-08-28 - Corrections interface FR + déconnexion + navigation automatique
 
 ## 🏗️ ARCHITECTURE TECHNIQUE
 
@@ -268,6 +268,24 @@ git reset --hard 57b058e
 
 ## 🐛 PROBLÈMES ET SOLUTIONS (HISTORIQUE CONSOLIDÉ)
 
+### 🚀 CORRECTIONS FINALES RÉSOLUES - 28/08/2025
+**Interface utilisateur + UX optimale :** ✅ **TOUS LES PROBLÈMES RÉSOLUS EN PRODUCTION**
+
+#### 1️⃣ **Libellés français dashboard admin** ✅
+- **Symptôme :** Interface FR affichait "dashboard.admin.newUser" au lieu de traductions
+- **Solution :** Ajout section complète `dashboard.admin` dans `src/i18n/fr.json`
+- **Résultat :** "Nouvel Utilisateur", "Export Global", "Tableau de Bord Administrateur" corrects
+
+#### 2️⃣ **Erreur 403 déconnexion production** ✅  
+- **Symptôme :** `POST /auth/v1/logout?scope=global 403 (Forbidden)`
+- **Solution :** `signOut({ scope: 'local' })` dans supabase.ts + useAuthNew.ts
+- **Résultat :** Déconnexion fonctionnelle en production sans erreurs
+
+#### 3️⃣ **Redirection automatique post-connexion** ✅
+- **Symptôme :** Reste sur page login après "Connexion réussie !", nécessite F5
+- **Solution :** NewLoginPage unifié avec AppRouter + useEffect redirection auto
+- **Résultat :** Navigation fluide login → dashboard sans intervention manuelle
+
 ### 🏆 PROBLÈME CRITIQUE RÉSOLU - 27/08/2025  
 **Chargement infini persistant :** ✅ **DÉFINITIVEMENT RÉSOLU EN LOCAL ET PRODUCTION**
 - **Solution appliquée :** Unification complète des services Supabase (4 services → 1 service)
@@ -437,11 +455,11 @@ git reset --hard 57b058e
 
 ---
 
-**Dernière mise à jour :** 2025-08-27  
-**Version :** 4.0 - Refonte authentification complète (Option B)  
+**Dernière mise à jour :** 2025-08-28  
+**Version :** 5.0 - Interface FR optimale + UX parfaite  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** 🧪 **EN TEST - NOUVEAU SYSTÈME AUTH**
+**Status :** 🚀 **PRODUCTION STABLE - APPLICATION COMPLÈTE**
 
 ## 📚 HISTORIQUE CONSOLIDÉ
 
@@ -450,13 +468,16 @@ git reset --hard 57b058e
 - **14-18/08/2025 :** Résolution boucles infinies auth + navigation SPA  
 - **27/08/2025 Matin :** Création utilisateurs opérationnelle avec mots de passe temporaires
 - **27/08/2025 Après-midi :** 🔄 **REFONTE AUTHENTIFICATION COMPLÈTE** (Option B)
+- **28/08/2025 Matin :** 🎉 **CORRECTIONS FINALES UX** - Interface FR + Déconnexion + Navigation
 
-### Configuration actuelle essentielle - NOUVEAU SYSTÈME
-- **Système auth actif :** useAuthNew.ts + supabase-clean.ts (basculement via auth-switch.ts)
-- **React.StrictMode :** Temporairement désactivé (supprime doubles exécutions)
+### Configuration actuelle essentielle - SYSTÈME OPTIMISÉ
+- **Système auth actif :** useAuthNew.ts (NEW system via auth-switch.ts)
+- **Service unifié :** src/services/supabase.ts (singleton global)
+- **Interface multilingue :** FR/EN complètement fonctionnelle
+- **Navigation :** Redirection automatique post-connexion
+- **Déconnexion :** scope:'local' pour compatibilité production
 - **Environnement dev :** WSL obligatoire pour npm
 - **Variables requises :** VITE_SUPABASE_SERVICE_ROLE_KEY pour création utilisateurs
-- **Architecture :** AppRouter avec basculement NEW ↔ OLD
 
 ### SAUVEGARDE ET RESTAURATION
 - **Commit de sauvegarde :** `57b058e` - État fonctionnel avant refonte
