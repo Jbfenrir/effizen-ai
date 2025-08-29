@@ -11,9 +11,12 @@ const ResetPasswordPage: React.FC = () => {
   useEffect(() => {
     console.log('🔑 ResetPasswordPage: Page de réinitialisation chargée');
     
-    // Vérifier si nous avons une session de récupération
+    // Vérifier si nous avons une session valide (après clic sur lien de récupération)
     const checkRecoverySession = async () => {
       try {
+        // Attendre un peu pour que la session soit établie
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -22,13 +25,14 @@ const ResetPasswordPage: React.FC = () => {
           return;
         }
 
-        if (!session) {
-          console.error('❌ ResetPasswordPage: Aucune session de récupération');
-          setError('Lien de réinitialisation invalide ou expiré');
+        if (!session?.user) {
+          console.error('❌ ResetPasswordPage: Aucune session utilisateur');
+          setError('Lien de réinitialisation invalide ou expiré. Veuillez demander un nouveau lien.');
           return;
         }
 
-        console.log('✅ ResetPasswordPage: Session de récupération valide');
+        console.log('✅ ResetPasswordPage: Session utilisateur valide:', session.user.email);
+        console.log('🔑 ResetPasswordPage: Prêt pour la réinitialisation');
       } catch (error) {
         console.error('🚨 ResetPasswordPage: Erreur catch:', error);
         setError('Une erreur est survenue lors de la vérification');

@@ -69,13 +69,14 @@ function AppRouter() {
       isAuthenticated, 
       currentPath,
       user: user?.email || 'null',
-      shouldRedirectToLogin: !isAuthenticated && currentPath !== '/login',
+      shouldRedirectToLogin: !isAuthenticated && currentPath !== '/login' && currentPath !== '/reset-password',
       shouldRedirectToDashboard: isAuthenticated && (currentPath === '/login' || currentPath === '/')
     });
     
     // NOUVEAU: Délai réduit pour redirection plus rapide après connexion
     const redirectTimeout = setTimeout(() => {
-      if (!isAuthenticated && currentPath !== '/login') {
+      // Ne pas rediriger si on est sur une page de récupération de mot de passe
+      if (!isAuthenticated && currentPath !== '/login' && currentPath !== '/reset-password') {
         console.log('🔄 AppRouter: Redirection vers /login (non authentifié)');
         sessionStorage.setItem('lastRedirect', now.toString());
         navigate('/login');
