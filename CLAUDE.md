@@ -266,6 +266,54 @@ npm run lint
 git reset --hard 57b058e
 ```
 
+## 🚨 PROBLÈME CRITIQUE NON RÉSOLU - 29/08/2025
+
+### ⚠️ Récupération de mot de passe - EN COURS DE RÉSOLUTION
+**Symptômes persistants :**
+- Lien de récupération redirige vers `/login` au lieu de `/reset-password`
+- Interface production affiche l'ancienne version (infos admin visibles)
+- Délai email production : 5 minutes (trop long)
+- URL reçue : `https://effizen-ai-prod.vercel.app/assets/index-Diqmplx.js` (erreur source map)
+
+### 📊 État des tests (29/08/2025)
+| Environnement | Fonctionnalité | Status |
+|---------------|----------------|---------|
+| **Localhost** | Interface sans infos admin | ✅ |
+| **Localhost** | Bouton "Mot de passe oublié ?" | ✅ |
+| **Localhost** | Envoi email | ✅ (rapide) |
+| **Localhost** | Redirection `/reset-password` | ❌ (→ `/login`) |
+| **Production** | Interface sans infos admin | ❌ (ancienne version) |
+| **Production** | Envoi email | ✅ (5 min délai) |
+| **Production** | Redirection `/reset-password` | ❌ (→ `/login`) |
+
+### 🔧 Solutions tentées (sans succès complet)
+1. **28/08 - 13h00** : Implémentation initiale avec `/auth/callback?type=recovery`
+2. **28/08 - 17h00** : Route dédiée `/reset-password` créée
+3. **28/08 - 17h30** : Exclusion `/reset-password` des redirections AppRouter
+4. **29/08 - 18h00** : Tests multiples - problème persiste
+
+### 🎯 Configuration Supabase à vérifier
+**URLs de redirection nécessaires :**
+```
+https://effizen-ai-prod.vercel.app/reset-password
+http://localhost:3000/reset-password
+http://localhost:3001/reset-password
+http://localhost:3002/reset-password
+http://localhost:3003/reset-password
+```
+
+### ⚠️ Limites Supabase identifiées
+- **Limite emails :** 3-5 tentatives/heure par adresse
+- **Solution :** Utiliser différents emails pour tests
+- **Délai production :** 5 minutes (problème SMTP Gmail ?)
+
+### 📝 Questions critiques pour prochaine session
+1. **Déploiement Vercel :** Le dernier commit `dd1c37c` est-il bien déployé en production ?
+2. **Cache CDN :** Y a-t-il un cache Vercel/CloudFlare qui sert l'ancienne version ?
+3. **Configuration Supabase :** Les URLs de redirection sont-elles correctement configurées dans le dashboard ?
+4. **Session Supabase :** Pourquoi la session créée après clic sur lien n'est pas détectée comme recovery ?
+5. **Source maps :** Pourquoi l'URL du lien contient `/assets/index-Diqmplx.js` ?
+
 ## 🐛 PROBLÈMES ET SOLUTIONS (HISTORIQUE CONSOLIDÉ)
 
 ### 🚀 CORRECTIONS FINALES RÉSOLUES - 28/08/2025
@@ -380,6 +428,11 @@ git reset --hard 57b058e
 
 ## 🤖 INSTRUCTIONS CLAUDE CODE
 
+### ⚠️ PROCHAIN DÉMARRAGE - ACTIONS CRITIQUES
+1. **LIRE SECTION "PROBLÈME CRITIQUE NON RÉSOLU"** en priorité absolue
+2. **POSER LES 5 QUESTIONS** listées dans la section avant toute action
+3. **NE PAS COMMENCER À CODER** avant d'avoir toutes les réponses
+
 ### Approche recommandée
 1. **TOUJOURS lire CLAUDE.md en premier** pour comprendre le contexte
 2. **ANTICIPER les problèmes courants** basés sur l'historique du projet
@@ -487,11 +540,11 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 
 ---
 
-**Dernière mise à jour :** 2025-08-28  
-**Version :** 5.0 - Interface FR optimale + UX parfaite  
+**Dernière mise à jour :** 2025-08-29  
+**Version :** 5.1 - Récupération mot de passe EN COURS  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** 🚀 **PRODUCTION STABLE - APPLICATION COMPLÈTE**
+**Status :** ⚠️ **PRODUCTION PARTIELLEMENT FONCTIONNELLE - Récupération mot de passe à corriger**
 
 ## 📚 HISTORIQUE CONSOLIDÉ
 
@@ -501,6 +554,7 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 - **27/08/2025 Matin :** Création utilisateurs opérationnelle avec mots de passe temporaires
 - **27/08/2025 Après-midi :** 🔄 **REFONTE AUTHENTIFICATION COMPLÈTE** (Option B)
 - **28/08/2025 Matin :** 🎉 **CORRECTIONS FINALES UX** - Interface FR + Déconnexion + Navigation
+- **28-29/08/2025 :** ⚠️ **RÉCUPÉRATION MOT DE PASSE** - En cours de résolution
 
 ### Configuration actuelle essentielle - SYSTÈME OPTIMISÉ
 - **Système auth actif :** useAuthNew.ts (NEW system via auth-switch.ts)
@@ -515,6 +569,10 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 - **Commit de sauvegarde :** `57b058e` - État fonctionnel avant refonte
 - **Restauration rapide :** `git reset --hard 57b058e` (dans WSL)
 - **Guides disponibles :** RESTORE-AUTH-BACKUP.md + SWITCH-AUTH-GUIDE.md
+
+### 🔴 PRIORITÉ ABSOLUE - À RÉSOUDRE
+- [ ] **CRITIQUE** : Récupération mot de passe non fonctionnelle
+- [ ] **URGENT** : Version production sert ancienne interface
 
 ### Prochaines fonctionnalités à développer
 - [ ] Dashboard Manager (fonctionnalités équipe)
