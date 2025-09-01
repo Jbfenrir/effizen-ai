@@ -138,7 +138,7 @@ function AppRouter() {
   }
 
   // Gestion de la réinitialisation de mot de passe
-  if (currentPath === '/reset-password') {
+  if (currentPath === '/reset-password' || currentPath.includes('#access_token')) {
     return <ResetPasswordPage />;
   }
 

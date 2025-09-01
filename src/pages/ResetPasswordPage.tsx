@@ -7,16 +7,49 @@ const ResetPasswordPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
     console.log('🔑 ResetPasswordPage: Page de réinitialisation chargée');
+    console.log('📍 URL complète:', window.location.href);
     
-    // Vérifier si nous avons une session valide (après clic sur lien de récupération)
+    // Vérifier si nous avons les paramètres de récupération dans l'URL
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+    const type = hashParams.get('type') || searchParams.get('type');
+    
+    console.log('🔍 Paramètres détectés:', { accessToken: !!accessToken, type });
+    
     const checkRecoverySession = async () => {
       try {
-        // Attendre un peu pour que la session soit établie
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Si nous avons un access_token et type=recovery, traiter le token
+        if (accessToken && type === 'recovery') {
+          console.log('🔄 ResetPasswordPage: Token de récupération détecté, établissement de la session...');
+          
+          // Établir la session avec le token
+          const { data, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: hashParams.get('refresh_token') || searchParams.get('refresh_token') || ''
+          });
+          
+          if (sessionError) {
+            console.error('❌ ResetPasswordPage: Erreur établissement session:', sessionError);
+            setError('Erreur lors de l\'établissement de la session. Veuillez réessayer.');
+            return;
+          }
+          
+          if (data?.session) {
+            console.log('✅ ResetPasswordPage: Session établie avec succès');
+            setSessionReady(true);
+            // Nettoyer l'URL
+            window.history.replaceState({}, document.title, '/reset-password');
+            return;
+          }
+        }
         
+        // Vérifier si nous avons déjà une session valide
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -33,6 +66,7 @@ const ResetPasswordPage: React.FC = () => {
 
         console.log('✅ ResetPasswordPage: Session utilisateur valide:', session.user.email);
         console.log('🔑 ResetPasswordPage: Prêt pour la réinitialisation');
+        setSessionReady(true);
       } catch (error) {
         console.error('🚨 ResetPasswordPage: Erreur catch:', error);
         setError('Une erreur est survenue lors de la vérification');
@@ -96,6 +130,46 @@ const ResetPasswordPage: React.FC = () => {
               Redirection vers votre dashboard...
             </p>
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-green mx-auto mt-4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Afficher un état de chargement pendant la vérification de session
+  if (!sessionReady && !error) {
+    return (
+      <div className="min-h-screen bg-off-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="mt-6 text-3xl font-extrabold text-dark-blue">
+              Vérification en cours...
+            </h2>
+            <p className="mt-2 text-sm text-metallic-gray">
+              Validation de votre lien de réinitialisation
+            </p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-green mx-auto mt-4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Afficher une erreur si le lien est invalide
+  if (error && !sessionReady) {
+    return (
+      <div className="min-h-screen bg-off-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="mt-6 text-3xl font-extrabold text-dark-blue">
+              Erreur de validation
+            </h2>
+            <div className="mt-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
+              {error}
+            </div>
+            <a href="/login" className="mt-4 inline-block text-lime-green hover:text-blue-gray">
+              Retour à la connexion
+            </a>
           </div>
         </div>
       </div>
