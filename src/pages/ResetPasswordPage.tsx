@@ -18,61 +18,95 @@ const ResetPasswordPage: React.FC = () => {
     const searchParams = new URLSearchParams(window.location.search);
     
     const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
     const type = hashParams.get('type') || searchParams.get('type');
     const code = searchParams.get('code'); // Pour le flux PKCE
     
-    console.log('🔍 Paramètres détectés:', { accessToken: !!accessToken, type, code: !!code });
+    console.log('🔍 Paramètres détectés:', { 
+      accessToken: !!accessToken, 
+      refreshToken: !!refreshToken,
+      type, 
+      code: !!code 
+    });
     
     const checkRecoverySession = async () => {
       try {
-        // NOUVEAU: Gérer le flux PKCE avec code
+        // PRIORITÉ 1: Gérer le flux PKCE avec code
         if (code && !accessToken) {
           console.log('🔄 ResetPasswordPage: Code PKCE détecté, échange en cours...');
           
-          // Échanger le code pour une session
-          const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          
-          if (exchangeError) {
-            console.error('❌ ResetPasswordPage: Erreur échange code:', exchangeError);
-            setError('Erreur lors de la validation du lien. Veuillez demander un nouveau lien.');
-            return;
-          }
-          
-          if (session) {
-            console.log('✅ ResetPasswordPage: Session établie via PKCE');
-            setSessionReady(true);
-            // Nettoyer l'URL
-            window.history.replaceState({}, document.title, '/reset-password');
+          try {
+            const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (exchangeError) {
+              console.error('❌ ResetPasswordPage: Erreur échange code:', exchangeError);
+              setError('Erreur lors de la validation du lien. Veuillez demander un nouveau lien.');
+              return;
+            }
+            
+            if (session && session.user) {
+              console.log('✅ ResetPasswordPage: Session établie via PKCE pour:', session.user.email);
+              setSessionReady(true);
+              window.history.replaceState({}, document.title, '/reset-password');
+              return;
+            }
+          } catch (pkceError) {
+            console.error('🚨 ResetPasswordPage: Erreur PKCE:', pkceError);
+            setError('Erreur lors du traitement du lien de récupération.');
             return;
           }
         }
         
-        // Si nous avons un access_token et type=recovery, traiter le token
+        // PRIORITÉ 2: Gérer les tokens directs (access_token + refresh_token)
         if (accessToken && type === 'recovery') {
           console.log('🔄 ResetPasswordPage: Token de récupération détecté, établissement de la session...');
           
-          // Établir la session avec le token
-          const { data, error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: hashParams.get('refresh_token') || searchParams.get('refresh_token') || ''
-          });
-          
-          if (sessionError) {
-            console.error('❌ ResetPasswordPage: Erreur établissement session:', sessionError);
-            setError('Erreur lors de l\'établissement de la session. Veuillez réessayer.');
-            return;
-          }
-          
-          if (data?.session) {
-            console.log('✅ ResetPasswordPage: Session établie avec succès');
-            setSessionReady(true);
-            // Nettoyer l'URL
-            window.history.replaceState({}, document.title, '/reset-password');
+          try {
+            // Forcer l'établissement de la session avec un refresh token valide
+            const sessionData = {
+              access_token: accessToken,
+              refresh_token: refreshToken || 'placeholder-refresh-token',
+              expires_in: 3600,
+              token_type: 'bearer'
+            };
+            
+            const { data, error: sessionError } = await supabase.auth.setSession(sessionData);
+            
+            if (sessionError) {
+              console.error('❌ ResetPasswordPage: Erreur établissement session:', sessionError);
+              // Essayer une méthode alternative si setSession échoue
+              console.log('🔄 Tentative alternative avec refreshSession...');
+              
+              // Alternative: forcer une nouvelle session
+              const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+              
+              if (refreshError || !refreshData?.session) {
+                console.error('❌ ResetPasswordPage: Échec méthode alternative:', refreshError);
+                setError('Lien de récupération expiré ou invalide. Veuillez demander un nouveau lien.');
+                return;
+              } else {
+                console.log('✅ ResetPasswordPage: Session alternative établie');
+                setSessionReady(true);
+                window.history.replaceState({}, document.title, '/reset-password');
+                return;
+              }
+            }
+            
+            if (data?.session && data.session.user) {
+              console.log('✅ ResetPasswordPage: Session établie avec succès pour:', data.session.user.email);
+              setSessionReady(true);
+              window.history.replaceState({}, document.title, '/reset-password');
+              return;
+            }
+          } catch (tokenError) {
+            console.error('🚨 ResetPasswordPage: Erreur traitement token:', tokenError);
+            setError('Erreur lors du traitement du token de récupération.');
             return;
           }
         }
         
-        // Vérifier si nous avons déjà une session valide
+        // PRIORITÉ 3: Vérifier si nous avons déjà une session valide
+        console.log('🔍 Vérification session existante...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {

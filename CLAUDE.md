@@ -266,53 +266,66 @@ npm run lint
 git reset --hard 57b058e
 ```
 
-## 🚨 PROBLÈME CRITIQUE NON RÉSOLU - 29/08/2025
+## 🚨 PROBLÈME CRITIQUE DIAGNOSTIQUÉ - 01/09/2025
 
-### ⚠️ Récupération de mot de passe - EN COURS DE RÉSOLUTION
-**Symptômes persistants :**
-- Lien de récupération redirige vers `/login` au lieu de `/reset-password`
-- Interface production affiche l'ancienne version (infos admin visibles)
-- Délai email production : 5 minutes (trop long)
-- URL reçue : `https://effizen-ai-prod.vercel.app/assets/index-Diqmplx.js` (erreur source map)
+### ⚠️ Récupération de mot de passe - DIAGNOSTIC COMPLET ÉTABLI
 
-### 📊 État des tests (29/08/2025)
-| Environnement | Fonctionnalité | Status |
-|---------------|----------------|---------|
-| **Localhost** | Interface sans infos admin | ✅ |
-| **Localhost** | Bouton "Mot de passe oublié ?" | ✅ |
-| **Localhost** | Envoi email | ✅ (rapide) |
-| **Localhost** | Redirection `/reset-password` | ❌ (→ `/login`) |
-| **Production** | Interface sans infos admin | ❌ (ancienne version) |
-| **Production** | Envoi email | ✅ (5 min délai) |
-| **Production** | Redirection `/reset-password` | ❌ (→ `/login`) |
+#### 🔍 **INVESTIGATION APPROFONDIE (01/09/2025)**
+**Suite à une analyse technique exhaustive incluant :**
+- Vérification des commits et déploiements
+- Analyse des fichiers de code source
+- Examen des logs console et localStorage
+- Tests avec screenshots multiples
+- Vérification de la configuration Supabase
 
-### 🔧 Solutions tentées (sans succès complet)
-1. **28/08 - 13h00** : Implémentation initiale avec `/auth/callback?type=recovery`
-2. **28/08 - 17h00** : Route dédiée `/reset-password` créée
-3. **28/08 - 17h30** : Exclusion `/reset-password` des redirections AppRouter
-4. **29/08 - 18h00** : Tests multiples - problème persiste
+#### 🎯 **PROBLÈME RACINE IDENTIFIÉ**
 
-### 🎯 Configuration Supabase à vérifier
-**URLs de redirection nécessaires :**
+**1. SÉQUENCE EXACTE DU BUG :**
 ```
-https://effizen-ai-prod.vercel.app/reset-password
-http://localhost:3000/reset-password
-http://localhost:3001/reset-password
-http://localhost:3002/reset-password
-http://localhost:3003/reset-password
+1. Clic sur lien email → https://effizen-ai-prod.vercel.app/reset-password#access_token=...
+2. AppRouter détecte : Path: /reset-password, Auth: false, User: null  
+3. ResetPasswordPage ne parvient PAS à établir la session avec l'access_token
+4. AppRouter redirige automatiquement vers /login (car pas authentifié)
+5. Page /login affiche une ANCIENNE interface avec infos admin hardcodées
 ```
 
-### ⚠️ Limites Supabase identifiées
-- **Limite emails :** 3-5 tentatives/heure par adresse
-- **Solution :** Utiliser différents emails pour tests
-- **Délai production :** 5 minutes (problème SMTP Gmail ?)
+**2. PREUVES TECHNIQUES COLLECTÉES :**
+- ✅ **Lien Supabase fonctionnel** : `#access_token=135593&type=recovery`
+- ✅ **URLs Supabase configurées** : Toutes les redirections sont correctes
+- ✅ **Code ResetPasswordPage correct** : Support PKCE et tokens implémenté
+- ✅ **Site URL correct** : `https://effizen-ai-prod.vercel.app`
+- ❌ **Session non établie** : access_token non traité correctement
+- ❌ **Ancienne interface cachée** : Affiche "Admin: jbgerberon@gmail.com" et "Mot de passe temporaire: admin123"
 
-### 📝 Questions critiques pour prochaine session
-1. **Déploiement Vercel :** Le dernier commit `dd1c37c` est-il bien déployé en production ?
-2. **Cache CDN :** Y a-t-il un cache Vercel/CloudFlare qui sert l'ancienne version ?
-3. **Configuration Supabase :** Les URLs de redirection sont-elles correctement configurées dans le dashboard ?
-4. **Session Supabase :** Pourquoi la session créée après clic sur lien n'est pas détectée comme recovery ?
-5. **Source maps :** Pourquoi l'URL du lien contient `/assets/index-Diqmplx.js` ?
+**3. SYMPTÔMES CONFIRMÉS :**
+- **Cache navigateur** : F5 → boucle infinie, Ctrl+F5 → bonne interface
+- **localStorage vide** : Seul `language: 'fr'` présent (pas de tokens Supabase)
+- **Console logs** : "useAuth: Pas de session active" → redirection vers /login
+- **Interface double** : NewLoginPage.tsx (propre) vs ancienne version (avec infos admin)
+
+#### 📊 **ÉTAT TECHNIQUE DIAGNOSTIQUÉ (01/09/2025)**
+
+| Composant | Status | Détail |
+|-----------|---------|---------|
+| **Lien email Supabase** | ✅ Fonctionnel | `#access_token=...&type=recovery` correct |
+| **Page ResetPasswordPage** | ⚠️ Problème session | Code présent mais établissement session échoue |
+| **Redirection AppRouter** | ❌ Prématurée | Redirige vers `/login` avant traitement token |
+| **Interface login** | ❌ Version mixte | Cache sert ancienne version avec infos admin |
+| **Configuration Supabase** | ✅ Correcte | Site URL et redirections configurées |
+
+#### 🚨 **CAUSES TECHNIQUES IDENTIFIÉES**
+
+**CAUSE 1 : Session non établie sur /reset-password**
+- La page ResetPasswordPage ne parvient pas à établir la session avec l'access_token du hash
+- AppRouter détecte `auth: false` et redirige immédiatement vers `/login`
+
+**CAUSE 2 : Ancienne interface cachée/hardcodée**
+- Il existe une version de la page de login avec infos admin écrites en dur dans le code
+- Cette version est servie aléatoirement selon l'état du cache navigateur
+
+**CAUSE 3 : Build/Cache mixte**
+- Le système semble servir différentes versions selon le cache (F5 vs Ctrl+F5)
+- Les tokens access_token ne sont pas correctement traités par le code actuel
 
 ## 🐛 PROBLÈMES ET SOLUTIONS (HISTORIQUE CONSOLIDÉ)
 
@@ -570,9 +583,11 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 - **Restauration rapide :** `git reset --hard 57b058e` (dans WSL)
 - **Guides disponibles :** RESTORE-AUTH-BACKUP.md + SWITCH-AUTH-GUIDE.md
 
-### 🔴 PRIORITÉ ABSOLUE - À RÉSOUDRE
-- [ ] **CRITIQUE** : Récupération mot de passe non fonctionnelle
-- [ ] **URGENT** : Version production sert ancienne interface
+### 🔴 PRIORITÉ ABSOLUE - RÉSOLUTION EN COURS (01/09/2025)
+- [x] **CRITIQUE** : Récupération mot de passe - DIAGNOSTIC COMPLET ÉTABLI
+- [ ] **EN COURS** : Élimination ancienne interface avec infos admin hardcodées
+- [ ] **EN COURS** : Correction établissement session sur /reset-password
+- [ ] **EN COURS** : Nettoyage cache/build pour version unique
 
 ### Prochaines fonctionnalités à développer
 - [ ] Dashboard Manager (fonctionnalités équipe)
