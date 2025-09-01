@@ -19,11 +19,34 @@ const ResetPasswordPage: React.FC = () => {
     
     const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
     const type = hashParams.get('type') || searchParams.get('type');
+    const code = searchParams.get('code'); // Pour le flux PKCE
     
-    console.log('🔍 Paramètres détectés:', { accessToken: !!accessToken, type });
+    console.log('🔍 Paramètres détectés:', { accessToken: !!accessToken, type, code: !!code });
     
     const checkRecoverySession = async () => {
       try {
+        // NOUVEAU: Gérer le flux PKCE avec code
+        if (code && !accessToken) {
+          console.log('🔄 ResetPasswordPage: Code PKCE détecté, échange en cours...');
+          
+          // Échanger le code pour une session
+          const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (exchangeError) {
+            console.error('❌ ResetPasswordPage: Erreur échange code:', exchangeError);
+            setError('Erreur lors de la validation du lien. Veuillez demander un nouveau lien.');
+            return;
+          }
+          
+          if (session) {
+            console.log('✅ ResetPasswordPage: Session établie via PKCE');
+            setSessionReady(true);
+            // Nettoyer l'URL
+            window.history.replaceState({}, document.title, '/reset-password');
+            return;
+          }
+        }
+        
         // Si nous avons un access_token et type=recovery, traiter le token
         if (accessToken && type === 'recovery') {
           console.log('🔄 ResetPasswordPage: Token de récupération détecté, établissement de la session...');

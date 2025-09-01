@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Simulation Récupération</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Simulation - Récupération de Mot de Passe</h1>
+    
+    <div class="test info">
+        <h2>📋 Simulation du flux complet</h2>
+        <p>Ce test simule ce qui se passe quand un utilisateur clique sur le lien de récupération reçu par email.</p>
+    </div>
+
+    <div class="test">
+        <h3>1️⃣ Lien reçu par email (Supabase)</h3>
+        <pre>https://qzvrkcmwzdaffpknuozl.supabase.co/auth/v1/verify?token=XXXXX&type=recovery&redirect_to=https://effizen-ai-prod.vercel.app/reset-password</pre>
+    </div>
+
+    <div class="test">
+        <h3>2️⃣ Après redirection, l'URL devient :</h3>
+        <pre id="redirectUrl">https://effizen-ai-prod.vercel.app/reset-password#access_token=XXXXX&type=recovery&refresh_token=XXXXX</pre>
+    </div>
+
+    <div class="test">
+        <h3>3️⃣ Test de détection des paramètres</h3>
+        <button onclick="testDetection()">Tester la détection</button>
+        <div id="detectionResult"></div>
+    </div>
+
+    <div class="test">
+        <h3>4️⃣ Simulation locale</h3>
+        <button onclick="simulateLocal()">Simuler en local (port 3002)</button>
+        <button onclick="simulateProd()">Simuler en production</button>
+    </div>
+
+    <script>
+        function testDetection() {
+            // Simuler l'URL avec les paramètres
+            const testUrl = 'https://effizen-ai-prod.vercel.app/reset-password#access_token=test123&type=recovery&refresh_token=refresh123';
+            
+            // Parser comme le fait notre code React
+            const url = new URL(testUrl);
+            const hashParams = new URLSearchParams(url.hash.substring(1));
+            const searchParams = new URLSearchParams(url.search);
+            
+            const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+            const type = hashParams.get('type') || searchParams.get('type');
+            
+            const result = document.getElementById('detectionResult');
+            if (accessToken && type === 'recovery') {
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Paramètres détectés correctement !<br>
+                        - access_token: ${accessToken}<br>
+                        - type: ${type}<br>
+                        → La page ResetPasswordPage va établir la session
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `
+                    <div class="error">
+                        ❌ Paramètres non détectés<br>
+                        - access_token: ${accessToken || 'null'}<br>
+                        - type: ${type || 'null'}
+                    </div>
+                `;
+            }
+        }
+
+        function simulateLocal() {
+            const url = 'http://localhost:3002/reset-password#access_token=simulation&type=recovery';
+            window.open(url, '_blank');
+        }
+
+        function simulateProd() {
+            const url = 'https://effizen-ai-prod.vercel.app/reset-password#access_token=simulation&type=recovery';
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -49,8 +49,9 @@ function AppRouter() {
     // Ne rien faire pendant le chargement
     if (loading || !ready) return;
     
-    // Ne pas rediriger si on est sur la page de callback
+    // Ne pas rediriger si on est sur la page de callback ou reset avec paramètres
     if (currentPath === '/auth/callback' || currentPath.includes('access_token')) return;
+    if (currentPath === '/reset-password' && (window.location.search.includes('code=') || window.location.hash.includes('access_token='))) return;
     
     // Tracker pour éviter les redirections multiples
     const lastRedirect = sessionStorage.getItem('lastRedirect');
