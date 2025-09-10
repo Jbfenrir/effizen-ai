@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Key, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Key, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabaseAdmin } from '../services/supabase';
+import { supabase, supabaseAdmin } from '../services/supabase';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -53,14 +53,36 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
     setError('');
 
     try {
-      // Utiliser updateUserById pour admin
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        userId,
-        { password: newPassword }
-      );
+      // Vérifier si supabaseAdmin est disponible
+      if (!supabaseAdmin) {
+        // Alternative : Envoyer un email de réinitialisation
+        console.log('Service admin non disponible, utilisation de la méthode email');
+        
+        // Afficher le mot de passe généré pour copie manuelle
+        if (!generatedPassword) {
+          setError('Veuillez générer un mot de passe à communiquer manuellement à l\'utilisateur');
+          setLoading(false);
+          return;
+        }
+        
+        // Simuler le succès pour permettre la copie du mot de passe
+        setSuccess(true);
+        setError('');
+        
+        // Message informatif
+        console.log('Mot de passe à configurer manuellement pour:', userEmail);
+        console.log('Nouveau mot de passe:', generatedPassword || newPassword);
+        
+      } else {
+        // Utiliser updateUserById si admin disponible
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+          userId,
+          { password: newPassword }
+        );
 
-      if (updateError) {
-        throw updateError;
+        if (updateError) {
+          throw updateError;
+        }
       }
 
       setSuccess(true);
@@ -120,17 +142,37 @@ const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
             <CheckCircle className="h-5 w-5 text-green-600" />
             <div>
               <p className="font-semibold text-green-800">
-                {t('dashboard.admin.passwordReset.success')}
+                {!supabaseAdmin ? 'Mot de passe généré avec succès !' : t('dashboard.admin.passwordReset.success')}
               </p>
               {generatedPassword && (
-                <p className="text-sm text-green-700 mt-1">
-                  {t('dashboard.admin.passwordReset.passwordCopied')}
-                </p>
+                <>
+                  <p className="text-sm text-green-700 mt-1">
+                    {t('dashboard.admin.passwordReset.passwordCopied')}
+                  </p>
+                  {!supabaseAdmin && (
+                    <p className="text-sm text-orange-600 mt-2">
+                      ⚠️ Configuration manuelle requise : Utilisez la Solution 1 (SQL) dans Supabase Dashboard
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
         ) : (
           <form onSubmit={handleReset}>
+            {!supabaseAdmin && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
+                <Info className="h-5 w-5 text-yellow-600 mt-0.5" />
+                <div className="text-sm text-yellow-800">
+                  <p className="font-semibold">Mode génération manuelle</p>
+                  <p>Le service de reset automatique n'est pas disponible. Le mot de passe sera généré et copié dans le presse-papiers.</p>
+                  <p className="mt-1">Vous devrez le configurer manuellement via :</p>
+                  <code className="block mt-1 p-1 bg-yellow-100 rounded text-xs">
+                    UPDATE auth.users SET encrypted_password = crypt('[MOT_DE_PASSE]', gen_salt('bf')) WHERE email = '{userEmail}'
+                  </code>
+                </div>
+              </div>
+            )}
             <div className="mb-4">
               <label className="block text-sm font-medium text-dark-blue mb-2">
                 {t('dashboard.admin.passwordReset.newPassword')}
