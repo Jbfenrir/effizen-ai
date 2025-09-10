@@ -658,3 +658,4 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 - [ ] Système de notifications
 - [ ] Export de données
 - [ ] Mode sombre
+# Configuration Vercel mise à jour Wed Sep 10 12:41:04 CEST 2025
