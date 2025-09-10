@@ -1,6 +1,7 @@
 {
   "common": {
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
@@ -189,7 +190,24 @@
       "viewDetails": "View details",
       "edit": "Edit",
       "deactivate": "Deactivate",
+      "resetPassword": "Reset password",
       "confirmDeactivateUser": "Are you sure you want to deactivate this user?",
+      "passwordReset": {
+        "title": "Reset Password",
+        "resetFor": "Reset password for",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "passwordPlaceholder": "Minimum 6 characters",
+        "confirmPlaceholder": "Re-enter password",
+        "generate": "Generate",
+        "generated": "Generated password",
+        "reset": "Reset",
+        "success": "Password reset successfully!",
+        "passwordCopied": "Password has been copied to clipboard.",
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "error": "Error resetting password"
+      },
       "confirmDeactivateTeam": "Are you sure you want to deactivate this team?",
       "employee": "Employee",
       "manager": "Manager",

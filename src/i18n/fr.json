@@ -1,6 +1,7 @@
 {
   "common": {
     "save": "Sauvegarder",
+    "saving": "Enregistrement...",
     "cancel": "Annuler",
     "edit": "Modifier",
     "delete": "Supprimer",
@@ -185,7 +186,24 @@
       "viewDetails": "Voir les détails",
       "edit": "Modifier",
       "deactivate": "Désactiver",
+      "resetPassword": "Réinitialiser le mot de passe",
       "confirmDeactivateUser": "Êtes-vous sûr de vouloir désactiver cet utilisateur ?",
+      "passwordReset": {
+        "title": "Réinitialiser le mot de passe",
+        "resetFor": "Réinitialiser le mot de passe pour",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "passwordPlaceholder": "Minimum 6 caractères",
+        "confirmPlaceholder": "Retaper le mot de passe",
+        "generate": "Générer",
+        "generated": "Mot de passe généré",
+        "reset": "Réinitialiser",
+        "success": "Mot de passe réinitialisé avec succès !",
+        "passwordCopied": "Le mot de passe a été copié dans le presse-papiers.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "error": "Erreur lors de la réinitialisation du mot de passe"
+      },
       "confirmDeactivateTeam": "Êtes-vous sûr de vouloir désactiver cette équipe ?",
       "employee": "Employé",
       "manager": "Manager",

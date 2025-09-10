@@ -8,6 +8,7 @@ import './index.css';
 import Header from './components/Header';
 import LoginPage from './pages/LoginPage';
 import AuthCallback from './pages/AuthCallback';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardEmployee from './pages/DashboardEmployee';
 import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
@@ -48,6 +49,10 @@ function App() {
             <Route 
               path="/login" 
               element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
+            />
+            <Route 
+              path="/reset-password" 
+              element={<ResetPasswordPage />} 
             />
             <Route 
               path="/dashboard" 

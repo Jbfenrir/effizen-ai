@@ -14,12 +14,14 @@ import {
   Search,
   Filter,
   Download,
-  Shield
+  Shield,
+  Key
 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 // import { mockAdminService as adminService } from '../services/mockAdminService';
 import UserModal from '../components/UserModal';
 import TeamModal from '../components/TeamModal';
+import PasswordResetModal from '../components/PasswordResetModal';
 import type { UserWithTeam, Team, AdminMetrics } from '../types';
 
 const DashboardAdmin: React.FC = () => {
@@ -50,6 +52,12 @@ const DashboardAdmin: React.FC = () => {
     mode: 'create' | 'edit' | 'view';
     team?: Team | null;
   }>({ isOpen: false, mode: 'create', team: null });
+  
+  const [passwordResetModal, setPasswordResetModal] = useState<{
+    isOpen: boolean;
+    userEmail: string;
+    userId: string;
+  }>({ isOpen: false, userEmail: '', userId: '' });
 
   // Charger les données au montage
   useEffect(() => {
@@ -468,6 +476,17 @@ const DashboardAdmin: React.FC = () => {
                               <Edit size={16} />
                             </button>
                             <button
+                              onClick={() => setPasswordResetModal({ 
+                                isOpen: true, 
+                                userEmail: user.email, 
+                                userId: user.id 
+                              })}
+                              className="text-purple-600 hover:text-purple-800 transition-colors"
+                              title={t('dashboard.admin.resetPassword')}
+                            >
+                              <Key size={16} />
+                            </button>
+                            <button
                               onClick={() => handleUserAction('delete', user.id)}
                               className="text-red-600 hover:text-red-800 transition-colors"
                               title={t('dashboard.admin.deactivate')}
@@ -571,6 +590,13 @@ const DashboardAdmin: React.FC = () => {
         team={teamModal.team}
         users={users}
         mode={teamModal.mode}
+      />
+      
+      <PasswordResetModal
+        isOpen={passwordResetModal.isOpen}
+        onClose={() => setPasswordResetModal({ isOpen: false, userEmail: '', userId: '' })}
+        userEmail={passwordResetModal.userEmail}
+        userId={passwordResetModal.userId}
       />
     </div>
   );
