@@ -94,6 +94,19 @@ function AppRouter() {
   console.log('🎯 AppRouter - Path:', currentPath, 'Auth:', isAuthenticated, 'Loading:', loading, 'User:', user?.email || 'null');
 
   // Afficher un loader si i18n ou auth ne sont pas prêts
+  // MAIS avec un timeout pour éviter le blocage infini
+  const [showEmergencyButton, setShowEmergencyButton] = useState(false);
+  
+  useEffect(() => {
+    if (!ready || loading) {
+      const timer = setTimeout(() => {
+        setShowEmergencyButton(true);
+      }, 3000); // Montrer le bouton après 3 secondes
+      
+      return () => clearTimeout(timer);
+    }
+  }, [ready, loading]);
+  
   if (!ready || loading) {
     return (
       <div className="min-h-screen bg-off-white flex items-center justify-center">
@@ -101,33 +114,35 @@ function AppRouter() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-green mx-auto"></div>
           <p className="mt-4 text-metallic-gray">Chargement...</p>
           
-          {/* BOUTON D'URGENCE - Si bloqué plus de 5 secondes */}
-          <div className="mt-8 p-4 bg-red-50 rounded-lg">
-            <p className="text-sm text-red-600 mb-2">Bloqué sur cette page ?</p>
-            <button 
-              onClick={() => {
-                console.log('🚨 Bouton d\'urgence activé!');
-                
-                // Reset complet de tous les états
-                localStorage.clear();
-                sessionStorage.clear();
-                
-                // Force reset des flags globaux
-                if (window.globalCheckInProgress !== undefined) {
-                  window.globalCheckInProgress = false;
-                }
-                if (window.globalLastCheckTime !== undefined) {
-                  window.globalLastCheckTime = 0;
-                }
-                
-                // Force rechargement complet de la page
-                window.location.href = '/login?emergency=true';
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Forcer la connexion
-            </button>
-          </div>
+          {/* BOUTON D'URGENCE - Visible après 3 secondes */}
+          {showEmergencyButton && (
+            <div className="mt-8 p-4 bg-red-50 rounded-lg">
+              <p className="text-sm text-red-600 mb-2">Chargement trop long ?</p>
+              <button 
+                onClick={() => {
+                  console.log('🚨 Bouton d\'urgence activé!');
+                  
+                  // Reset complet de tous les états
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  
+                  // Force reset des flags globaux
+                  if (window.globalCheckInProgress !== undefined) {
+                    window.globalCheckInProgress = false;
+                  }
+                  if (window.globalLastCheckTime !== undefined) {
+                    window.globalLastCheckTime = 0;
+                  }
+                  
+                  // Force rechargement complet de la page
+                  window.location.href = '/login?emergency=true';
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Forcer la connexion
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

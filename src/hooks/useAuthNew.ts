@@ -45,12 +45,21 @@ export const useAuthNew = () => {
     };
   };
 
-  // Vérification initiale de session - SIMPLE ET DIRECTE
+  // Vérification initiale de session - SIMPLE ET DIRECTE AVEC TIMEOUT DE SÉCURITÉ
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: NodeJS.Timeout;
 
     const checkInitialSession = async () => {
       console.log('🔍 useAuthNew: Vérification session initiale');
+      
+      // Timeout de sécurité - force la fin du chargement après 3 secondes
+      timeoutId = setTimeout(() => {
+        if (isMounted && authState.loading) {
+          console.log('⏱️ useAuthNew: Timeout de sécurité - forçage fin de chargement');
+          setAuthState(prev => ({ ...prev, loading: false }));
+        }
+      }, 3000);
       
       try {
         // Méthode directe: getSession immédiatement
@@ -61,6 +70,7 @@ export const useAuthNew = () => {
         if (error) {
           console.error('❌ useAuthNew: Erreur getSession:', error.message);
           setAuthState({ user: null, loading: false, error: error.message });
+          clearTimeout(timeoutId);
           return;
         }
 
@@ -77,6 +87,8 @@ export const useAuthNew = () => {
           console.log('ℹ️ useAuthNew: Pas de session active');
           setAuthState({ user: null, loading: false, error: null });
         }
+        
+        clearTimeout(timeoutId);
       } catch (error) {
         if (!isMounted) return;
         
@@ -86,6 +98,7 @@ export const useAuthNew = () => {
           loading: false, 
           error: error instanceof Error ? error.message : 'Authentication error'
         });
+        clearTimeout(timeoutId);
       }
     };
 
@@ -93,6 +106,7 @@ export const useAuthNew = () => {
 
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
     };
   }, []); // Exécution unique au montage
 
