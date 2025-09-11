@@ -211,6 +211,24 @@
       "members": "membre(s)"
     }
   },
+  "teamModal": {
+    "createTitle": "Créer une nouvelle équipe",
+    "editTitle": "Modifier l'équipe",
+    "viewTitle": "Détails de l'équipe",
+    "teamName": "Nom de l'équipe",
+    "description": "Description (optionnelle)",
+    "responsibleManager": "Manager responsable",
+    "noManager": "Aucun manager assigné",
+    "isActive": "Équipe active",
+    "createdOn": "Créée le :",
+    "lastModified": "Dernière modification :",
+    "membersCount": "Nombre de membres :",
+    "teamMembers": "Membres de l'équipe :",
+    "close": "Fermer",
+    "create": "Créer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement..."
+  },
   "ai": {
     "recommendations": {
       "energy": {
