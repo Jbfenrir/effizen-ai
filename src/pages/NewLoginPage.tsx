@@ -24,6 +24,9 @@ const NewLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginMode, setLoginMode] = useState<'password' | 'magic' | 'reset'>('password');
+  // Mode magic et reset désactivés - masqués sur demande utilisateur
+  const magicLinkEnabled = false;
+  const resetPasswordEnabled = false;
   const [message, setMessage] = useState<string | null>(null);
 
   // 🚀 CORRECTION: Redirection automatique après connexion
@@ -115,33 +118,35 @@ const NewLoginPage: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          {/* Mode de connexion */}
-          <div className="mb-6">
-            <div className="flex rounded-lg bg-light-gray p-1">
-              <button
-                type="button"
-                onClick={() => setLoginMode('password')}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition ${
-                  loginMode === 'password'
-                    ? 'bg-white text-dark-blue shadow'
-                    : 'text-metallic-gray hover:text-dark-blue'
-                }`}
-              >
-                Mot de passe
-              </button>
-              <button
-                type="button"
-                onClick={() => setLoginMode('magic')}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition ${
-                  loginMode === 'magic'
-                    ? 'bg-white text-dark-blue shadow'
-                    : 'text-metallic-gray hover:text-dark-blue'
-                }`}
-              >
-                Lien email
-              </button>
+          {/* Mode de connexion - onglet Lien email masqué */}
+          {magicLinkEnabled && (
+            <div className="mb-6">
+              <div className="flex rounded-lg bg-light-gray p-1">
+                <button
+                  type="button"
+                  onClick={() => setLoginMode('password')}
+                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition ${
+                    loginMode === 'password'
+                      ? 'bg-white text-dark-blue shadow'
+                      : 'text-metallic-gray hover:text-dark-blue'
+                  }`}
+                >
+                  Mot de passe
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginMode('magic')}
+                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition ${
+                    loginMode === 'magic'
+                      ? 'bg-white text-dark-blue shadow'
+                      : 'text-metallic-gray hover:text-dark-blue'
+                  }`}
+                >
+                  Lien email
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {loginMode === 'reset' ? (
             <form onSubmit={handlePasswordReset} className="space-y-4">
@@ -226,17 +231,20 @@ const NewLoginPage: React.FC = () => {
                 {loading ? 'Connexion...' : 'Se connecter'}
               </button>
               
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginMode('reset');
-                  setMessage(null);
-                  clearError();
-                }}
-                className="mt-2 w-full text-sm text-metallic-gray hover:text-dark-blue"
-              >
-                Mot de passe oublié ?
-              </button>
+              {/* Lien "Mot de passe oublié ?" masqué */}
+              {resetPasswordEnabled && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMode('reset');
+                    setMessage(null);
+                    clearError();
+                  }}
+                  className="mt-2 w-full text-sm text-metallic-gray hover:text-dark-blue"
+                >
+                  Mot de passe oublié ?
+                </button>
+              )}
             </form>
           ) : (
             <form onSubmit={handleMagicLinkLogin} className="space-y-4">
