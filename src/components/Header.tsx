@@ -58,14 +58,34 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
     };
 
     const calculateBreaksScore = (wellbeingData: any): number => {
-      if (!wellbeingData?.meditationsPauses) return 0;
-      const pausesCount = [
-        wellbeingData.meditationsPauses.morning,
-        wellbeingData.meditationsPauses.noon,
-        wellbeingData.meditationsPauses.afternoon,
-        wellbeingData.meditationsPauses.evening
-      ].filter(Boolean).length;
-      return pausesCount * 25; // 4 créneaux = 100%
+      if (!wellbeingData) return 0;
+      
+      // Composante 1: Méditations/Pauses (40% du score équilibre)
+      let pausesScore = 0;
+      if (wellbeingData.meditationsPauses) {
+        const pausesCount = [
+          wellbeingData.meditationsPauses.morning,
+          wellbeingData.meditationsPauses.noon,
+          wellbeingData.meditationsPauses.afternoon,
+          wellbeingData.meditationsPauses.evening
+        ].filter(Boolean).length;
+        pausesScore = (pausesCount / 4) * 40; // Max 40 points sur 100
+      }
+      
+      // Composante 2: Sport/Loisirs (40% du score équilibre)
+      let sportScore = 0;
+      if (wellbeingData.sportLeisureHours !== undefined) {
+        // Recommandation OMS : 1h/jour = optimal
+        sportScore = Math.min((wellbeingData.sportLeisureHours / 1) * 40, 40);
+      }
+      
+      // Composante 3: Interactions sociales (20% du score équilibre) 
+      let socialScore = 0;
+      if (wellbeingData.socialInteraction === true) {
+        socialScore = 20; // Bonus si interaction sociale présente
+      }
+      
+      return Math.round(pausesScore + sportScore + socialScore);
     };
 
     const calculateOptimizationScore = (tasksData: any[], focusData: any): number => {

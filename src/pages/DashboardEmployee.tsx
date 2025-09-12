@@ -6,6 +6,7 @@ import DateRangePicker from '../components/DateRangePicker';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange } from '../utils/dateUtils';
 import { calculateAnalyticsForPeriod, getAllEntriesFromStorage, type AnalyticsData } from '../utils/dataAnalytics';
+import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGenerator';
 
 
 const DashboardEmployee: React.FC = () => {
@@ -27,16 +28,31 @@ const DashboardEmployee: React.FC = () => {
     dataAvailable: false,
     daysWithData: 0
   });
+  
+  const [smartAdvice, setSmartAdvice] = useState<SmartAdvice | null>(null);
 
-  // Calculer les données analytiques
+  // Calculer les données analytiques et générer les conseils
   useEffect(() => {
-    const entries = getAllEntriesFromStorage();
-    const dateRange = selectedPeriod === 'custom' && customDateRange 
-      ? customDateRange 
-      : getDateRangeForPeriod(selectedPeriod);
+    const loadAnalyticsAndAdvice = async () => {
+      const entries = getAllEntriesFromStorage();
+      const dateRange = selectedPeriod === 'custom' && customDateRange 
+        ? customDateRange 
+        : getDateRangeForPeriod(selectedPeriod);
+      
+      const analyticsData = calculateAnalyticsForPeriod(entries, dateRange);
+      setAnalytics(analyticsData);
+      
+      // Générer les conseils intelligents
+      try {
+        const advice = await generateSmartAdvice(entries, analyticsData);
+        setSmartAdvice(advice);
+      } catch (error) {
+        console.warn('Erreur génération conseils:', error);
+        setSmartAdvice(null);
+      }
+    };
     
-    const analyticsData = calculateAnalyticsForPeriod(entries, dateRange);
-    setAnalytics(analyticsData);
+    loadAnalyticsAndAdvice();
   }, [selectedPeriod, customDateRange]);
 
   const handlePeriodChange = (period: PeriodType) => {
@@ -59,46 +75,8 @@ const DashboardEmployee: React.FC = () => {
       : getDateRangeForPeriod(selectedPeriod);
   };
 
-  // Génération de la recommandation personnalisée basée sur les vraies données
+  // Extraire les données analytiques
   const { wellbeingScore, sleepScore, energyScore, breaksScore, optimizationScore, dataAvailable, daysWithData, wellbeingRadarData, wellbeingLineData, tasksRadarData, optimizationLineData } = analytics;
-  
-  let recommendation = {
-    color: 'bg-green-100 border-l-4 border-green-500',
-    icon: '🌟',
-    title: 'Bravo !',
-    message: `Votre bien-être global est excellent (${wellbeingScore}/100). Continuez ainsi !`
-  };
-  
-  if (!dataAvailable) {
-    recommendation = {
-      color: 'bg-blue-100 border-l-4 border-blue-500',
-      icon: '📊',
-      title: 'Données insuffisantes',
-      message: 'Aucune donnée disponible pour cette période. Commencez par saisir vos informations quotidiennes.'
-    };
-  } else if (wellbeingScore < 60 || optimizationScore < 60) {
-    const lowAreas = [];
-    if (sleepScore < 60) lowAreas.push('sommeil');
-    if (energyScore < 60) lowAreas.push('énergie');
-    if (breaksScore < 60) lowAreas.push('pauses');
-    if (optimizationScore < 60) lowAreas.push('optimisation du temps');
-    
-    recommendation = {
-      color: 'bg-red-100 border-l-4 border-red-500',
-      icon: '⚠️',
-      title: 'Attention',
-      message: `Scores faibles détectés : ${lowAreas.join(', ')}. Concentrez-vous sur ces aspects pour améliorer votre bien-être global (${wellbeingScore}/100).`
-    };
-  } else if (wellbeingScore < 75 || optimizationScore < 75) {
-    recommendation = {
-      color: 'bg-yellow-100 border-l-4 border-yellow-500',
-      icon: '💡',
-      title: 'À surveiller',
-      message: `Bien-être à ${wellbeingScore}/100 sur ${daysWithData} jour(s). Consultez les graphiques pour identifier vos axes de progrès.`
-    };
-  } else {
-    recommendation.message = `Excellent ! Bien-être à ${wellbeingScore}/100 et optimisation à ${optimizationScore}/100 sur ${daysWithData} jour(s).`;
-  }
 
 
   return (
@@ -266,10 +244,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="h-64 flex items-center justify-center">
                 {dataAvailable && wellbeingLineData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={wellbeingLineData.map(item => ({
-                      ...item,
-                      date: new Date(item.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-                    }))}>  
+                    <LineChart data={wellbeingLineData}>  
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis domain={[0, 100]} />
@@ -296,7 +271,7 @@ const DashboardEmployee: React.FC = () => {
         <div className="mb-12">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-dark-blue mb-2">🎯 Optimisation du temps travaillé</h2>
-            <p className="text-metallic-gray">Analyse de votre efficacité et répartition des tâches</p>
+            <p className="text-metallic-gray">Analyse dans quelle mesure vous consacrez votre temps et votre énergie aux tâches les plus importantes de votre poste.</p>
           </div>
           
           {/* Bloc optimisation pleine largeur */}
@@ -381,10 +356,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="h-64 flex items-center justify-center">
                 {dataAvailable && optimizationLineData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={optimizationLineData.map(item => ({
-                      ...item,
-                      date: new Date(item.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-                    }))}>  
+                    <LineChart data={optimizationLineData}>  
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis domain={[0, 100]} />
@@ -404,16 +376,37 @@ const DashboardEmployee: React.FC = () => {
           </div>
         </div>
 
-        {/* Recommandation personnalisée */}
-        <div className={`mt-8 p-4 rounded-lg ${recommendation.color}`}>
-          <div className="flex items-start space-x-3">
-            <div className="text-2xl">{recommendation.icon}</div>
-            <div>
-              <p className="font-bold text-dark-blue mb-1">{recommendation.title}</p>
-              <p className="text-dark-blue">{recommendation.message}</p>
+        {/* Conseils intelligents avec diagnostic et recommandations */}
+        {smartAdvice && (
+          <div className={`mt-8 rounded-lg ${smartAdvice.color}`}>
+            <div className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="text-3xl">{smartAdvice.icon}</div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-dark-blue text-lg mb-3">
+                    🎯 Diagnostic Expert
+                  </h3>
+                  <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                    <p className="text-dark-blue font-medium">{smartAdvice.diagnosis}</p>
+                  </div>
+                  
+                  <h3 className="font-bold text-dark-blue text-lg mb-3">
+                    💡 Conseils Pratiques
+                  </h3>
+                  <div className="bg-white bg-opacity-50 rounded-lg p-4">
+                    <div className="text-dark-blue whitespace-pre-line">{smartAdvice.recommendation}</div>
+                  </div>
+                  
+                  {dataAvailable && (
+                    <div className="mt-4 text-sm text-dark-blue opacity-75">
+                      Basé sur {daysWithData} jour(s) d'analyse avec nos expertises en bien-être au travail
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         
         {/* Modal sélecteur de dates */}
         {showDatePicker && (

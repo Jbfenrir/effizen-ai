@@ -45,16 +45,37 @@ const calculateFatigueScore = (focusData: any): number => {
 };
 
 /**
- * Calcule le score des pauses
+ * Calcule le score d'équilibre complet (méditations/pauses + sport + social)
  */
 const calculateBreaksScore = (wellbeingData: any): number => {
-  if (!wellbeingData?.breaks) return 0;
-  const breaksCount = [
-    wellbeingData.breaks.am,
-    wellbeingData.breaks.noon,
-    wellbeingData.breaks.pm
-  ].filter(Boolean).length;
-  return breaksCount * 33.33;
+  if (!wellbeingData) return 0;
+  
+  // Composante 1: Méditations/Pauses (40% du score équilibre)
+  let pausesScore = 0;
+  if (wellbeingData.meditationsPauses) {
+    const pausesCount = [
+      wellbeingData.meditationsPauses.morning,
+      wellbeingData.meditationsPauses.noon,
+      wellbeingData.meditationsPauses.afternoon,
+      wellbeingData.meditationsPauses.evening
+    ].filter(Boolean).length;
+    pausesScore = (pausesCount / 4) * 40; // Max 40 points sur 100
+  }
+  
+  // Composante 2: Sport/Loisirs (40% du score équilibre)
+  let sportScore = 0;
+  if (wellbeingData.sportLeisureHours !== undefined) {
+    // Recommandation OMS : 1h/jour = optimal
+    sportScore = Math.min((wellbeingData.sportLeisureHours / 1) * 40, 40);
+  }
+  
+  // Composante 3: Interactions sociales (20% du score équilibre) 
+  let socialScore = 0;
+  if (wellbeingData.socialInteraction === true) {
+    socialScore = 20; // Bonus si interaction sociale présente
+  }
+  
+  return Math.round(pausesScore + sportScore + socialScore);
 };
 
 /**
@@ -132,13 +153,11 @@ export const calculateAnalyticsForPeriod = (
     { subject: 'Pauses', score: Math.round(avgBreaksScore) }
   ];
 
-  // Données pour graphique ligne évolution bien-être
+  // Données pour graphique ligne évolution bien-être avec dates JJ/MM
   const wellbeingLineData = filteredEntries.map(entry => {
-    const date = new Date(entry.entry_date).toLocaleDateString('fr-FR', { 
-      weekday: 'short' 
-    });
+    const date = new Date(entry.entry_date);
     return {
-      date: date.charAt(0).toUpperCase() + date.slice(1),
+      date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
       Sommeil: Math.round(calculateSleepScore(entry.sleep)),
       Énergie: Math.round(calculateEnergyScore(entry.wellbeing)),
       Fatigue: Math.round(calculateFatigueScore(entry.focus)),
@@ -146,14 +165,75 @@ export const calculateAnalyticsForPeriod = (
     };
   });
 
-  // Données pour graphique radar tâches (>20% du temps)
+  // Données pour graphique radar tâches avec regroupement intelligent
   const allTasks: { [key: string]: number } = {};
   let totalTaskTime = 0;
+
+  // Fonction de normalisation des noms de tâches
+  const normalizeTaskName = (name: string): string => {
+    const normalized = name.toLowerCase()
+      .replace(/[\s-_]+/g, ' ') // Normaliser espaces, tirets, underscores
+      .trim();
+    
+    // Dictionnaire de regroupement intelligent
+    const groupings: { [key: string]: string } = {
+      // Réunions
+      'rdv': 'Réunions',
+      'rendez vous': 'Réunions', 
+      'rendez-vous': 'Réunions',
+      'reunion': 'Réunions',
+      'réunion': 'Réunions',
+      'meeting': 'Réunions',
+      // Administration
+      'admin': 'Administration',
+      'administratif': 'Administration',
+      'gestion': 'Administration',
+      // Formation - patterns étendus
+      'formation': 'Formation',
+      'forma': 'Formation',
+      'prep forma': 'Formation',
+      'prepforma': 'Formation',
+      'preparation formation': 'Formation',
+      'préparation': 'Formation',
+      'cours': 'Formation',
+      'apprentissage': 'Formation',
+      // Développement
+      'dev': 'Développement',
+      'developpement': 'Développement',
+      'développement': 'Développement',
+      'coding': 'Développement',
+      'programmation': 'Développement',
+      // Communication
+      'mail': 'Communication',
+      'mails': 'Communication',
+      'email': 'Communication',
+      'emails': 'Communication',
+      'echange': 'Communication',
+      'discussion': 'Communication',
+      // Recherche
+      'recherche': 'Recherche',
+      'veille': 'Recherche',
+      'analyse': 'Recherche',
+      'etude': 'Recherche'
+    };
+    
+    
+    // Vérifier si le nom normalisé correspond à une catégorie
+    for (const [key, group] of Object.entries(groupings)) {
+      if (normalized.includes(key)) {
+        return group;
+      }
+    }
+    
+    // Si pas de correspondance, capitaliser la première lettre
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  };
 
   filteredEntries.forEach(entry => {
     if (entry.tasks) {
       entry.tasks.forEach(task => {
-        allTasks[task.name] = (allTasks[task.name] || 0) + task.duration;
+        const normalizedName = normalizeTaskName(task.name);
+        allTasks[normalizedName] = (allTasks[normalizedName] || 0) + task.duration;
         totalTaskTime += task.duration;
       });
     }
@@ -164,15 +244,14 @@ export const calculateAnalyticsForPeriod = (
       subject: name,
       score: Math.round((duration / totalTaskTime) * 100)
     }))
-    .filter(task => task.score >= 20);
+    .filter(task => task.score >= 5) // Réduit à 5% pour plus de détail
+    .sort((a, b) => b.score - a.score); // Trier par score décroissant
 
-  // Données pour graphique ligne optimisation
+  // Données pour graphique ligne optimisation avec dates JJ/MM
   const optimizationLineData = filteredEntries.map(entry => {
-    const date = new Date(entry.entry_date).toLocaleDateString('fr-FR', { 
-      weekday: 'short' 
-    });
+    const date = new Date(entry.entry_date);
     return {
-      date: date.charAt(0).toUpperCase() + date.slice(1),
+      date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
       Optimisation: Math.round(calculateOptimizationScore(entry.tasks, entry.focus))
     };
   });
