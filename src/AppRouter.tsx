@@ -13,6 +13,7 @@ import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
 import TestLoadingPage from './pages/TestLoadingPage';
+import AdviceEngineTest from './components/AdviceEngineTest';
 
 // 🔄 SYSTÈME DE BASCULEMENT AUTH
 import { AUTH_CONFIG } from './config/auth-switch';
@@ -178,6 +179,9 @@ function AppRouter() {
         
         {/* Page de test du bouton d'urgence */}
         {currentPath === '/test-loading' && <TestLoadingPage />}
+        
+        {/* Test du moteur de conseils - accessible en développement */}
+        {currentPath === '/test-advice' && <AdviceEngineTest />}
       </main>
     </div>
   );

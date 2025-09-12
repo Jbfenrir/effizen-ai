@@ -44,10 +44,9 @@ const EntryForm: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const [wellbeing, setWellbeing] = useState<Wellbeing>({
-    meditations: { am: false, pm: false },
-    breaks: { am: false, noon: false, pm: false },
-    sportHours: 0,
-    manualHours: 0,
+    meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false },
+    sportLeisureHours: 0,
+    socialInteraction: false,
     energy: 50,
   });
 
@@ -59,12 +58,12 @@ const EntryForm: React.FC = () => {
       setSleep(parsed.sleep || { bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
       setFocus(parsed.focus || { morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
       setTasks(parsed.tasks || []);
-      setWellbeing(parsed.wellbeing || { meditations: { am: false, pm: false }, breaks: { am: false, noon: false, pm: false }, sportHours: 0, manualHours: 0, energy: 50 });
+      setWellbeing(parsed.wellbeing || { meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
     } else {
       setSleep({ bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
       setFocus({ morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
       setTasks([]);
-      setWellbeing({ meditations: { am: false, pm: false }, breaks: { am: false, noon: false, pm: false }, sportHours: 0, manualHours: 0, energy: 50 });
+      setWellbeing({ meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
     }
   }, [entryDate]);
 
@@ -122,19 +121,18 @@ const EntryForm: React.FC = () => {
     // Score fatigue (0-100) - inversé
     const fatigueScore = isNaN(focus.fatigue) ? 60 : (5 - focus.fatigue) * 20;
     
-    // Score méditation (0-100)
-    const meditCount = (wellbeing.meditations?.am ? 1 : 0) + (wellbeing.meditations?.pm ? 1 : 0);
-    const meditScore = 50 * meditCount;
+    // Score méditations/pauses (0-100)
+    const meditPauseCount = wellbeing.meditationsPauses ? [wellbeing.meditationsPauses.morning, wellbeing.meditationsPauses.noon, wellbeing.meditationsPauses.afternoon, wellbeing.meditationsPauses.evening].filter(Boolean).length : 0;
+    const meditPauseScore = meditPauseCount * 25;
     
-    // Score pauses (0-100)
-    const breaksCount = wellbeing.breaks ? [wellbeing.breaks.am, wellbeing.breaks.noon, wellbeing.breaks.pm].filter(Boolean).length : 0;
-    const pauseScore = breaksCount * 33.33;
+    // Score activité sport/loisir (0-100)
+    const activityScore = wellbeing.sportLeisureHours > 0 ? Math.min(wellbeing.sportLeisureHours * 25, 100) : 0;
     
-    // Score activité (0-100)
-    const activityScore = (wellbeing.sportHours > 0 ? 50 : 0) + (wellbeing.manualHours > 0 ? 50 : 0);
+    // Score social (0-100)
+    const socialScore = wellbeing.socialInteraction ? 100 : 0;
     
     // Score global
-    return Math.round((sleepScore + fatigueScore + meditScore + pauseScore + activityScore) / 5);
+    return Math.round((sleepScore + fatigueScore + meditPauseScore + activityScore + socialScore) / 5);
   };
 
   const wellbeingScore = calculateWellbeingScore();
@@ -254,20 +252,12 @@ const EntryForm: React.FC = () => {
         </div>
 
         {/* Actions en bas */}
-        <div className="mt-12 flex justify-center space-x-4">
+        <div className="mt-12 flex justify-center">
           <button
             onClick={() => navigate('/dashboard')}
             className="btn-secondary"
           >
             Voir le tableau de bord
-          </button>
-          
-          <button
-            onClick={() => saveData(true)}
-            disabled={isLoading}
-            className="btn-success"
-          >
-            Sauvegarder et continuer
           </button>
         </div>
       </div>

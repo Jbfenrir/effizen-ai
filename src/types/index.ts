@@ -32,17 +32,14 @@ export interface Task {
 }
 
 export interface Wellbeing {
-  meditations: {
-    am: boolean;
-    pm: boolean;
-  };
-  breaks: {
-    am: boolean;
+  meditationsPauses: {
+    morning: boolean;
     noon: boolean;
-    pm: boolean;
+    afternoon: boolean;
+    evening: boolean;
   };
-  sportHours: number;
-  manualHours: number;
+  sportLeisureHours: number;
+  socialInteraction: boolean;
   energy: number; // 0-100%
 }
 

@@ -6,7 +6,7 @@
 
 **Statut actuel :** ✅ **PRODUCTION FONCTIONNELLE - Système de reset password opérationnel**
 **URL Production :** https://effizen-ai-prod.vercel.app
-**Dernière mise à jour :** 2025-09-10 - Système complet de réinitialisation des mots de passe implémenté
+**Dernière mise à jour :** 2025-09-12 - Système de conseils intelligent avec optimisation des tâches + autocomplétion implémentés
 
 ## 🏗️ ARCHITECTURE TECHNIQUE
 
@@ -124,6 +124,16 @@ src/
 - SMTP Gmail configuré
 - Session persistante
 - Gestion déconnexion
+- Page de connexion simplifiée (onglet "Lien email" et "Mot de passe oublié" masqués)
+
+### ✅ Interface de Saisie Quotidienne (11/09/2025)
+- **Énergie** (ex-"Focus & fatigue") avec échelle inversée (1=Très fatigué, 5=Très énergique)
+- **Équilibre** (ex-"Bien-être & énergie") avec structure réorganisée :
+  - **Méditations / Pauses** : 4 cases (Matin, Midi, Après-midi, Soir)
+  - **Heures de sport/loisir** : Champ unique fusionné (sport + activités manuelles)
+  - **Interaction sociale quotidienne** : Case à cocher binaire
+- Suppression du bouton "Sauvegarder et continuer" (seul "Sauvegarder" en haut à droite)
+- Suppression des conseils basiques de l'interface (déplacés vers le système intelligent)
 
 ### ✅ Dashboard Admin
 - Vue d'ensemble système
@@ -137,6 +147,7 @@ src/
 - Anglais (complet)
 - Changement dynamique
 - Traductions admin complètes
+- Traductions TeamModal ajoutées (11/09/2025)
 
 ### ✅ Sécurité
 - Row Level Security (RLS)
@@ -646,11 +657,11 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 
 ---
 
-**Dernière mise à jour :** 2025-09-10  
-**Version :** 6.0 - Système complet de reset password avec mode dégradé  
+**Dernière mise à jour :** 2025-09-12  
+**Version :** 7.1 - Optimisation des tâches à haute valeur ajoutée + Autocomplétion intelligente  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** ✅ **PRODUCTION FONCTIONNELLE - Reset password opérationnel via 3 solutions**
+**Status :** ✅ **PRODUCTION FONCTIONNELLE - Système de conseils intelligent opérationnel avec optimisation des tâches**
 
 ## 📚 HISTORIQUE CONSOLIDÉ
 
@@ -677,15 +688,115 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 - **Restauration rapide :** `git reset --hard 57b058e` (dans WSL)
 - **Guides disponibles :** RESTORE-AUTH-BACKUP.md + SWITCH-AUTH-GUIDE.md
 
-### ✅ ACCOMPLISSEMENTS RÉCENTS (10/09/2025)
-- [x] **Système de reset password** : 3 solutions fonctionnelles
-- [x] **Route /reset-password** : Accessible et opérationnelle
-- [x] **Modal admin** : Génération avec mode dégradé
-- [x] **Documentation SQL** : Solution de secours toujours disponible
+## 🤖 SYSTÈME DE CONSEILS INTELLIGENT (En cours - 11/09/2025)
+
+### 🎯 **Vision et Architecture**
+Système de conseils personnalisés basé sur l'expertise multi-disciplinaire :
+- **Psychologie du travail et clinique du burnout**
+- **Prévention des risques psychosociaux (RPS)**
+- **Ergonomie organisationnelle et hygiène de vie**
+- **Médecine douce et approche holistique**
+
+### 📊 **Approche Technique (Phase 1)**
+- **Base de règles expertes** encodées à partir de sources documentaires validées
+- **Analyse de patterns** sur périodes définies par les expertises (ex: 3 semaines pour social)
+- **Conseils contextualisés** avec avertissements médicaux appropriés
+- **Génération au dashboard** plutôt qu'en temps réel lors de la saisie
+
+### 📚 **Sources d'Expertise Identifiées**
+- Guide INRS/DGT/ANACT sur la prévention du burnout
+- Brochures RPS du Ministère du Travail
+- Normes ISO 6385:2016 (Ergonomie)
+- Recherches en neuropsychologie du stress
+- Médecines douces et gestion holistique du burnout
+
+### ✅ ACCOMPLISSEMENTS RÉCENTS (12/09/2025)
+- [x] **Refonte interface de saisie** : Énergie + Équilibre redesignés
+- [x] **Suppression conseils basiques** : Préparation pour système intelligent
+- [x] **Types TypeScript mis à jour** : Nouvelle structure Wellbeing
+- [x] **Architecture système de conseils** : Définie et documentée
+- [x] **Traductions TeamModal** : Interface admin complètement traduite
+- [x] **Système de conseils opérationnel** : Interface de test /test-advice fonctionnelle
+- [x] **Seuils expertises affinés** : Correction logique patterns et valeurs de référence
+- [x] **Optimisation des tâches à haute valeur ajoutée** : Nouvelle catégorie d'analyse avec seuils expertisés
+- [x] **Autocomplétion intelligente** : Système de suggestion des noms de tâches basé sur l'historique utilisateur
+- [x] **Règles expertes avancées** : 2 nouvelles règles (ergonomie cognitive + dispersion cognitive critique)
+
+### 📊 **Seuils d'Analyse Affinés (12/09/2025)**
+
+#### **Interface de Test** : http://localhost:3001/test-advice
+
+#### **Métriques et Niveaux de Préoccupation**
+
+**🔋 Énergie** (échelle 1-5)
+- **Aucun** : ≥4 (Énergie excellente)
+- **Faible** : 3-3.99 (Énergie correcte)  
+- **Moyen** : 2-2.99 (Attention requise)
+- **Élevé** : <2 (Fatigue préoccupante)
+
+**⏰ Heures Travaillées**
+- **Aucun** : ≤7h/jour (Charge saine)
+- **Faible** : 7.01-8h/jour (Acceptable)
+- **Moyen** : 8.01-9h/jour (Zone d'attention)
+- **Élevé** : >9h/jour (Surcharge préoccupante)
+
+**😴 Durée de Sommeil**
+- **Aucun** : 7-9h/nuit (Durée optimale)
+- **Faible** : 6.5-6.99h ou 9.01-9.5h (Acceptable)
+- **Moyen** : 6-6.49h ou 9.51-10h (Insuffisant/Excessif)
+- **Élevé** : <6h ou >10h (Très préoccupant)
+
+**⏸️ Pauses/Méditations**
+- **Aucun** : ≥3 pauses/jour (Excellent rythme)
+- **Faible** : 2-2.99 pauses/jour (Rythme correct)
+- **Moyen** : 1-1.99 pauses/jour (Insuffisant)
+- **Élevé** : <1 pause/jour (Très préoccupant)
+
+**🏃 Sport/Loisirs**
+- **Aucun** : ≥1h/jour (Recommandation OMS atteinte)
+- **Faible** : 0.5-0.99h/jour (Sous-optimal)
+- **Moyen** : 0.25-0.49h/jour (Très insuffisant)
+- **Élevé** : <0.25h/jour (Sédentarité préoccupante)
+
+**👥 Interactions Sociales**
+- **Aucun** : >70% des jours (Très social)
+- **Faible** : 40-70% des jours (Moyen)
+- **Moyen** : 20-40% des jours (Insuffisant)
+- **Élevé** : <20% des jours (Isolement préoccupant)
+
+**🎯 Optimisation du Temps Travaillé** *(NOUVEAU 12/09/2025)*
+- **Aucun** : ≥70% (Excellente optimisation)
+- **Faible** : 50-69.99% (Bonne optimisation)
+- **Moyen** : 30-49.99% (Optimisation insuffisante)
+- **Élevé** : <30% (Dispersion critique)
+
+### 🚧 **Nouvelles Fonctionnalités Implémentées (12/09/2025)**
+
+#### **🎯 Optimisation des Tâches à Haute Valeur Ajoutée**
+- **Approche temporelle** : Analyse automatique du % de temps consacré aux tâches importantes
+- **Métriques intelligentes** : Calcul basé sur `tasks[].isHighValue` dans les entrées quotidiennes
+- **Seuils expertisés** : Basés sur l'ergonomie cognitive et la psychologie organisationnelle
+- **Règles expertes** : 2 nouvelles règles pour détecter dispersion cognitive et mauvaise optimisation
+
+#### **✨ Autocomplétion Intelligente des Tâches**
+- **Historique personnalisé** : Mémorisation des tâches saisies par chaque utilisateur
+- **Suggestions contextuelles** : Propositions basées sur la fréquence d'utilisation
+- **Interface intuitive** : Navigation clavier + informations sur l'historique d'usage
+- **Réduction pollution données** : Normalisation automatique des noms similaires
+- **Performance** : Limite de 50 tâches mémorisées, tri par pertinence
+
+#### **📚 Nouvelles Règles Expertes Ajoutées**
+1. **`ergo-003-task-optimization`** : Ergonomie cognitive - Mauvaise allocation temporelle
+2. **`psy-003-cognitive-dispersion`** : Psychologie - Dispersion cognitive critique
+
+### 🚧 **En cours de développement**
+- [ ] **Intégration dashboard** : Section conseils intelligents dans les dashboards utilisateur
+- [ ] **Notifications proactives** : Alertes basées sur les règles expertes déclenchées
+- [ ] **Historique des conseils** : Suivi de l'efficacité des recommandations appliquées
 
 ### Prochaines fonctionnalités à développer
 - [ ] Dashboard Manager (fonctionnalités équipe)
-- [ ] Dashboard Employee (saisie quotidienne)  
+- [ ] Dashboard Employee (saisie quotidienne complète)
 - [ ] Système de notifications
 - [ ] Export de données
 - [ ] Mode sombre

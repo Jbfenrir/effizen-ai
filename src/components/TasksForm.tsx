@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Target, Clock, AlertTriangle } from 'lucide-react';
+import TaskAutocomplete from './TaskAutocomplete';
+import { useTaskHistory } from '../hooks/useTaskHistory';
 import type { Task } from '../types';
 
 interface TasksFormProps {
@@ -15,6 +17,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
   disabled = false,
 }) => {
   const { t } = useTranslation();
+  const { addTaskToHistory } = useTaskHistory();
   const [tasks, setTasks] = useState<Task[]>(initialData);
 
   useEffect(() => {
@@ -51,6 +54,15 @@ const TasksForm: React.FC<TasksFormProps> = ({
       onChange(updated);
       return updated;
     });
+  };
+
+  // Gérer la sélection d'une tâche depuis l'autocomplétion
+  const handleTaskNameChange = (taskId: string, taskName: string) => {
+    updateTask(taskId, 'name', taskName);
+    // Ajouter à l'historique seulement quand la tâche est validée (non vide)
+    if (taskName.trim()) {
+      addTaskToHistory(taskName.trim());
+    }
   };
 
   const totalDuration = tasks.reduce((sum, task) => sum + task.duration, 0);
@@ -108,12 +120,11 @@ const TasksForm: React.FC<TasksFormProps> = ({
                   <label className="form-label text-sm">
                     {t('tasks.taskName')} #{index + 1}
                   </label>
-                  <input
-                    type="text"
+                  <TaskAutocomplete
                     value={task.name}
-                    onChange={(e) => updateTask(task.id, 'name', e.target.value)}
+                    onChange={(value) => updateTask(task.id, 'name', value)}
+                    onTaskSelected={(taskName) => handleTaskNameChange(task.id, taskName)}
                     placeholder="Ex: Réunion équipe, Développement feature..."
-                    className="form-input"
                     disabled={disabled}
                   />
                 </div>

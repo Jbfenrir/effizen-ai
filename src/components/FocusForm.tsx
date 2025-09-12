@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, AlertTriangle, Brain } from 'lucide-react';
+import { Clock, AlertTriangle, Battery } from 'lucide-react';
 import type { Focus } from '../types';
 
 interface FocusFormProps {
@@ -43,12 +43,12 @@ const FocusForm: React.FC<FocusFormProps> = ({
     });
   };
 
-  const fatigueLevels = [
-    { value: 1, label: t('focus.fatigueLevels.1'), color: 'fatigue-btn-1' },
-    { value: 2, label: t('focus.fatigueLevels.2'), color: 'fatigue-btn-2' },
-    { value: 3, label: t('focus.fatigueLevels.3'), color: 'fatigue-btn-3' },
-    { value: 4, label: t('focus.fatigueLevels.4'), color: 'fatigue-btn-4' },
-    { value: 5, label: t('focus.fatigueLevels.5'), color: 'fatigue-btn-5' },
+  const energyLevels = [
+    { value: 1, label: 'Très fatigué', color: 'fatigue-btn-5' },
+    { value: 2, label: 'Fatigué', color: 'fatigue-btn-4' },
+    { value: 3, label: 'Neutre', color: 'fatigue-btn-3' },
+    { value: 4, label: 'Énergique', color: 'fatigue-btn-2' },
+    { value: 5, label: 'Très énergique', color: 'fatigue-btn-1' },
   ];
 
   const getFatigueColor = (level: number) => {
@@ -61,8 +61,8 @@ const FocusForm: React.FC<FocusFormProps> = ({
     <div className="card">
       <div className="card-header">
         <div className="flex items-center space-x-2">
-          <Brain className="icon" size={24} />
-          <h3 className="text-lg font-semibold">{t('focus.title')}</h3>
+          <Battery className="icon" size={24} />
+          <h3 className="text-lg font-semibold">Énergie</h3>
         </div>
       </div>
 
@@ -172,13 +172,13 @@ const FocusForm: React.FC<FocusFormProps> = ({
         </div>
       </div>
 
-      {/* Niveau de fatigue */}
+      {/* Niveau d'énergie */}
       <div className="mt-6">
         <label className="form-label">
-          {t('focus.fatigue')}
+          Niveau d'énergie
         </label>
         <div className="grid grid-cols-5 gap-2">
-          {fatigueLevels.map((level) => (
+          {energyLevels.map((level) => (
             <button
               key={level.value}
               type="button"
@@ -197,14 +197,14 @@ const FocusForm: React.FC<FocusFormProps> = ({
         </div>
       </div>
 
-      {/* Indicateur de fatigue actuel */}
+      {/* Indicateur d'énergie actuel */}
       <div className="mt-4 p-3 rounded-lg bg-light-gray">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-dark-blue">
-            Niveau de fatigue actuel :
+            Niveau d'énergie actuel :
           </span>
           <span className={`text-sm font-semibold ${getFatigueColor(focus.fatigue)}`}>
-            {t(`focus.fatigueLevels.${focus.fatigue}`)}
+            {energyLevels.find(l => l.value === focus.fatigue)?.label || 'Neutre'}
           </span>
         </div>
       </div>
