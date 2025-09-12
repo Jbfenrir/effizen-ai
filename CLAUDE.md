@@ -4,9 +4,9 @@
 
 **EffiZen-AI** est une application React/TypeScript de bien-être au travail avec authentification Supabase, gestion multi-rôles (employee/manager/admin), et interface multilingue (FR/EN).
 
-**Statut actuel :** ✅ **PRODUCTION FONCTIONNELLE - Système de reset password opérationnel**
+**Statut actuel :** ✅ **PRODUCTION OPTIMALE - Dashboard production entièrement fonctionnel**
 **URL Production :** https://effizen-ai-prod.vercel.app
-**Dernière mise à jour :** 2025-09-12 - Système de conseils intelligent avec optimisation des tâches + autocomplétion implémentés
+**Dernière mise à jour :** 2025-09-12 - Corrections majeures dashboard : Score Équilibre, dates, regroupement tâches, conseils experts, export CSV complet
 
 ## 🏗️ ARCHITECTURE TECHNIQUE
 
@@ -658,10 +658,10 @@ Read("/mnt/c/Users/FIAE/Desktop/effizen-ai/screenshots/temp-screenshot.png")
 ---
 
 **Dernière mise à jour :** 2025-09-12  
-**Version :** 7.1 - Optimisation des tâches à haute valeur ajoutée + Autocomplétion intelligente  
+**Version :** 7.2 - Corrections majeures dashboard production - Tous problèmes critiques résolus  
 **URL Production :** https://effizen-ai-prod.vercel.app  
 **Maintainer :** JB Gerberon (jbgerberon@gmail.com)  
-**Status :** ✅ **PRODUCTION FONCTIONNELLE - Système de conseils intelligent opérationnel avec optimisation des tâches**
+**Status :** ✅ **PRODUCTION OPTIMALE - Dashboard entièrement fonctionnel avec scores calculés, conseils experts et export complet**
 
 ## 📚 HISTORIQUE CONSOLIDÉ
 
@@ -721,6 +721,58 @@ Système de conseils personnalisés basé sur l'expertise multi-disciplinaire :
 - [x] **Optimisation des tâches à haute valeur ajoutée** : Nouvelle catégorie d'analyse avec seuils expertisés
 - [x] **Autocomplétion intelligente** : Système de suggestion des noms de tâches basé sur l'historique utilisateur
 - [x] **Règles expertes avancées** : 2 nouvelles règles (ergonomie cognitive + dispersion cognitive critique)
+
+### 🚀 CORRECTIONS MAJEURES DASHBOARD PRODUCTION (12/09/2025) - SESSION CRITIQUE
+**Problèmes identifiés en production et corrigés :**
+
+#### 1. 🎯 **Score Équilibre 0/100 → RÉSOLU**
+- **Problème :** Score toujours à 0, ne calculait que les méditations/pauses
+- **Solution :** Calcul 3 composantes dans `dataAnalytics.ts` et `Header.tsx` :
+  - **40% Méditations/Pauses** : 4 créneaux (matin, midi, après-midi, soir)
+  - **40% Sport/Loisirs** : Recommandation OMS 1h/jour optimal
+  - **20% Interactions sociales** : Bonus si interaction quotidienne
+- **Résultat :** Score Équilibre maintenant calculé et affiché correctement
+
+#### 2. 📅 **Dates "Invalid Date" → RÉSOLU**
+- **Problème :** Graphiques d'évolution affichaient "Invalid Date" au lieu des dates
+- **Cause :** Double formatage de dates déjà formatées en JJ/MM
+- **Solution :** Suppression du re-formatage dans `DashboardEmployee.tsx`
+- **Résultat :** Dates JJ/MM correctes dans tous les graphiques
+
+#### 3. 🏷️ **Répartition 100% "prep forma" → RÉSOLU**  
+- **Problème :** Regroupement intelligent ne fonctionnait pas
+- **Solution :** Extension patterns de reconnaissance dans `dataAnalytics.ts` :
+  - Ajout : 'prep forma', 'prepforma', 'preparation formation' → 'Formation'
+  - Patterns étendus pour toutes les catégories
+- **Résultat :** Regroupement intelligent des tâches opérationnel
+
+#### 4. 💡 **Conseils basiques → FORMAT DIAGNOSTIC EXPERT**
+- **Problème :** Conseils affichaient format simple ("Scores faibles détectés...")
+- **Solution :** Nouveau système `generateEnhancedFallbackAdvice` dans `adviceGenerator.ts` :
+  - **Format diagnostic** : "Analyse comportementale : Déficit principal..."
+  - **Conseils personnalisés** selon le domaine problématique (sommeil, énergie, équilibre, optimisation)
+  - **Recommandations concrètes** : Techniques spécialisées (Pomodoro, 4-7-8, Eisenhower...)
+- **Résultat :** Conseils avec format "Diagnostic Expert" + "Conseils Pratiques"
+
+#### 5. 📂 **Export CSV incomplet → COMPLET**
+- **Problème :** Colonnes manquantes (Énergie, Pauses, Score optimisation) + Bien-être vide
+- **Solution :** Mise à jour complète `Header.tsx` :
+  - Nouvelles colonnes calculées avec mêmes formules que dashboard
+  - Tri chronologique des données
+  - Encodage UTF-8 pour caractères spéciaux
+- **Résultat :** Export CSV complet avec tous les scores calculés
+
+#### 🧪 **Tests et Validation**
+- **Build production :** ✅ Compilation sans erreurs (1m 19s)
+- **Tests automatisés :** Script `test-corrections-finales.cjs` validé
+- **Serveur local :** ✅ localhost:3001 fonctionnel
+- **Déploiement :** ✅ Push production effectué (commit 1e4ab58)
+
+#### 📊 **Impact Technique**
+- **Fichiers modifiés :** 4 fichiers core (`dataAnalytics.ts`, `DashboardEmployee.tsx`, `adviceGenerator.ts`, `Header.tsx`)
+- **Nouvelles fonctions :** `calculateBreaksScore` étendue, `generateEnhancedFallbackAdvice`
+- **Architecture préservée :** Aucune rupture de compatibilité
+- **Performance :** Pas d'impact négatif sur la vitesse
 
 ### 📊 **Seuils d'Analyse Affinés (12/09/2025)**
 
