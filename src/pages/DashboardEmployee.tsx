@@ -7,6 +7,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, LineChar
 import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange } from '../utils/dateUtils';
 import { calculateAnalyticsForPeriod, getAllEntries, type AnalyticsData } from '../utils/dataAnalytics';
 import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGenerator';
+import DataMigration from '../utils/dataMigration';
 
 
 const DashboardEmployee: React.FC = () => {
@@ -30,6 +31,11 @@ const DashboardEmployee: React.FC = () => {
   });
   
   const [smartAdvice, setSmartAdvice] = useState<SmartAdvice | null>(null);
+
+  // Exposer DataMigration globalement pour debugging
+  useEffect(() => {
+    (window as any).DataMigration = DataMigration;
+  }, []);
 
   // Calculer les données analytiques et générer les conseils
   useEffect(() => {
