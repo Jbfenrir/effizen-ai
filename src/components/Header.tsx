@@ -33,32 +33,109 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
     { name: t('navigation.entry'), href: '/entry', icon: Plus },
   ];
 
-  // Fonction d’export CSV
+  // Fonction d'export CSV
   const exportData = () => {
     // Récupérer toutes les entrées sauvegardées dans le localStorage
     const entries = Object.keys(localStorage)
       .filter(key => key.startsWith('entry-'))
-      .map(key => JSON.parse(localStorage.getItem(key) || '{}'));
+      .map(key => JSON.parse(localStorage.getItem(key) || '{}'))
+      .sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());
+    
     if (entries.length === 0) {
       alert('Aucune donnée à exporter.');
       return;
     }
-    // Générer le CSV
-    const headers = ['Date', 'Sommeil (h)', 'Fatigue', 'Tâches', 'Bien-être'];
-    const rows = entries.map(e => [
-      e.entry_date,
-      e.sleep?.duration ?? '',
-      e.focus?.fatigue ?? '',
-      (e.tasks || []).map(t => t.name + ' (' + t.duration + 'h)').join(' | '),
-      Object.entries(e.wellbeing?.breaks || {}).map(([k, v]) => (v ? k : null)).filter(Boolean).join(', ')
-    ]);
+
+    // Calcul des scores comme dans dataAnalytics.ts
+    const calculateSleepScore = (sleepData: any): number => {
+      if (!sleepData || sleepData.duration === undefined) return 0;
+      return Math.min((sleepData.duration / 8) * 100, 100);
+    };
+
+    const calculateEnergyScore = (wellbeingData: any): number => {
+      if (!wellbeingData || wellbeingData.energy === undefined) return 0;
+      return wellbeingData.energy;
+    };
+
+    const calculateBreaksScore = (wellbeingData: any): number => {
+      if (!wellbeingData?.meditationsPauses) return 0;
+      const pausesCount = [
+        wellbeingData.meditationsPauses.morning,
+        wellbeingData.meditationsPauses.noon,
+        wellbeingData.meditationsPauses.afternoon,
+        wellbeingData.meditationsPauses.evening
+      ].filter(Boolean).length;
+      return pausesCount * 25; // 4 créneaux = 100%
+    };
+
+    const calculateOptimizationScore = (tasksData: any[], focusData: any): number => {
+      if (!tasksData?.length || !focusData) return 0;
+      
+      const totalHours = focusData.morningHours + focusData.afternoonHours;
+      if (totalHours === 0) return 0;
+      
+      const highValueTasks = tasksData.filter((task: any) => task.isHighValue);
+      const highValueHours = highValueTasks.reduce((sum: number, task: any) => sum + task.duration, 0);
+      
+      const efficiency = (highValueHours / totalHours) * 100;
+      const fatigueBonus = Math.max(0, (5 - focusData.fatigue) * 5);
+      
+      return Math.min(efficiency + fatigueBonus, 100);
+    };
+
+    const calculateFatigueScore = (focusData: any): number => {
+      if (!focusData || focusData.fatigue === undefined) return 60;
+      return (5 - focusData.fatigue) * 20;
+    };
+
+    // Générer le CSV avec toutes les colonnes demandées
+    const headers = [
+      'Date', 
+      'Sommeil (h)', 
+      'Fatigue', 
+      'Energie', 
+      'Pauses', 
+      'Bien-être',
+      'Score d\'optimisation',
+      'Tâches'
+    ];
+    
+    const rows = entries.map(e => {
+      const sleepScore = Math.round(calculateSleepScore(e.sleep));
+      const energyScore = Math.round(calculateEnergyScore(e.wellbeing));
+      const breaksScore = Math.round(calculateBreaksScore(e.wellbeing));
+      const optimizationScore = Math.round(calculateOptimizationScore(e.tasks, e.focus));
+      const fatigueScore = calculateFatigueScore(e.focus);
+      const wellbeingScore = Math.round((sleepScore + energyScore + fatigueScore + breaksScore) / 4);
+      
+      // Compter les pauses actives
+      const pausesActive = e.wellbeing?.meditationsPauses ? [
+        e.wellbeing.meditationsPauses.morning,
+        e.wellbeing.meditationsPauses.noon, 
+        e.wellbeing.meditationsPauses.afternoon,
+        e.wellbeing.meditationsPauses.evening
+      ].filter(Boolean).length : 0;
+
+      return [
+        e.entry_date,
+        e.sleep?.duration ?? '',
+        e.focus?.fatigue ?? '',
+        energyScore,
+        pausesActive,
+        wellbeingScore,
+        optimizationScore,
+        (e.tasks || []).map(t => `${t.name} (${t.duration}h)`).join(' | ')
+      ];
+    });
+    
     let csv = headers.join(';') + '\n' + rows.map(r => r.join(';')).join('\n');
+    
     // Télécharger le fichier
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'effizen-data.csv';
+    a.download = 'effizen-data-complet.csv';
     a.click();
     URL.revokeObjectURL(url);
   };
