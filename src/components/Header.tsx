@@ -34,12 +34,13 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   ];
 
   // Fonction d'export CSV
-  const exportData = () => {
-    // Récupérer toutes les entrées sauvegardées dans le localStorage
-    const entries = Object.keys(localStorage)
-      .filter(key => key.startsWith('entry-'))
-      .map(key => JSON.parse(localStorage.getItem(key) || '{}'))
-      .sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());
+  const exportData = async () => {
+    try {
+      // Import dynamique pour éviter les erreurs
+      const { getAllEntries } = await import('../utils/dataAnalytics');
+      
+      // Récupérer toutes les entrées depuis la source appropriée
+      const entries = await getAllEntries();
     
     if (entries.length === 0) {
       alert('Aucune donnée à exporter.');
@@ -158,6 +159,11 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
     a.download = 'effizen-data-complet.csv';
     a.click();
     URL.revokeObjectURL(url);
+    
+    } catch (error) {
+      console.error('Erreur lors de l\'export CSV:', error);
+      alert('Erreur lors de l\'export. Veuillez réessayer.');
+    }
   };
 
   return (

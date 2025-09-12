@@ -5,7 +5,7 @@ import EnergyBar from '../components/EnergyBar';
 import DateRangePicker from '../components/DateRangePicker';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange } from '../utils/dateUtils';
-import { calculateAnalyticsForPeriod, getAllEntriesFromStorage, type AnalyticsData } from '../utils/dataAnalytics';
+import { calculateAnalyticsForPeriod, getAllEntries, type AnalyticsData } from '../utils/dataAnalytics';
 import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGenerator';
 
 
@@ -34,20 +34,40 @@ const DashboardEmployee: React.FC = () => {
   // Calculer les données analytiques et générer les conseils
   useEffect(() => {
     const loadAnalyticsAndAdvice = async () => {
-      const entries = getAllEntriesFromStorage();
-      const dateRange = selectedPeriod === 'custom' && customDateRange 
-        ? customDateRange 
-        : getDateRangeForPeriod(selectedPeriod);
-      
-      const analyticsData = calculateAnalyticsForPeriod(entries, dateRange);
-      setAnalytics(analyticsData);
-      
-      // Générer les conseils intelligents
       try {
-        const advice = await generateSmartAdvice(entries, analyticsData);
-        setSmartAdvice(advice);
+        const entries = await getAllEntries();
+        const dateRange = selectedPeriod === 'custom' && customDateRange 
+          ? customDateRange 
+          : getDateRangeForPeriod(selectedPeriod);
+        
+        const analyticsData = calculateAnalyticsForPeriod(entries, dateRange);
+        setAnalytics(analyticsData);
+        
+        // Générer les conseils intelligents
+        try {
+          const advice = await generateSmartAdvice(entries, analyticsData);
+          setSmartAdvice(advice);
+        } catch (error) {
+          console.warn('Erreur génération conseils:', error);
+          setSmartAdvice(null);
+        }
       } catch (error) {
-        console.warn('Erreur génération conseils:', error);
+        console.error('Erreur chargement données:', error);
+        // En cas d'erreur, utiliser des données vides
+        setAnalytics({
+          wellbeingScore: 0,
+          sleepScore: 0,
+          energyScore: 0,
+          fatigueScore: 0,
+          breaksScore: 0,
+          optimizationScore: 0,
+          wellbeingRadarData: [],
+          wellbeingLineData: [],
+          tasksRadarData: [],
+          optimizationLineData: [],
+          dataAvailable: false,
+          daysWithData: 0
+        });
         setSmartAdvice(null);
       }
     };

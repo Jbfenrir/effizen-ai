@@ -296,3 +296,63 @@ export const getAllEntriesFromStorage = (): DailyEntry[] => {
     new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()
   );
 };
+
+/**
+ * Récupère toutes les entrées depuis Supabase pour l'utilisateur connecté
+ */
+export const getAllEntriesFromSupabase = async (): Promise<DailyEntry[]> => {
+  try {
+    // Import dynamique pour éviter les erreurs de build
+    const { supabase } = await import('../services/supabase');
+    
+    // Récupérer l'utilisateur connecté
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.warn('Utilisateur non connecté:', userError);
+      return [];
+    }
+
+    // Récupérer les entrées de l'utilisateur
+    const { data: entries, error } = await supabase
+      .from('daily_entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('entry_date', { ascending: true });
+
+    if (error) {
+      console.error('Erreur lors de la récupération des entrées:', error);
+      return [];
+    }
+
+    return entries || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération depuis Supabase:', error);
+    return [];
+  }
+};
+
+/**
+ * Fonction universelle pour récupérer les entrées selon l'environnement
+ */
+export const getAllEntries = async (): Promise<DailyEntry[]> => {
+  // En développement (localhost), utiliser localStorage
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return getAllEntriesFromStorage();
+  }
+  
+  // En production, essayer d'abord Supabase, puis localStorage en fallback
+  try {
+    const supabaseEntries = await getAllEntriesFromSupabase();
+    if (supabaseEntries.length > 0) {
+      console.log(`📊 Chargé ${supabaseEntries.length} entrées depuis Supabase`);
+      return supabaseEntries;
+    }
+  } catch (error) {
+    console.warn('Fallback vers localStorage:', error);
+  }
+  
+  // Fallback vers localStorage
+  const localEntries = getAllEntriesFromStorage();
+  console.log(`📊 Chargé ${localEntries.length} entrées depuis localStorage`);
+  return localEntries;
+};
