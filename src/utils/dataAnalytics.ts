@@ -335,23 +335,21 @@ export const getAllEntriesFromSupabase = async (): Promise<DailyEntry[]> => {
  * Fonction universelle pour récupérer les entrées selon l'environnement
  */
 export const getAllEntries = async (): Promise<DailyEntry[]> => {
-  // En développement (localhost), utiliser localStorage
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return getAllEntriesFromStorage();
-  }
-  
-  // En production, essayer d'abord Supabase, puis localStorage en fallback
+  // TOUJOURS essayer Supabase d'abord (même en localhost)
+  // Car les données ont été centralisées dans Supabase
   try {
     const supabaseEntries = await getAllEntriesFromSupabase();
     if (supabaseEntries.length > 0) {
       console.log(`📊 Chargé ${supabaseEntries.length} entrées depuis Supabase`);
       return supabaseEntries;
     }
+    console.log('📊 Supabase accessible mais aucune entrée trouvée');
   } catch (error) {
-    console.warn('Fallback vers localStorage:', error);
+    console.warn('⚠️ Erreur chargement Supabase, fallback localStorage:', error);
   }
   
-  // Fallback vers localStorage
+  // Fallback vers localStorage seulement si Supabase échoue
+  console.log('📊 Tentative de chargement depuis localStorage...');
   const localEntries = getAllEntriesFromStorage();
   console.log(`📊 Chargé ${localEntries.length} entrées depuis localStorage`);
   return localEntries;
