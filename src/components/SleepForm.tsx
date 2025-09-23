@@ -41,8 +41,8 @@ const SleepForm: React.FC<SleepFormProps> = ({
   };
 
   const getSleepQuality = (duration: number) => {
-    if (duration >= 7 && duration <= 9) return 'good';
-    if (duration < 7) return 'short';
+    if (duration >= 8 && duration <= 9) return 'good';
+    if (duration < 8) return 'short';
     return 'long';
   };
 

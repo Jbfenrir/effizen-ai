@@ -89,6 +89,8 @@
     "lowValue": "Faible valeur",
     "totalDuration": "Durée totale",
     "hvRatio": "Ratio haute valeur",
+    "noTasks": "Aucune tâche ajoutée",
+    "clickToAdd": "Cliquez sur \"Ajouter une tâche\" pour commencer",
     "tips": {
       "good": "Excellent ratio de tâches à haute valeur !",
       "low": "Considérez automatiser ou déléguer vos tâches à faible valeur.",
@@ -264,5 +266,36 @@
     "serverError": "Erreur serveur",
     "validation": "Erreur de validation",
     "unknown": "Erreur inconnue"
+  },
+  "entry": {
+    "title": "Saisie quotidienne",
+    "dailyEntry": "Saisie quotidienne",
+    "wellbeingScore": "Score Bien-être",
+    "save": "Sauvegarder",
+    "saving": "Sauvegarde...",
+    "saveAndContinue": "Sauvegarder et continuer",
+    "seeDashboard": "Voir le tableau de bord",
+    "lastSaved": "Dernière sauvegarde"
+  },
+  "focus": {
+    "title": "Énergie",
+    "energy": "Énergie",
+    "veryTired": "Très fatigué",
+    "tired": "Fatigué",
+    "neutral": "Neutre",
+    "energetic": "Énergique",
+    "veryEnergetic": "Très énergique",
+    "currentLevel": "Niveau d'énergie actuel",
+    "morningHours": "Heures de travail matin",
+    "afternoonHours": "Heures de travail après-midi",
+    "drivingHours": "Heures de conduite",
+    "totalHours": "Total heures travaillées"
+  },
+  "wellbeing": {
+    "title": "Équilibre",
+    "balance": "Équilibre",
+    "meditationsHelp": "Cochez les moments où vous avez pris du temps pour méditer, faire des pauses ou vous détendre.",
+    "sportsHelp": "Incluez le sport, les activités manuelles, les loisirs créatifs, etc.",
+    "socialHelp": "Conversations avec des collègues, famille, amis, ou autres interactions enrichissantes."
   }
 } 

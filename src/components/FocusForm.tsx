@@ -44,11 +44,11 @@ const FocusForm: React.FC<FocusFormProps> = ({
   };
 
   const energyLevels = [
-    { value: 1, label: 'Très fatigué', color: 'fatigue-btn-5' },
-    { value: 2, label: 'Fatigué', color: 'fatigue-btn-4' },
-    { value: 3, label: 'Neutre', color: 'fatigue-btn-3' },
-    { value: 4, label: 'Énergique', color: 'fatigue-btn-2' },
-    { value: 5, label: 'Très énergique', color: 'fatigue-btn-1' },
+    { value: 1, label: t('focus.veryTired'), color: 'fatigue-btn-5' },
+    { value: 2, label: t('focus.tired'), color: 'fatigue-btn-4' },
+    { value: 3, label: t('focus.neutral'), color: 'fatigue-btn-3' },
+    { value: 4, label: t('focus.energetic'), color: 'fatigue-btn-2' },
+    { value: 5, label: t('focus.veryEnergetic'), color: 'fatigue-btn-1' },
   ];
 
   const getFatigueColor = (level: number) => {
@@ -62,7 +62,7 @@ const FocusForm: React.FC<FocusFormProps> = ({
       <div className="card-header">
         <div className="flex items-center space-x-2">
           <Battery className="icon" size={24} />
-          <h3 className="text-lg font-semibold">Énergie</h3>
+          <h3 className="text-lg font-semibold">{t('focus.title')}</h3>
         </div>
       </div>
 
@@ -201,10 +201,10 @@ const FocusForm: React.FC<FocusFormProps> = ({
       <div className="mt-4 p-3 rounded-lg bg-light-gray">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-dark-blue">
-            Niveau d'énergie actuel :
+            {t('focus.currentLevel')} :
           </span>
           <span className={`text-sm font-semibold ${getFatigueColor(focus.fatigue)}`}>
-            {energyLevels.find(l => l.value === focus.fatigue)?.label || 'Neutre'}
+            {energyLevels.find(l => l.value === focus.fatigue)?.label || t('focus.neutral')}
           </span>
         </div>
       </div>

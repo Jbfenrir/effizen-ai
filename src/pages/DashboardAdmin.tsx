@@ -15,13 +15,15 @@ import {
   Filter,
   Download,
   Shield,
-  Key
+  Key,
+  Database
 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 // import { mockAdminService as adminService } from '../services/mockAdminService';
 import UserModal from '../components/UserModal';
 import TeamModal from '../components/TeamModal';
 import PasswordResetModal from '../components/PasswordResetModal';
+import DataRecoveryModal from '../components/DataRecoveryModal';
 import type { UserWithTeam, Team, AdminMetrics } from '../types';
 
 const DashboardAdmin: React.FC = () => {
@@ -58,6 +60,8 @@ const DashboardAdmin: React.FC = () => {
     userEmail: string;
     userId: string;
   }>({ isOpen: false, userEmail: '', userId: '' });
+
+  const [dataRecoveryModal, setDataRecoveryModal] = useState(false);
 
   // Charger les données au montage
   useEffect(() => {
@@ -215,6 +219,13 @@ const DashboardAdmin: React.FC = () => {
               <button className="btn-success flex items-center space-x-2">
                 <Download size={16} />
                 <span>{t('dashboard.admin.globalExport') || 'Export Global'}</span>
+              </button>
+              <button 
+                onClick={() => setDataRecoveryModal(true)}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+              >
+                <Database size={16} />
+                <span>Récupérer Données</span>
               </button>
               <button 
                 onClick={() => setUserModal({ isOpen: true, mode: 'create', user: null })}
@@ -597,6 +608,11 @@ const DashboardAdmin: React.FC = () => {
         onClose={() => setPasswordResetModal({ isOpen: false, userEmail: '', userId: '' })}
         userEmail={passwordResetModal.userEmail}
         userId={passwordResetModal.userId}
+      />
+
+      <DataRecoveryModal
+        isOpen={dataRecoveryModal}
+        onClose={() => setDataRecoveryModal(false)}
       />
     </div>
   );

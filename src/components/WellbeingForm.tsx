@@ -73,7 +73,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
       <div className="card-header">
         <div className="flex items-center space-x-2">
           <Heart className="icon" size={24} />
-          <h3 className="text-lg font-semibold">Équilibre</h3>
+          <h3 className="text-lg font-semibold">{t('wellbeing.title')}</h3>
         </div>
       </div>
 
@@ -139,7 +139,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
             </div>
           </div>
           <p className="text-sm text-metallic-gray mt-2">
-            Cochez les moments où vous avez pris du temps pour méditer, faire des pauses ou vous détendre.
+            {t('wellbeing.meditationsHelp')}
           </p>
         </div>
 
@@ -166,7 +166,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
             </span>
           </div>
           <p className="text-sm text-metallic-gray mt-1">
-            Incluez le sport, les activités manuelles, les loisirs créatifs, etc.
+            {t('wellbeing.sportsHelp')}
           </p>
         </div>
 
@@ -190,7 +190,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
             </label>
           </div>
           <p className="text-sm text-metallic-gray mt-2">
-            Conversations avec des collègues, famille, amis, ou autres interactions enrichissantes.
+            {t('wellbeing.socialHelp')}
           </p>
         </div>
       </div>

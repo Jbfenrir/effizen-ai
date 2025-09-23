@@ -142,63 +142,66 @@ const EntryForm: React.FC = () => {
       {/* Header de la page */}
       <div className="bg-white border-b border-light-gray sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Calendar className="text-metallic-gray" size={24} />
+          {/* Première ligne : Titre + Date + Dashboard */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <Calendar className="text-metallic-gray" size={20} />
               <div>
-                <h1 className="text-xl font-bold text-dark-blue">
-                  Saisie quotidienne
+                <h1 className="text-lg sm:text-xl font-bold text-dark-blue">
+                  {t('entry.title')}
                 </h1>
-                <p className="text-sm text-metallic-gray">
-                  {new Date(entryDate).toLocaleDateString('fr-FR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
               </div>
             </div>
+
+            {/* Bouton Dashboard - visible sur mobile */}
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn-secondary text-sm px-3 py-1"
+            >
+              Dashboard
+            </button>
+          </div>
+
+          {/* Deuxième ligne : Date + Score + Bouton Save */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* Sélecteur de date */}
             <input
               type="date"
               value={entryDate}
               onChange={e => setEntryDate(e.target.value)}
-              className="form-input ml-4"
+              className="form-input flex-shrink-0"
               max={format(new Date(), 'yyyy-MM-dd')}
             />
-            
-            <div className="flex items-center space-x-4">
-              {/* Score de bien-être */}
-              <div className="text-center">
-                <div className="text-sm text-metallic-gray">Score Bien-être</div>
-                <div className={`text-2xl font-bold ${
-                  wellbeingScore >= 80 ? 'text-lime-green' : 
-                  wellbeingScore >= 60 ? 'text-yellow-600' : 'text-red-600'
-                }`}>
-                  {wellbeingScore}/100
-                </div>
-              </div>
 
-              {/* Bouton de sauvegarde */}
-              <button
-                onClick={() => saveData(true)}
-                disabled={isLoading}
-                className="btn-primary flex items-center space-x-2"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Sauvegarde...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    <span>Sauvegarder</span>
-                  </>
-                )}
-              </button>
+            {/* Score de bien-être */}
+            <div className="flex items-center justify-center bg-light-gray rounded-lg px-4 py-2 flex-shrink-0">
+              <span className="text-sm text-metallic-gray mr-2">{t('entry.wellbeingScore')}:</span>
+              <span className={`text-xl font-bold ${
+                wellbeingScore >= 80 ? 'text-lime-green' :
+                wellbeingScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+              }`}>
+                {wellbeingScore}/100
+              </span>
             </div>
+
+            {/* Bouton de sauvegarde */}
+            <button
+              onClick={() => saveData(true)}
+              disabled={isLoading}
+              className="btn-primary flex items-center justify-center space-x-2 flex-1 sm:flex-initial"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>{t('entry.saving')}</span>
+                </>
+              ) : (
+                <>
+                  <Save size={16} />
+                  <span>{t('entry.save')}</span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Indicateur de dernière sauvegarde */}
@@ -206,7 +209,7 @@ const EntryForm: React.FC = () => {
             <div className="mt-2 flex items-center space-x-2 text-sm text-metallic-gray">
               <CheckCircle size={14} className="text-lime-green" />
               <span>
-                Dernière sauvegarde : {lastSaved.toLocaleTimeString('fr-FR')}
+                {t('entry.lastSaved')}: {lastSaved.toLocaleTimeString('fr-FR')}
               </span>
             </div>
           )}
@@ -257,7 +260,7 @@ const EntryForm: React.FC = () => {
             onClick={() => navigate('/dashboard')}
             className="btn-secondary"
           >
-            Voir le tableau de bord
+            {t('entry.seeDashboard')}
           </button>
         </div>
       </div>

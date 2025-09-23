@@ -32,10 +32,19 @@ const TasksForm: React.FC<TasksFormProps> = ({
       isHighValue: false,
     };
     setTasks(prev => {
-      const updated = [...prev, newTask];
+      // Ajouter la nouvelle tâche au début pour UX mobile
+      const updated = [newTask, ...prev];
       onChange(updated);
       return updated;
     });
+
+    // Scroller vers le haut pour voir la nouvelle tâche (UX mobile)
+    setTimeout(() => {
+      const tasksList = document.querySelector('[data-tasks-list]');
+      if (tasksList) {
+        tasksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const removeTask = (taskId: string) => {
@@ -104,12 +113,12 @@ const TasksForm: React.FC<TasksFormProps> = ({
       </div>
 
       {/* Liste des tâches */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-tasks-list>
         {tasks.length === 0 ? (
           <div className="text-center py-8 text-metallic-gray">
             <Target size={48} className="mx-auto mb-4 opacity-50" />
-            <p>Aucune tâche ajoutée</p>
-            <p className="text-sm">Cliquez sur "Ajouter une tâche" pour commencer</p>
+            <p>{t('tasks.noTasks')}</p>
+            <p className="text-sm">{t('tasks.clickToAdd')}</p>
           </div>
         ) : (
           tasks.map((task, index) => (

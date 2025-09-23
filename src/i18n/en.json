@@ -90,6 +90,8 @@
     "lowValue": "Low value",
     "totalDuration": "Total duration",
     "hvRatio": "High value ratio",
+    "noTasks": "No tasks added",
+    "clickToAdd": "Click \"Add task\" to get started",
     "tips": {
       "good": "Excellent high-value task ratio!",
       "low": "Consider automating or delegating your low-value tasks.",
@@ -288,10 +290,34 @@
     "saving": "Saving..."
   },
   "entry": {
+    "title": "Daily Entry",
     "dailyEntry": "Daily Entry",
-    "wellbeingScore": "Well-being score",
+    "wellbeingScore": "Well-being Score",
     "save": "Save",
+    "saving": "Saving...",
     "saveAndContinue": "Save and continue",
-    "seeDashboard": "See dashboard"
+    "seeDashboard": "View dashboard",
+    "lastSaved": "Last saved"
+  },
+  "focus": {
+    "title": "Energy",
+    "energy": "Energy",
+    "veryTired": "Very tired",
+    "tired": "Tired",
+    "neutral": "Neutral",
+    "energetic": "Energetic",
+    "veryEnergetic": "Very energetic",
+    "currentLevel": "Current energy level",
+    "morningHours": "Morning work hours",
+    "afternoonHours": "Afternoon work hours",
+    "drivingHours": "Driving hours",
+    "totalHours": "Total hours worked"
+  },
+  "wellbeing": {
+    "title": "Balance",
+    "balance": "Balance",
+    "meditationsHelp": "Check the times when you took time to meditate, take breaks or relax.",
+    "sportsHelp": "Include sports, manual activities, creative hobbies, etc.",
+    "socialHelp": "Conversations with colleagues, family, friends, or other enriching interactions."
   }
 } 
