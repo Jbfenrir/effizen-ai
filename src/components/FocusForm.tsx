@@ -175,7 +175,7 @@ const FocusForm: React.FC<FocusFormProps> = ({
       {/* Niveau d'énergie */}
       <div className="mt-6">
         <label className="form-label">
-          Niveau d'énergie
+          {t('focus.energyLevel')}
         </label>
         <div className="grid grid-cols-5 gap-2">
           {energyLevels.map((level) => (

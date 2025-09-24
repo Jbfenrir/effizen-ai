@@ -140,30 +140,31 @@ const EntryForm: React.FC = () => {
   return (
     <div className="min-h-screen bg-off-white">
       {/* Header de la page */}
-      <div className="bg-white border-b border-light-gray sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          {/* Première ligne : Titre + Date + Dashboard */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-3">
-              <Calendar className="text-metallic-gray" size={20} />
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold text-dark-blue">
-                  {t('entry.title')}
-                </h1>
+      <div className="sticky top-0 z-10">
+        <div className="bg-white border-b border-light-gray">
+          <div className="container mx-auto px-4 py-4">
+            {/* Première ligne : Titre + Dashboard */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <Calendar className="text-metallic-gray" size={20} />
+                <div>
+                  <h1 className="text-lg sm:text-xl font-bold text-dark-blue">
+                    {t('entry.title')}
+                  </h1>
+                </div>
               </div>
+
+              {/* Bouton Dashboard */}
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="btn-secondary text-sm px-3 py-1"
+              >
+                Dashboard
+              </button>
             </div>
 
-            {/* Bouton Dashboard - visible sur mobile */}
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="btn-secondary text-sm px-3 py-1"
-            >
-              Dashboard
-            </button>
-          </div>
-
-          {/* Deuxième ligne : Date + Score + Bouton Save */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Deuxième ligne : Date + Score + Bouton Save */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* Sélecteur de date */}
             <input
               type="date"
@@ -202,17 +203,18 @@ const EntryForm: React.FC = () => {
                 </>
               )}
             </button>
-          </div>
-
-          {/* Indicateur de dernière sauvegarde */}
-          {lastSaved && (
-            <div className="mt-2 flex items-center space-x-2 text-sm text-metallic-gray">
-              <CheckCircle size={14} className="text-lime-green" />
-              <span>
-                {t('entry.lastSaved')}: {lastSaved.toLocaleTimeString('fr-FR')}
-              </span>
             </div>
-          )}
+
+            {/* Indicateur de dernière sauvegarde */}
+            {lastSaved && (
+              <div className="mt-2 flex items-center space-x-2 text-sm text-metallic-gray">
+                <CheckCircle size={14} className="text-lime-green" />
+                <span>
+                  {t('entry.lastSaved')}: {lastSaved.toLocaleTimeString('fr-FR')}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

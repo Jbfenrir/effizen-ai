@@ -132,7 +132,38 @@
         "fatigueTrend": "Évolution Fatigue",
         "meditationBars": "Méditations",
         "breaksBars": "Pauses"
-      }
+      },
+      "wellbeingSection": "🌱 Bien-être",
+      "wellbeingScoreLabel": "Score de bien-être",
+      "sleep": "Sommeil",
+      "energy": "Énergie",
+      "balance": "Équilibre",
+      "wellbeingProfile": "Profil Bien-être",
+      "score": "Score",
+      "wellbeingEvolution": "Évolution Bien-être",
+      "sleepLine": "Sommeil",
+      "energyLine": "Énergie",
+      "pausesLine": "Pauses",
+      "optimizationSection": "🎯 Optimisation du temps travaillé",
+      "optimizationDescription": "Analyse dans quelle mesure vous consacrez votre temps et votre énergie aux tâches les plus importantes de votre poste.",
+      "optimizationScore": "Score d'Optimisation",
+      "excellentOptimization": "🎆 Excellente optimisation",
+      "goodOptimization": "👍 Bonne optimisation",
+      "insufficientOptimization": "⚠️ Optimisation insuffisante",
+      "criticalDispersion": "🚨 Dispersion critique",
+      "taskDistribution": "Répartition du temps des tâches",
+      "optimizationEvolution": "Évolution de l'optimisation du temps",
+      "optimizationLine": "Optimisation",
+      "expertDiagnosis": "🎯 Diagnostic Expert",
+      "practicalAdvice": "💡 Conseils Pratiques",
+      "subtitle": "Suivez votre bien-être et votre productivité",
+      "wellbeingOverview": "Vue d'ensemble de votre équilibre personnel",
+      "customPeriod": "Personnalisée",
+      "noData": "Aucune donnée",
+      "noDataAvailable": "Aucune donnée disponible",
+      "daysWithData": "jour(s) avec données",
+      "highValueTasksTime": "Temps consacré aux tâches à haute valeur ajoutée",
+      "basedOnAnalysis": "Basé sur {{days}} jour(s) d'analyse avec nos expertises en bien-être au travail"
     },
     "manager": {
       "title": "Tableau de Bord Manager",
@@ -286,6 +317,7 @@
     "energetic": "Énergique",
     "veryEnergetic": "Très énergique",
     "currentLevel": "Niveau d'énergie actuel",
+    "energyLevel": "Niveau d'énergie",
     "morningHours": "Heures de travail matin",
     "afternoonHours": "Heures de travail après-midi",
     "drivingHours": "Heures de conduite",
@@ -294,8 +326,47 @@
   "wellbeing": {
     "title": "Équilibre",
     "balance": "Équilibre",
+    "meditationsPauses": "Méditations / Pauses",
+    "sportLeisureHours": "Heures de sport/loisir",
+    "socialInteraction": "Interaction sociale quotidienne",
+    "socialInteractionText": "J'ai eu des interactions sociales positives aujourd'hui",
+    "meditations": {
+      "morning": "Matin",
+      "noon": "Midi",
+      "afternoon": "Après-midi",
+      "evening": "Soir"
+    },
+    "summary": {
+      "meditationsPauses": "Méditations / Pauses",
+      "sportLeisure": "Sport / Loisir",
+      "social": "Social"
+    },
     "meditationsHelp": "Cochez les moments où vous avez pris du temps pour méditer, faire des pauses ou vous détendre.",
     "sportsHelp": "Incluez le sport, les activités manuelles, les loisirs créatifs, etc.",
-    "socialHelp": "Conversations avec des collègues, famille, amis, ou autres interactions enrichissantes."
+    "socialHelp": "Conversations avec des collègues, famille, amis, ou autres interactions enrichissantes.",
+    "quality": {
+      "excellent": "Excellent !",
+      "good": "Bien",
+      "fair": "Correct",
+      "toImprove": "À améliorer",
+      "veryActive": "Très actif",
+      "active": "Actif",
+      "lessActive": "Peu actif",
+      "inactive": "Inactif",
+      "connected": "Connecté",
+      "isolated": "Isolé"
+    }
+  },
+  "taskCategories": {
+    "meetings": "Réunions",
+    "formation": "Formation",
+    "development": "Développement",
+    "communication": "Communication",
+    "networking": "Networking",
+    "marketing": "Marketing",
+    "partnership": "Partenariat",
+    "transport": "Transport",
+    "strategy": "Stratégie",
+    "app": "App"
   }
 } 

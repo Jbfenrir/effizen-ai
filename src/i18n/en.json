@@ -136,7 +136,38 @@
         "breaksBars": "Breaks"
       },
       "seeDashboard": "See dashboard",
-      "saveAndContinue": "Save and continue"
+      "saveAndContinue": "Save and continue",
+      "wellbeingSection": "🌱 Well-being",
+      "wellbeingScoreLabel": "Well-being Score",
+      "sleep": "Sleep",
+      "energy": "Energy",
+      "balance": "Balance",
+      "wellbeingProfile": "Well-being Profile",
+      "score": "Score",
+      "wellbeingEvolution": "Well-being Evolution",
+      "sleepLine": "Sleep",
+      "energyLine": "Energy",
+      "pausesLine": "Breaks",
+      "optimizationSection": "🎯 Time Optimization",
+      "optimizationDescription": "Analyze to what extent you devote your time and energy to the most important tasks of your position.",
+      "optimizationScore": "Optimization Score",
+      "excellentOptimization": "🎆 Excellent optimization",
+      "goodOptimization": "👍 Good optimization",
+      "insufficientOptimization": "⚠️ Insufficient optimization",
+      "criticalDispersion": "🚨 Critical dispersion",
+      "taskDistribution": "Task Time Distribution",
+      "optimizationEvolution": "Time Optimization Evolution",
+      "optimizationLine": "Optimization",
+      "expertDiagnosis": "🎯 Expert Diagnosis",
+      "practicalAdvice": "💡 Practical Advice",
+      "subtitle": "Track your well-being and productivity",
+      "wellbeingOverview": "Overview of your personal balance",
+      "customPeriod": "Custom",
+      "noData": "No data",
+      "noDataAvailable": "No data available",
+      "daysWithData": "day(s) with data",
+      "highValueTasksTime": "Time spent on high-value tasks",
+      "basedOnAnalysis": "Based on {{days}} day(s) of analysis with our workplace well-being expertise"
     },
     "manager": {
       "title": "Manager Dashboard",
@@ -308,6 +339,7 @@
     "energetic": "Energetic",
     "veryEnergetic": "Very energetic",
     "currentLevel": "Current energy level",
+    "energyLevel": "Energy level",
     "morningHours": "Morning work hours",
     "afternoonHours": "Afternoon work hours",
     "drivingHours": "Driving hours",
@@ -316,8 +348,47 @@
   "wellbeing": {
     "title": "Balance",
     "balance": "Balance",
+    "meditationsPauses": "Meditations / Breaks",
+    "sportLeisureHours": "Sport/leisure hours",
+    "socialInteraction": "Daily social interaction",
+    "socialInteractionText": "I had positive social interactions today",
+    "meditations": {
+      "morning": "Morning",
+      "noon": "Noon",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "summary": {
+      "meditationsPauses": "Meditations / Breaks",
+      "sportLeisure": "Sport / Leisure",
+      "social": "Social"
+    },
     "meditationsHelp": "Check the times when you took time to meditate, take breaks or relax.",
     "sportsHelp": "Include sports, manual activities, creative hobbies, etc.",
-    "socialHelp": "Conversations with colleagues, family, friends, or other enriching interactions."
+    "socialHelp": "Conversations with colleagues, family, friends, or other enriching interactions.",
+    "quality": {
+      "excellent": "Excellent!",
+      "good": "Good",
+      "fair": "Fair",
+      "toImprove": "To improve",
+      "veryActive": "Very active",
+      "active": "Active",
+      "lessActive": "Less active",
+      "inactive": "Inactive",
+      "connected": "Connected",
+      "isolated": "Isolated"
+    }
+  },
+  "taskCategories": {
+    "meetings": "Meetings",
+    "formation": "Training",
+    "development": "Development",
+    "communication": "Communication",
+    "networking": "Networking",
+    "marketing": "Marketing",
+    "partnership": "Partnership",
+    "transport": "Transport",
+    "strategy": "Strategy",
+    "app": "App"
   }
 } 

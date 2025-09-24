@@ -82,7 +82,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
         <div>
           <label className="form-label flex items-center space-x-2">
             <Coffee size={16} />
-            <span>Méditations / Pauses</span>
+            <span>{t('wellbeing.meditationsPauses')}</span>
           </label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
             <div className="flex items-center space-x-2">
@@ -95,7 +95,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
                 className="w-4 h-4 text-lime-green bg-gray-100 border-gray-300 rounded focus:ring-lime-green focus:ring-2"
               />
               <label htmlFor="meditation-pause-morning" className="text-sm font-medium text-dark-blue">
-                Matin
+                {t('wellbeing.meditations.morning')}
               </label>
             </div>
             <div className="flex items-center space-x-2">
@@ -108,7 +108,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
                 className="w-4 h-4 text-lime-green bg-gray-100 border-gray-300 rounded focus:ring-lime-green focus:ring-2"
               />
               <label htmlFor="meditation-pause-noon" className="text-sm font-medium text-dark-blue">
-                Midi
+                {t('wellbeing.meditations.noon')}
               </label>
             </div>
             <div className="flex items-center space-x-2">
@@ -121,7 +121,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
                 className="w-4 h-4 text-lime-green bg-gray-100 border-gray-300 rounded focus:ring-lime-green focus:ring-2"
               />
               <label htmlFor="meditation-pause-afternoon" className="text-sm font-medium text-dark-blue">
-                Après-midi
+                {t('wellbeing.meditations.afternoon')}
               </label>
             </div>
             <div className="flex items-center space-x-2">
@@ -134,7 +134,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
                 className="w-4 h-4 text-lime-green bg-gray-100 border-gray-300 rounded focus:ring-lime-green focus:ring-2"
               />
               <label htmlFor="meditation-pause-evening" className="text-sm font-medium text-dark-blue">
-                Soir
+                {t('wellbeing.meditations.evening')}
               </label>
             </div>
           </div>
@@ -147,7 +147,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
         <div className="form-group">
           <label htmlFor="sportLeisureHours" className="form-label flex items-center space-x-2">
             <Dumbbell size={16} />
-            <span>Heures de sport/loisir</span>
+            <span>{t('wellbeing.sportLeisureHours')}</span>
           </label>
           <div className="relative">
             <input
@@ -174,7 +174,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
         <div className="form-group">
           <label className="form-label flex items-center space-x-2">
             <Users size={16} />
-            <span>Interaction sociale quotidienne</span>
+            <span>{t('wellbeing.socialInteraction')}</span>
           </label>
           <div className="flex items-center space-x-3 mt-2">
             <input
@@ -186,7 +186,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
               className="w-4 h-4 text-lime-green bg-gray-100 border-gray-300 rounded focus:ring-lime-green focus:ring-2"
             />
             <label htmlFor="socialInteraction" className="text-sm font-medium text-dark-blue">
-              J'ai eu des interactions sociales positives aujourd'hui
+              {t('wellbeing.socialInteractionText')}
             </label>
           </div>
           <p className="text-sm text-metallic-gray mt-2">
@@ -201,23 +201,23 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
           {/* Méditations/Pauses */}
           <div className="text-center">
             <div className="text-sm font-medium text-dark-blue mb-2">
-              Méditations / Pauses
+              {t('wellbeing.summary.meditationsPauses')}
             </div>
             <div className="text-2xl font-bold text-lime-green">
               {[wellbeing.meditationsPauses.morning, wellbeing.meditationsPauses.noon, 
                 wellbeing.meditationsPauses.afternoon, wellbeing.meditationsPauses.evening].filter(Boolean).length}/4
             </div>
             <div className="text-xs text-metallic-gray">
-              {meditationPauseScore >= 75 ? 'Excellent !' : 
-               meditationPauseScore >= 50 ? 'Bien' : 
-               meditationPauseScore >= 25 ? 'Correct' : 'À améliorer'}
+              {meditationPauseScore >= 75 ? t('wellbeing.quality.excellent') : 
+               meditationPauseScore >= 50 ? t('wellbeing.quality.good') : 
+               meditationPauseScore >= 25 ? t('wellbeing.quality.fair') : t('wellbeing.quality.toImprove')}
             </div>
           </div>
 
           {/* Sport/Loisir */}
           <div className="text-center">
             <div className="text-sm font-medium text-dark-blue mb-2">
-              Sport / Loisir
+              {t('wellbeing.summary.sportLeisure')}
             </div>
             <div className={`text-2xl font-bold ${
               wellbeing.sportLeisureHours >= 2 ? 'text-lime-green' : 
@@ -226,16 +226,16 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
               {wellbeing.sportLeisureHours}h
             </div>
             <div className="text-xs text-metallic-gray">
-              {wellbeing.sportLeisureHours >= 2 ? 'Très actif' : 
-               wellbeing.sportLeisureHours >= 1 ? 'Actif' : 
-               wellbeing.sportLeisureHours > 0 ? 'Peu actif' : 'Inactif'}
+              {wellbeing.sportLeisureHours >= 2 ? t('wellbeing.quality.veryActive') : 
+               wellbeing.sportLeisureHours >= 1 ? t('wellbeing.quality.active') : 
+               wellbeing.sportLeisureHours > 0 ? t('wellbeing.quality.lessActive') : t('wellbeing.quality.inactive')}
             </div>
           </div>
 
           {/* Social */}
           <div className="text-center">
             <div className="text-sm font-medium text-dark-blue mb-2">
-              Social
+              {t('wellbeing.summary.social')}
             </div>
             <div className={`text-2xl font-bold ${
               wellbeing.socialInteraction ? 'text-lime-green' : 'text-red-600'
@@ -243,7 +243,7 @@ const WellbeingForm: React.FC<WellbeingFormProps> = ({
               {wellbeing.socialInteraction ? '✓' : '✗'}
             </div>
             <div className="text-xs text-metallic-gray">
-              {wellbeing.socialInteraction ? 'Connecté' : 'Isolé'}
+              {wellbeing.socialInteraction ? t('wellbeing.quality.connected') : t('wellbeing.quality.isolated')}
             </div>
           </div>
         </div>

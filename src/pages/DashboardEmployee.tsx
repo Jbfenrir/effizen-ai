@@ -6,7 +6,7 @@ import DateRangePicker from '../components/DateRangePicker';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange } from '../utils/dateUtils';
 import { calculateAnalyticsForPeriod, getAllEntries, type AnalyticsData } from '../utils/dataAnalytics';
-import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGenerator';
+import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGeneratorWithTranslation';
 import DataMigration from '../utils/dataMigration';
 
 
@@ -116,7 +116,7 @@ const DashboardEmployee: React.FC = () => {
                 {t('dashboard.employee.title')}
               </h1>
               <p className="text-metallic-gray mt-1">
-                Suivez votre bien-être et votre productivité
+                {t('dashboard.employee.subtitle')}
               </p>
             </div>
 
@@ -154,7 +154,7 @@ const DashboardEmployee: React.FC = () => {
                 <Calendar size={16} />
                 <span>{selectedPeriod === 'custom' && customDateRange 
                   ? formatDateRange(customDateRange) 
-                  : 'Personnalisée'
+                  : t('dashboard.employee.customPeriod')
                 }</span>
                 <ChevronDown size={14} />
               </button>
@@ -163,7 +163,7 @@ const DashboardEmployee: React.FC = () => {
             {/* Affichage de la période sélectionnée */}
             {selectedPeriod !== 'custom' && (
               <div className="text-sm text-metallic-gray">
-                {formatDateRange(getCurrentDateRange())} • {dataAvailable ? `${daysWithData} jour(s) avec données` : 'Aucune donnée'}
+                {formatDateRange(getCurrentDateRange())} • {dataAvailable ? `${daysWithData} ${t('dashboard.employee.daysWithData')}` : t('dashboard.employee.noData')}
               </div>
             )}
           </div>
@@ -174,8 +174,8 @@ const DashboardEmployee: React.FC = () => {
         {/* SECTION 1: BIEN-ÉTRE */}
         <div className="mb-12">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-dark-blue mb-2">🌱 Bien-être</h2>
-            <p className="text-metallic-gray">Vue d'ensemble de votre équilibre personnel</p>
+            <h2 className="text-xl font-bold text-dark-blue mb-2">{t('dashboard.employee.wellbeingSection')}</h2>
+            <p className="text-metallic-gray">{t('dashboard.employee.wellbeingOverview')}</p>
           </div>
           
           {/* 4 blocs bien-être : Score, Sommeil, Énergie, Équilibre */}
@@ -186,7 +186,7 @@ const DashboardEmployee: React.FC = () => {
                   <Heart className="text-lime-green" size={24} />
                 </div>
                 <div>
-                  <p className="text-sm text-metallic-gray">Score de bien-être</p>
+                  <p className="text-sm text-metallic-gray">{t('dashboard.employee.wellbeingScoreLabel')}</p>
                   <p className="text-2xl font-bold text-dark-blue">{wellbeingScore}/100</p>
                 </div>
               </div>
@@ -198,7 +198,7 @@ const DashboardEmployee: React.FC = () => {
                   <Clock className="text-purple-600" size={24} />
                 </div>
                 <div>
-                  <p className="text-sm text-metallic-gray">Sommeil</p>
+                  <p className="text-sm text-metallic-gray">{t('dashboard.employee.sleep')}</p>
                   <p className="text-2xl font-bold text-dark-blue">{sleepScore}/100</p>
                 </div>
               </div>
@@ -210,7 +210,7 @@ const DashboardEmployee: React.FC = () => {
                   <Activity className="text-blue-600" size={24} />
                 </div>
                 <div>
-                  <p className="text-sm text-metallic-gray">Énergie</p>
+                  <p className="text-sm text-metallic-gray">{t('dashboard.employee.energy')}</p>
                   <p className="text-2xl font-bold text-dark-blue">{energyScore}/100</p>
                 </div>
               </div>
@@ -222,7 +222,7 @@ const DashboardEmployee: React.FC = () => {
                   <Heart className="text-teal-600" size={24} />
                 </div>
                 <div>
-                  <p className="text-sm text-metallic-gray">Équilibre</p>
+                  <p className="text-sm text-metallic-gray">{t('dashboard.employee.balance')}</p>
                   <p className="text-2xl font-bold text-dark-blue">{breaksScore}/100</p>
                 </div>
               </div>
@@ -236,7 +236,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="card-header">
                 <div className="flex items-center space-x-2">
                   <BarChart3 className="icon" size={20} />
-                  <h3 className="font-semibold">Profil Bien-être</h3>
+                  <h3 className="font-semibold">{t('dashboard.employee.wellbeingProfile')}</h3>
                 </div>
               </div>
               <div className="h-64 flex items-center justify-center">
@@ -246,14 +246,14 @@ const DashboardEmployee: React.FC = () => {
                       <PolarGrid />
                       <PolarAngleAxis dataKey="subject" />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                      <Radar name="Score" dataKey="score" stroke="#32CD32" fill="#32CD32" fillOpacity={0.3} />
+                      <Radar name={t('dashboard.employee.score')} dataKey="score" stroke="#32CD32" fill="#32CD32" fillOpacity={0.3} />
                       <Tooltip />
                     </RadarChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="text-center text-metallic-gray">
                     <BarChart3 size={48} className="mx-auto mb-2 opacity-50" />
-                    <p>Aucune donnée disponible</p>
+                    <p>{t('dashboard.employee.noDataAvailable')}</p>
                   </div>
                 )}
               </div>
@@ -264,7 +264,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="card-header">
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="icon" size={20} />
-                  <h3 className="font-semibold">Évolution Bien-être</h3>
+                  <h3 className="font-semibold">{t('dashboard.employee.wellbeingEvolution')}</h3>
                 </div>
               </div>
               <div className="h-64 flex items-center justify-center">
@@ -276,16 +276,16 @@ const DashboardEmployee: React.FC = () => {
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="Sommeil" stroke="#6366f1" strokeWidth={2} />
-                      <Line type="monotone" dataKey="Énergie" stroke="#32CD32" strokeWidth={2} />
+                      <Line type="monotone" dataKey={t('dashboard.employee.sleepLine')} stroke="#6366f1" strokeWidth={2} />
+                      <Line type="monotone" dataKey={t('dashboard.employee.energyLine')} stroke="#32CD32" strokeWidth={2} />
                       <Line type="monotone" dataKey="Fatigue" stroke="#f59e0b" strokeWidth={2} />
-                      <Line type="monotone" dataKey="Pauses" stroke="#ef4444" strokeWidth={2} />
+                      <Line type="monotone" dataKey={t('dashboard.employee.pausesLine')} stroke="#ef4444" strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="text-center text-metallic-gray">
                     <TrendingUp size={48} className="mx-auto mb-2 opacity-50" />
-                    <p>Aucune donnée disponible</p>
+                    <p>{t('dashboard.employee.noDataAvailable')}</p>
                   </div>
                 )}
               </div>
@@ -296,8 +296,8 @@ const DashboardEmployee: React.FC = () => {
         {/* SECTION 2: OPTIMISATION DU TEMPS TRAVAILLÉ */}
         <div className="mb-12">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-dark-blue mb-2">🎯 Optimisation du temps travaillé</h2>
-            <p className="text-metallic-gray">Analyse dans quelle mesure vous consacrez votre temps et votre énergie aux tâches les plus importantes de votre poste.</p>
+            <h2 className="text-xl font-bold text-dark-blue mb-2">{t('dashboard.employee.optimizationSection')}</h2>
+            <p className="text-metallic-gray">{t('dashboard.employee.optimizationDescription')}</p>
           </div>
           
           {/* Bloc optimisation pleine largeur */}
@@ -307,15 +307,15 @@ const DashboardEmployee: React.FC = () => {
                 <Target className="text-orange-600" size={32} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-dark-blue">Score d'Optimisation</h3>
-                <p className="text-metallic-gray mb-2">Temps consacré aux tâches à haute valeur ajoutée</p>
+                <h3 className="text-lg font-bold text-dark-blue">{t('dashboard.employee.optimizationScore')}</h3>
+                <p className="text-metallic-gray mb-2">{t('dashboard.employee.highValueTasksTime')}</p>
                 <div className="flex items-center space-x-4">
                   <div className="text-3xl font-bold text-orange-600">{optimizationScore}/100</div>
                   <div className="text-sm text-metallic-gray">
-                    {optimizationScore >= 70 ? '🎆 Excellente optimisation' : 
-                     optimizationScore >= 50 ? '👍 Bonne optimisation' :
-                     optimizationScore >= 30 ? '⚠️ Optimisation insuffisante' :
-                     '🚨 Dispersion critique'}
+                    {optimizationScore >= 70 ? t('dashboard.employee.excellentOptimization') :
+                     optimizationScore >= 50 ? t('dashboard.employee.goodOptimization') :
+                     optimizationScore >= 30 ? t('dashboard.employee.insufficientOptimization') :
+                     t('dashboard.employee.criticalDispersion')}
                   </div>
                 </div>
               </div>
@@ -329,7 +329,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="card-header">
                 <div className="flex items-center space-x-2">
                   <Target className="icon" size={20} />
-                  <h3 className="font-semibold">Répartition du temps des tâches</h3>
+                  <h3 className="font-semibold">{t('dashboard.employee.taskDistribution')}</h3>
                 </div>
               </div>
               <div className="h-64 flex items-center justify-center">
@@ -365,7 +365,7 @@ const DashboardEmployee: React.FC = () => {
                 ) : (
                   <div className="text-center text-metallic-gray">
                     <Target size={48} className="mx-auto mb-2 opacity-50" />
-                    <p>Aucune donnée disponible</p>
+                    <p>{t('dashboard.employee.noDataAvailable')}</p>
                   </div>
                 )}
               </div>
@@ -376,7 +376,7 @@ const DashboardEmployee: React.FC = () => {
               <div className="card-header">
                 <div className="flex items-center space-x-2">
                   <Activity className="icon" size={20} />
-                  <h3 className="font-semibold">Évolution de l'optimisation du temps</h3>
+                  <h3 className="font-semibold">{t('dashboard.employee.optimizationEvolution')}</h3>
                 </div>
               </div>
               <div className="h-64 flex items-center justify-center">
@@ -388,13 +388,13 @@ const DashboardEmployee: React.FC = () => {
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="Optimisation" stroke="#ff7300" strokeWidth={2} />
+                      <Line type="monotone" dataKey={t('dashboard.employee.optimizationLine')} stroke="#ff7300" strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="text-center text-metallic-gray">
                     <Activity size={48} className="mx-auto mb-2 opacity-50" />
-                    <p>Aucune donnée disponible</p>
+                    <p>{t('dashboard.employee.noDataAvailable')}</p>
                   </div>
                 )}
               </div>
@@ -410,14 +410,14 @@ const DashboardEmployee: React.FC = () => {
                 <div className="text-3xl">{smartAdvice.icon}</div>
                 <div className="flex-1">
                   <h3 className="font-bold text-dark-blue text-lg mb-3">
-                    🎯 Diagnostic Expert
+                    {t('dashboard.employee.expertDiagnosis')}
                   </h3>
                   <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
                     <p className="text-dark-blue font-medium">{smartAdvice.diagnosis}</p>
                   </div>
                   
                   <h3 className="font-bold text-dark-blue text-lg mb-3">
-                    💡 Conseils Pratiques
+                    {t('dashboard.employee.practicalAdvice')}
                   </h3>
                   <div className="bg-white bg-opacity-50 rounded-lg p-4">
                     <div className="text-dark-blue whitespace-pre-line">{smartAdvice.recommendation}</div>
@@ -425,7 +425,7 @@ const DashboardEmployee: React.FC = () => {
                   
                   {dataAvailable && (
                     <div className="mt-4 text-sm text-dark-blue opacity-75">
-                      Basé sur {daysWithData} jour(s) d'analyse avec nos expertises en bien-être au travail
+                      {t('dashboard.employee.basedOnAnalysis', { days: daysWithData })}
                     </div>
                   )}
                 </div>

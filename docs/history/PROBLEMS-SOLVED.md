@@ -2,7 +2,23 @@
 
 ## 🚨 Problèmes critiques résolus
 
-### 1. Responsive mobile et traductions EN (23/09/2025)
+### 1. Traductions EN complètes et conseils IA multilingues (24/09/2025)
+**Symptômes :**
+- Textes français restants dans version EN : dashboard, wellbeing, task categories
+- Conseils IA toujours en français même en mode EN
+- Labels qualité non traduits : "Excellent !", "Actif", "Connecté"
+**Causes :**
+- 100+ clés de traduction manquantes dans en.json
+- Textes hardcodés en français dans DashboardEmployee.tsx et WellbeingForm.tsx
+- Système de conseils IA non multilingue
+**Solutions :**
+- ✅ 100+ traductions ajoutées dans en.json et fr.json
+- ✅ Remplacement hardcoded strings par t() dans DashboardEmployee.tsx
+- ✅ Création adviceGeneratorWithTranslation.ts pour conseils IA bilingues
+- ✅ Traduction labels qualité et catégories de tâches
+- ✅ Header desktop : Score et bouton Save dans conteneur blanc
+
+### 2. Responsive mobile et traductions EN (23/09/2025)
 **Symptômes :**
 - Bouton "Save" décalé sur mobile, score bien-être mal positionné
 - Pas de bouton Dashboard dans EntryForm
