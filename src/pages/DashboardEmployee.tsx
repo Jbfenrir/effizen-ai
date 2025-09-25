@@ -8,6 +8,7 @@ import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange
 import { calculateAnalyticsForPeriod, getAllEntries, type AnalyticsData } from '../utils/dataAnalytics';
 import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGeneratorWithTranslation';
 import DataMigration from '../utils/dataMigration';
+import DataIntegrityAlert from '../components/DataIntegrityAlert';
 
 
 const DashboardEmployee: React.FC = () => {
@@ -171,6 +172,9 @@ const DashboardEmployee: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Alerte intégrité des données */}
+        <DataIntegrityAlert className="mb-8" />
+
         {/* SECTION 1: BIEN-ÉTRE */}
         <div className="mb-12">
           <div className="mb-6">

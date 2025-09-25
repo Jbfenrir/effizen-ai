@@ -2,7 +2,31 @@
 
 ## 🚨 Problèmes critiques résolus
 
-### 1. Traductions EN complètes et conseils IA multilingues (24/09/2025)
+### 1. Restauration complète des données perdues + système anti-perte (24/09/2025)
+**Symptômes :**
+- Données du 13/09 au 23/09 manquantes en production
+- EntryForm sauvegardait uniquement en localStorage
+- Aucun gardefou contre la perte de données
+- Service entriesService manquant pour la synchronisation Supabase
+
+**Cause racine identifiée :**
+- EntryForm.tsx ligne 95 : `localStorage.setItem()` UNIQUEMENT
+- Aucune sauvegarde vers Supabase lors de la saisie
+- Données restaient en localStorage local lors du push en prod
+
+**Solutions appliquées :**
+- ✅ Restauration 28 entrées depuis CSV (11/08 au 23/09)
+- ✅ Création `src/services/entriesService.ts` complet
+- ✅ Correction EntryForm : sauvegarde Supabase + localStorage fallback
+- ✅ Système de détection jours manquants `DataIntegrityChecker`
+- ✅ Composant d'alerte intégrité `DataIntegrityAlert`
+- ✅ Auto-backup quotidien en localStorage (rotation 7 jours)
+- ✅ Export CSV manuel avec bouton téléchargement
+- ✅ Intégration dans DashboardEmployee
+
+**Résultat :** Plus jamais de perte de données, suivi automatique de l'intégrité
+
+### 2. Traductions EN complètes et conseils IA multilingues (24/09/2025)
 **Symptômes :**
 - Textes français restants dans version EN : dashboard, wellbeing, task categories
 - Conseils IA toujours en français même en mode EN

@@ -7,6 +7,8 @@ import TasksForm from '../components/TasksForm';
 import WellbeingForm from '../components/WellbeingForm';
 import type { DailyEntry, Sleep, Focus, Task, Wellbeing } from '../types';
 import { format } from 'date-fns';
+import { entriesService } from '../services/entriesService';
+import { authService } from '../services/supabase';
 
 interface Toast {
   id: string;
@@ -50,21 +52,47 @@ const EntryForm: React.FC = () => {
     energy: 50,
   });
 
-  // Charger les données pour la date sélectionnée (stockage local pour la démo)
+  // Charger les données pour la date sélectionnée (Supabase d'abord, localStorage en fallback)
   useEffect(() => {
-    const saved = localStorage.getItem('entry-' + entryDate);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setSleep(parsed.sleep || { bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
-      setFocus(parsed.focus || { morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
-      setTasks(parsed.tasks || []);
-      setWellbeing(parsed.wellbeing || { meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
-    } else {
-      setSleep({ bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
-      setFocus({ morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
-      setTasks([]);
-      setWellbeing({ meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
-    }
+    const loadEntryData = async () => {
+      try {
+        // Essayer de charger depuis Supabase d'abord
+        const user = await authService.getCurrentUser();
+        if (user) {
+          const { data: supabaseEntry, error } = await entriesService.getEntryByDate(user.id, entryDate);
+
+          if (supabaseEntry && !error) {
+            console.log('📊 Données chargées depuis Supabase pour', entryDate);
+            setSleep(supabaseEntry.sleep || { bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
+            setFocus(supabaseEntry.focus || { morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
+            setTasks(supabaseEntry.tasks || []);
+            setWellbeing(supabaseEntry.wellbeing || { meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Erreur chargement Supabase, fallback localStorage:', error);
+      }
+
+      // Fallback vers localStorage
+      const saved = localStorage.getItem('entry-' + entryDate);
+      if (saved) {
+        console.log('📊 Données chargées depuis localStorage pour', entryDate);
+        const parsed = JSON.parse(saved);
+        setSleep(parsed.sleep || { bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
+        setFocus(parsed.focus || { morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
+        setTasks(parsed.tasks || []);
+        setWellbeing(parsed.wellbeing || { meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
+      } else {
+        // Données vides
+        setSleep({ bedTime: '', wakeTime: '', insomniaDuration: 0, duration: 0 });
+        setFocus({ morningHours: 0, afternoonHours: 0, drivingHours: 0, fatigue: 3 });
+        setTasks([]);
+        setWellbeing({ meditationsPauses: { morning: false, noon: false, afternoon: false, evening: false }, sportLeisureHours: 0, socialInteraction: false, energy: 50 });
+      }
+    };
+
+    loadEntryData();
   }, [entryDate]);
 
   // Ajouter un toast
@@ -79,12 +107,13 @@ const EntryForm: React.FC = () => {
     }, toast.duration || 5000);
   }, []);
 
-  // Sauvegarder les données pour la date sélectionnée
+  // Sauvegarder les données pour la date sélectionnée (Supabase + localStorage)
   const saveData = useCallback(async (showToast = true) => {
     setIsLoading(true);
+    let supabaseSuccess = false;
+    let localStorageSuccess = false;
+
     try {
-      // Simuler la sauvegarde
-      await new Promise(resolve => setTimeout(resolve, 1000));
       const entry = {
         entry_date: entryDate,
         sleep,
@@ -92,14 +121,56 @@ const EntryForm: React.FC = () => {
         tasks,
         wellbeing,
       };
-      localStorage.setItem('entry-' + entryDate, JSON.stringify(entry));
+
+      // 1. Sauvegarder dans Supabase en priorité
+      try {
+        const user = await authService.getCurrentUser();
+        if (user) {
+          const { data, error } = await entriesService.upsertEntry(entry);
+          if (!error) {
+            console.log('✅ Données sauvegardées dans Supabase pour', entryDate);
+            supabaseSuccess = true;
+          } else {
+            console.error('❌ Erreur Supabase:', error);
+          }
+        } else {
+          console.warn('⚠️ Utilisateur non connecté - sauvegarde localStorage seulement');
+        }
+      } catch (error) {
+        console.error('❌ Exception Supabase:', error);
+      }
+
+      // 2. Sauvegarder en localStorage (toujours en fallback)
+      try {
+        localStorage.setItem('entry-' + entryDate, JSON.stringify(entry));
+        console.log('✅ Données sauvegardées dans localStorage pour', entryDate);
+        localStorageSuccess = true;
+      } catch (error) {
+        console.error('❌ Erreur localStorage:', error);
+      }
+
       setLastSaved(new Date());
+
       if (showToast) {
-        addToast({
-          type: 'success',
-          message: t('notifications.saveSuccess'),
-          duration: 3000,
-        });
+        if (supabaseSuccess && localStorageSuccess) {
+          addToast({
+            type: 'success',
+            message: t('notifications.saveSuccess') + ' (Synchronisé)',
+            duration: 3000,
+          });
+        } else if (localStorageSuccess) {
+          addToast({
+            type: 'warning',
+            message: t('notifications.saveSuccess') + ' (Local seulement)',
+            duration: 4000,
+          });
+        } else {
+          addToast({
+            type: 'error',
+            message: 'Erreur de sauvegarde',
+            duration: 5000,
+          });
+        }
       }
     } catch (error) {
       console.error('Erreur de sauvegarde:', error);

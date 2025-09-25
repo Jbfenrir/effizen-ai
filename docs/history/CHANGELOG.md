@@ -2,7 +2,32 @@
 
 ## 📅 Septembre 2025
 
-### 24/09/2025 - Traductions EN complètes et conseils IA multilingues
+### 24/09/2025 - Système anti-perte de données + restauration complète
+**PROBLÈME CRITIQUE RÉSOLU :** Données du 13/09 au 23/09 perdues en production
+**CAUSE IDENTIFIÉE :** EntryForm sauvegardait UNIQUEMENT en localStorage (jamais vers Supabase)
+
+**Solutions implémentées :**
+- ✅ **Restauration données :** 28 entrées récupérées depuis CSV (période 11/08 au 23/09)
+- ✅ **Service entriesService :** CRUD complet pour Supabase (create/read/update/delete)
+- ✅ **Sauvegarde hybride :** EntryForm → Supabase (priorité) + localStorage (fallback)
+- ✅ **Système d'intégrité :** Détection automatique jours manquants + alertes
+- ✅ **Auto-backup quotidien :** Rotation 7 jours en localStorage + export CSV
+- ✅ **Interface utilisateur :** Composant DataIntegrityAlert intégré au dashboard
+
+**Fichiers créés :**
+- `src/services/entriesService.ts` - Service CRUD Supabase complet
+- `src/utils/csvRestoration.ts` - Restauration/export CSV intelligent
+- `src/utils/dataIntegrityChecker.ts` - Vérification intégrité + auto-backup
+- `src/components/DataIntegrityAlert.tsx` - Composant d'alerte moderne
+- `restore-csv-data.mjs` - Script Node.js restauration (28 entrées récupérées)
+
+**Fichiers modifiés :**
+- `src/pages/EntryForm.tsx` - Sauvegarde Supabase + localStorage + indicateurs visuels
+- `src/pages/DashboardEmployee.tsx` - Intégration alerte intégrité
+
+**Impact :** Plus jamais de perte de données, suivi temps réel de l'intégrité
+
+### 24/09/2025 (précédent) - Traductions EN complètes et conseils IA multilingues
 **Problèmes corrigés :**
 - ✅ Traductions EN Dashboard : Tous les textes français restants traduits
 - ✅ Conseils IA multilingues : Création système de traduction dynamique EN/FR
