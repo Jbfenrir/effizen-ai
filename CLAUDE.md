@@ -82,3 +82,4 @@ Voir [`docs/features/TODO.md`](docs/features/TODO.md)
   3. Commande de commit :
   git add -A
   git commit -m "📝 SESSION: [Date] - [Résumé des changements]"
+- to memorize A chaque fois que tu pousses Une version en prod tu dois absolument t'assurer de ne pas altérer ni supprimer de données utilisateurs De la prod Qu'elle soit stockée dans supabase ou autre.

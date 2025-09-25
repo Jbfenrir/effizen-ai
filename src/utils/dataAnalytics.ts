@@ -304,7 +304,7 @@ export const getAllEntriesFromSupabase = async (): Promise<DailyEntry[]> => {
   try {
     // Import dynamique pour éviter les erreurs de build
     const { supabase } = await import('../services/supabase');
-    
+
     // Récupérer l'utilisateur connecté
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
@@ -312,18 +312,45 @@ export const getAllEntriesFromSupabase = async (): Promise<DailyEntry[]> => {
       return [];
     }
 
+    console.log(`🔍 Tentative de récupération des données pour user: ${user.email} (ID: ${user.id})`);
+
+    // CORRECTIF TEMPORAIRE URGENT pour jbgerberon@gmail.com
+    // Si l'utilisateur est jbgerberon@gmail.com mais que son user.id ne correspond pas
+    // à l'ID utilisé lors de la restauration des données, utiliser l'ID correct
+    let targetUserId = user.id;
+    if (user.email === 'jbgerberon@gmail.com') {
+      targetUserId = '8ac44380-84d5-49a8-b4a0-16f602d0e7d4';
+      console.log(`🔧 CORRECTIF: Utilisation de l'UUID correct pour jbgerberon@gmail.com: ${targetUserId}`);
+    }
+
     // Récupérer les entrées de l'utilisateur
     const { data: entries, error } = await supabase
       .from('daily_entries')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', targetUserId)
       .order('entry_date', { ascending: true });
 
     if (error) {
       console.error('Erreur lors de la récupération des entrées:', error);
-      return [];
+      console.log('Tentative avec user.id original...', user.id);
+
+      // Fallback: essayer avec l'ID original si le correctif échoue
+      const { data: fallbackEntries, error: fallbackError } = await supabase
+        .from('daily_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('entry_date', { ascending: true });
+
+      if (fallbackError) {
+        console.error('Erreur fallback aussi:', fallbackError);
+        return [];
+      }
+
+      console.log(`📊 Fallback réussi: ${fallbackEntries?.length || 0} entrées trouvées`);
+      return fallbackEntries || [];
     }
 
+    console.log(`📊 Récupération réussie: ${entries?.length || 0} entrées trouvées`);
     return entries || [];
   } catch (error) {
     console.error('Erreur lors de la récupération depuis Supabase:', error);
