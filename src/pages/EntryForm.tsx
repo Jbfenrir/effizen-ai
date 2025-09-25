@@ -213,7 +213,7 @@ const EntryForm: React.FC = () => {
       {/* Header de la page */}
       <div className="sticky top-0 z-10">
         <div className="bg-white border-b border-light-gray">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-4 max-w-7xl overflow-hidden">
             {/* Première ligne : Titre + Dashboard */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
@@ -235,45 +235,47 @@ const EntryForm: React.FC = () => {
             </div>
 
             {/* Deuxième ligne : Date + Score + Bouton Save */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            {/* Sélecteur de date */}
-            <input
-              type="date"
-              value={entryDate}
-              onChange={e => setEntryDate(e.target.value)}
-              className="form-input flex-shrink-0"
-              max={format(new Date(), 'yyyy-MM-dd')}
-            />
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 w-full">
+              {/* Sélecteur de date */}
+              <input
+                type="date"
+                value={entryDate}
+                onChange={e => setEntryDate(e.target.value)}
+                className="form-input w-full md:w-auto md:flex-shrink-0"
+                max={format(new Date(), 'yyyy-MM-dd')}
+              />
 
-            {/* Score de bien-être */}
-            <div className="flex items-center justify-center bg-light-gray rounded-lg px-4 py-2 flex-shrink-0">
-              <span className="text-sm text-metallic-gray mr-2">{t('entry.wellbeingScore')}:</span>
-              <span className={`text-xl font-bold ${
-                wellbeingScore >= 80 ? 'text-lime-green' :
-                wellbeingScore >= 60 ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-                {wellbeingScore}/100
-              </span>
-            </div>
+              {/* Score de bien-être - Spacer pour pousser à droite sur desktop */}
+              <div className="flex items-center gap-2 md:gap-3 md:ml-auto">
+                <div className="flex items-center justify-center bg-light-gray rounded-lg px-3 py-2 flex-1 md:flex-initial md:min-w-[140px]">
+                  <span className="text-sm text-metallic-gray mr-1 whitespace-nowrap">{t('entry.wellbeingScore')}:</span>
+                  <span className={`text-lg md:text-xl font-bold whitespace-nowrap ${
+                    wellbeingScore >= 80 ? 'text-lime-green' :
+                    wellbeingScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {wellbeingScore}/100
+                  </span>
+                </div>
 
-            {/* Bouton de sauvegarde */}
-            <button
-              onClick={() => saveData(true)}
-              disabled={isLoading}
-              className="btn-primary flex items-center justify-center space-x-2 flex-1 sm:flex-initial"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>{t('entry.saving')}</span>
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  <span>{t('entry.save')}</span>
-                </>
-              )}
-            </button>
+                {/* Bouton de sauvegarde */}
+                <button
+                  onClick={() => saveData(true)}
+                  disabled={isLoading}
+                  className="btn-primary flex items-center justify-center space-x-2 px-3 md:px-4 py-2 min-w-[100px] md:min-w-[120px]"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>{t('entry.saving')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      <span>{t('entry.save')}</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Indicateur de dernière sauvegarde */}

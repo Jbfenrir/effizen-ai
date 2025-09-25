@@ -2,6 +2,16 @@
 
 ## 📅 Septembre 2025
 
+### 25/09/2025 - Correction disposition header EntryForm
+**Problème corrigé :**
+- ✅ Éléments (date, score, bouton Sauvegarder) débordaient du cadre blanc sur la droite
+- ✅ Ajout `max-w-7xl` et `overflow-hidden` au conteneur principal
+- ✅ Réorganisation responsive : groupement score + bouton avec `md:ml-auto`
+- ✅ Ajustement largeurs minimales et padding responsive
+
+**Modifications :**
+- `src/pages/EntryForm.tsx` - Conteneur limité + flex responsive optimisé
+
 ### 24/09/2025 - Système anti-perte de données + restauration complète
 **PROBLÈME CRITIQUE RÉSOLU :** Données du 13/09 au 23/09 perdues en production
 **CAUSE IDENTIFIÉE :** EntryForm sauvegardait UNIQUEMENT en localStorage (jamais vers Supabase)
