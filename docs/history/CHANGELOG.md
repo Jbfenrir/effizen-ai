@@ -2,18 +2,23 @@
 
 ## 📅 Septembre 2025
 
-### 26/09/2025 - Corrections UX et formatage (SESSION COMPLÈTE)
+### 26/09/2025 - Corrections UX, formatage et protocoles Claude (SESSION COMPLÈTE)
 **Problèmes corrigés :**
 - ✅ **Scroll automatique tâches :** Suppression du scrollIntoView() gênant, remplacé par focus() sur nouveau champ
 - ✅ **Traductions manquantes :** Ajout "Type de tâche", "Excellent", "Insuffisant" dans fr.json et en.json
 - ✅ **Format durée sommeil :** Passage de format décimal (7.5h) au format HH:MM (07:30)
 - ✅ **Traductions finales :** "Supprimer", "Répartition", "Haute/Faible valeur" traduites (3 éléments identifiés screenshot)
+- ✅ **Textes français hard-codés :** FocusForm avertissements + TaskAutocomplete dates corrigés
+- ✅ **Documentation comportement :** Création protocoles Claude pour futures sessions
 
 **Fichiers modifiés :**
 - `src/components/TasksForm.tsx` - Suppression auto-scroll, ajout focus sur nouveau champ
 - `src/components/SleepForm.tsx` - Intégration formatage HH:MM et traductions
 - `src/i18n/fr.json` + `src/i18n/en.json` - Ajout clés taskType, excellent, insufficient
 - `src/utils/sleepFormatters.ts` - Nouvelles fonctions formatage durée sommeil
+- `src/components/FocusForm.tsx` + `src/components/TaskAutocomplete.tsx` - Traductions hard-codées → t() keys
+- `docs/guides/COMPORTEMENT.md` - Nouveau protocole Claude (limitations, serveurs, communication)
+- `CLAUDE.md` - Référence obligatoire au document COMPORTEMENT.md
 
 **Tests effectués :**
 - Build production : ✅ Réussi (1m 15s)

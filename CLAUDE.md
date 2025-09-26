@@ -32,6 +32,7 @@ npm run dev
 
 ### 1. TOUJOURS commencer par
 - Lire ce fichier CLAUDE.md
+- **LIRE OBLIGATOIREMENT** [`docs/guides/COMPORTEMENT.md`](docs/guides/COMPORTEMENT.md) - Protocoles de communication et gestion des limitations
 - Vérifier l'état actuel avec `git status`
 - Consulter la doc spécifique si besoin dans `docs/`
 
