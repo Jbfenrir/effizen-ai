@@ -2,6 +2,24 @@
 
 ## 📅 Septembre 2025
 
+### 26/09/2025 - Corrections UX et formatage
+**Problèmes corrigés :**
+- ✅ **Scroll automatique tâches :** Suppression du scrollIntoView() gênant, remplacé par focus() sur nouveau champ
+- ✅ **Traductions manquantes :** Ajout "Type de tâche", "Excellent", "Insuffisant" dans fr.json et en.json
+- ✅ **Format durée sommeil :** Passage de format décimal (7.5h) au format HH:MM (07:30)
+
+**Fichiers modifiés :**
+- `src/components/TasksForm.tsx` - Suppression auto-scroll, ajout focus sur nouveau champ
+- `src/components/SleepForm.tsx` - Intégration formatage HH:MM et traductions
+- `src/i18n/fr.json` + `src/i18n/en.json` - Ajout clés taskType, excellent, insufficient
+- `src/utils/sleepFormatters.ts` - Nouvelles fonctions formatage durée sommeil
+
+**Tests effectués :**
+- Build production : ✅ Réussi (1m 15s)
+- Serveur local : ✅ http://localhost:3001
+- Traductions : ✅ FR/EN complètes
+- UX tâches : ✅ Plus d'auto-scroll gênant
+
 ### 25/09/2025 - Correction disposition header EntryForm
 **Problème corrigé :**
 - ✅ Éléments (date, score, bouton Sauvegarder) débordaient du cadre blanc sur la droite

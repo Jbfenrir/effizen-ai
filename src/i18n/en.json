@@ -59,6 +59,8 @@
     "hours": "hours",
     "minutes": "minutes",
     "quality": "Sleep quality",
+    "excellent": "Excellent",
+    "insufficient": "Insufficient",
     "tips": {
       "good": "Excellent! You're respecting the recommended 8 hours.",
       "short": "Your sleep seems insufficient. Try going to bed earlier.",
@@ -86,6 +88,7 @@
     "addTask": "Add task",
     "taskName": "Task name",
     "duration": "Duration (hours)",
+    "taskType": "Task type",
     "highValue": "High value",
     "lowValue": "Low value",
     "totalDuration": "Total duration",

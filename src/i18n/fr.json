@@ -58,6 +58,8 @@
     "hours": "heures",
     "minutes": "minutes",
     "quality": "Qualité du sommeil",
+    "excellent": "Excellent",
+    "insufficient": "Insuffisant",
     "tips": {
       "good": "Excellent ! Vous respectez les 8h recommandées.",
       "short": "Votre sommeil semble insuffisant. Essayez de vous coucher plus tôt.",
@@ -85,6 +87,7 @@
     "addTask": "Ajouter une tâche",
     "taskName": "Nom de la tâche",
     "duration": "Durée (heures)",
+    "taskType": "Type de tâche",
     "highValue": "Haute valeur",
     "lowValue": "Faible valeur",
     "totalDuration": "Durée totale",

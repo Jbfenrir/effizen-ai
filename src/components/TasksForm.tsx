@@ -38,11 +38,11 @@ const TasksForm: React.FC<TasksFormProps> = ({
       return updated;
     });
 
-    // Scroller vers le haut pour voir la nouvelle tâche (UX mobile)
+    // Focus sur le nouveau champ de saisie au lieu de scroller
     setTimeout(() => {
-      const tasksList = document.querySelector('[data-tasks-list]');
-      if (tasksList) {
-        tasksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const newTaskInput = document.querySelector(`[data-task-id="${newTask.id}"] input[type="text"]`) as HTMLInputElement;
+      if (newTaskInput) {
+        newTaskInput.focus();
       }
     }, 100);
   };
@@ -122,7 +122,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
           </div>
         ) : (
           tasks.map((task, index) => (
-            <div key={task.id} className="border border-light-gray rounded-lg p-4">
+            <div key={task.id} data-task-id={task.id} className="border border-light-gray rounded-lg p-4">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                 {/* Nom de la tâche */}
                 <div className="md:col-span-4">
@@ -163,7 +163,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
                 {/* Haute valeur */}
                 <div className="md:col-span-3">
                   <label className="form-label text-sm">
-                    Type de tâche
+                    {t('tasks.taskType')}
                   </label>
                   <div className="flex space-x-2">
                     <button

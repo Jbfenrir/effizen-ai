@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Moon, Sunrise, Clock } from 'lucide-react';
 import { calculateSleepDuration } from '../utils/calculateSleepDuration';
+import { formatSleepDuration } from '../utils/sleepFormatters';
 import type { Sleep } from '../types';
 
 interface SleepFormProps {
@@ -120,7 +121,7 @@ const SleepForm: React.FC<SleepFormProps> = ({
           <div className="flex items-center space-x-2">
             <div className="flex-1 bg-light-gray rounded-lg px-4 py-2">
               <span className="text-lg font-semibold text-dark-blue">
-                {sleep.duration.toFixed(1)} {t('sleep.hours')}
+                {formatSleepDuration(sleep.duration)}
               </span>
             </div>
           </div>
@@ -135,7 +136,7 @@ const SleepForm: React.FC<SleepFormProps> = ({
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-lime-green rounded-full"></div>
                 <span className="text-green-800 font-medium">
-                  {t('sleep.quality')}: Excellent
+                  {t('sleep.quality')}: {t('sleep.excellent')}
                 </span>
               </div>
               <p className="text-green-700 text-sm mt-1">
@@ -149,7 +150,7 @@ const SleepForm: React.FC<SleepFormProps> = ({
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                 <span className="text-yellow-800 font-medium">
-                  {t('sleep.quality')}: Insuffisant
+                  {t('sleep.quality')}: {t('sleep.insufficient')}
                 </span>
               </div>
               <p className="text-yellow-700 text-sm mt-1">
