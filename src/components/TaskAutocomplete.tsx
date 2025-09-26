@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Clock, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTaskHistory, type TaskHistoryItem } from '../hooks/useTaskHistory';
 
 interface TaskAutocompleteProps {
@@ -19,6 +20,7 @@ const TaskAutocomplete: React.FC<TaskAutocompleteProps> = ({
   disabled = false,
   className = "form-input"
 }) => {
+  const { t } = useTranslation();
   const { getSuggestions, addTaskToHistory } = useTaskHistory();
   const [suggestions, setSuggestions] = useState<TaskHistoryItem[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -108,9 +110,9 @@ const TaskAutocomplete: React.FC<TaskAutocompleteProps> = ({
     const now = new Date();
     const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (diffInDays === 0) return "Aujourd'hui";
-    if (diffInDays === 1) return "Hier";
-    if (diffInDays < 7) return `Il y a ${diffInDays}j`;
+    if (diffInDays === 0) return t('common.today');
+    if (diffInDays === 1) return t('common.yesterday');
+    if (diffInDays < 7) return t('common.daysAgo', { days: diffInDays });
     return date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
   };
 

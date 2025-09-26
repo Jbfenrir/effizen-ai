@@ -28,7 +28,10 @@
     "sync": "Sync",
     "offline": "Offline",
     "online": "Online",
-    "apply": "Apply"
+    "apply": "Apply",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{days}}d ago"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -81,7 +84,9 @@
       "5": "Very tired"
     },
     "totalHours": "Total hours",
-    "warning": "Warning: you've entered more than 8 hours of work."
+    "warning": "Warning: you've entered more than 8 hours of work.",
+    "maxMorningHours": "Maximum 6 hours recommended for morning",
+    "maxAfternoonHours": "Maximum 6 hours recommended for afternoon"
   },
   "tasks": {
     "title": "Task Distribution",

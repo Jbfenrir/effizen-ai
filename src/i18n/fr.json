@@ -27,7 +27,10 @@
     "refresh": "Actualiser",
     "sync": "Synchroniser",
     "offline": "Hors ligne",
-    "online": "En ligne"
+    "online": "En ligne",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{days}}j"
   },
   "navigation": {
     "dashboard": "Tableau de bord",
@@ -80,7 +83,9 @@
       "5": "Très fatigué"
     },
     "totalHours": "Total des heures",
-    "warning": "Attention : vous avez saisi plus de 8h de travail."
+    "warning": "Attention : vous avez saisi plus de 8h de travail.",
+    "maxMorningHours": "Maximum 6 heures recommandé pour le matin",
+    "maxAfternoonHours": "Maximum 6 heures recommandé pour l'après-midi"
   },
   "tasks": {
     "title": "Répartition des tâches",

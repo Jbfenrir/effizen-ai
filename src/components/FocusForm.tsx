@@ -90,7 +90,7 @@ const FocusForm: React.FC<FocusFormProps> = ({
           </div>
           {focus.morningHours > 6 && (
             <p className="text-red-600 text-sm mt-1">
-              Maximum 6 heures recommandé pour le matin
+              {t('focus.maxMorningHours')}
             </p>
           )}
         </div>
@@ -118,7 +118,7 @@ const FocusForm: React.FC<FocusFormProps> = ({
           </div>
           {focus.afternoonHours > 6 && (
             <p className="text-red-600 text-sm mt-1">
-              Maximum 6 heures recommandé pour l'après-midi
+              {t('focus.maxAfternoonHours')}
             </p>
           )}
         </div>
