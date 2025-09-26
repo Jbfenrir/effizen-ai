@@ -202,7 +202,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
                     className="btn-secondary flex items-center space-x-1 text-red-600 hover:text-red-700"
                   >
                     <Trash2 size={16} />
-                    <span>Supprimer</span>
+                    <span>{t('tasks.delete')}</span>
                   </button>
                 </div>
 
@@ -262,15 +262,15 @@ const TasksForm: React.FC<TasksFormProps> = ({
             {/* Répartition */}
             <div className="text-center">
               <div className="text-sm font-medium text-dark-blue mb-2">
-                Répartition
+                {t('tasks.distribution')}
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-lime-green">Haute valeur</span>
+                  <span className="text-lime-green">{t('tasks.highValueShort')}</span>
                   <span>{highValueDuration.toFixed(1)}h</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-red-600">Faible valeur</span>
+                  <span className="text-red-600">{t('tasks.lowValueShort')}</span>
                   <span>{(totalDuration - highValueDuration).toFixed(1)}h</span>
                 </div>
               </div>

@@ -100,7 +100,10 @@
       "low": "Consider automating or delegating your low-value tasks.",
       "overwork": "Limit yourself to 8 hours of work per day to maintain your well-being."
     },
-    "delete": "Delete"
+    "delete": "Delete",
+    "distribution": "Distribution",
+    "highValueShort": "High value",
+    "lowValueShort": "Low value"
   },
   "wellbeing": {
     "title": "Well-being & Energy",

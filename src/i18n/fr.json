@@ -98,7 +98,11 @@
       "good": "Excellent ratio de tâches à haute valeur !",
       "low": "Considérez automatiser ou déléguer vos tâches à faible valeur.",
       "overwork": "Limitez-vous à 8h de travail par jour pour maintenir votre bien-être."
-    }
+    },
+    "delete": "Supprimer",
+    "distribution": "Répartition",
+    "highValueShort": "Haute valeur",
+    "lowValueShort": "Faible valeur"
   },
   "wellbeing": {
     "title": "Bien-être & Énergie",

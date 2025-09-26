@@ -2,11 +2,12 @@
 
 ## 📅 Septembre 2025
 
-### 26/09/2025 - Corrections UX et formatage
+### 26/09/2025 - Corrections UX et formatage (SESSION COMPLÈTE)
 **Problèmes corrigés :**
 - ✅ **Scroll automatique tâches :** Suppression du scrollIntoView() gênant, remplacé par focus() sur nouveau champ
 - ✅ **Traductions manquantes :** Ajout "Type de tâche", "Excellent", "Insuffisant" dans fr.json et en.json
 - ✅ **Format durée sommeil :** Passage de format décimal (7.5h) au format HH:MM (07:30)
+- ✅ **Traductions finales :** "Supprimer", "Répartition", "Haute/Faible valeur" traduites (3 éléments identifiés screenshot)
 
 **Fichiers modifiés :**
 - `src/components/TasksForm.tsx` - Suppression auto-scroll, ajout focus sur nouveau champ
