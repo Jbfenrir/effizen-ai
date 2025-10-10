@@ -5,7 +5,7 @@
 **EffiZen-AI** - Application React/TypeScript de bien-être au travail
 - **Production :** https://effizen-ai-prod.vercel.app
 - **Admin :** jbgerberon@gmail.com (ID: 8ac44380-8445-49a8-b4a9-16f602d0e7d4)
-- **Status :** ✅ Solution récupération données intégrée et fonctionnelle
+- **Status :** ✅ Traductions i18n complètes (100% couverture) - Incident 10/10/2025 résolu
 
 ## 📁 DOCUMENTATION COMPLÈTE
 
@@ -40,6 +40,7 @@ npm run dev
 - Commiter de données sensibles (emails, IDs, mots de passe)
 - Créer de nouveaux services Supabase (utiliser l'existant)
 - Utiliser npm hors de WSL
+- **AJOUTER CODE AVEC t('...') SANS AJOUTER CLÉS DANS fr.json ET en.json** ⚠️
 
 ### 3. Solutions aux problèmes fréquents
 - **npm not found** → Utiliser WSL uniquement
@@ -54,6 +55,7 @@ npm run dev
 - Système de conseils intelligent
 - Export CSV complet
 - Reset password (3 solutions)
+- **Traductions i18n complètes (265/265 clés - 100%)**
 
 ### 🔧 En cours
 - Optimisation performances
@@ -69,8 +71,8 @@ Voir [`docs/features/TODO.md`](docs/features/TODO.md)
 - **Historique ?** → [`docs/history/CHANGELOG.md`](docs/history/CHANGELOG.md)
 
 ---
-**Dernière mise à jour :** 2025-09-23
-**Version :** 8.0 - Documentation modulaire
+**Dernière mise à jour :** 2025-10-10
+**Version :** 8.1 - Traductions i18n complètes + Préconisations validation
 - to memorize : lorsque je te dirais d'effectuer une sauvegarde, tu devras suivre le process suivant : Pour sauvegarder les éléments d'une session :
 
   1. Pendant la session : Documentez dans le fichier approprié selon le type :

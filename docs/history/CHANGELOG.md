@@ -1,5 +1,51 @@
 # Historique des Sessions et Changements
 
+## 📅 Octobre 2025
+
+### 10/10/2025 - FIX CRITIQUE : Correction massive traductions + Post-mortem (SESSION COMPLÈTE)
+**Problème critique résolu :**
+- ✅ **132 clés de traduction manquantes** (sur 265 utilisées) causant affichage brut `dashboard.employee.xxx`
+- ✅ **Duplication clé subtitle** : Lignes 197 et 213 avec valeurs conflictuelles
+- ✅ **Erreur sleep.quality** : Validation structure string vs object
+- ✅ **Couverture i18n** : Passage de 50.2% à 100%
+
+**Corrections appliquées :**
+- Ajout systématique de 131+ clés manquantes dans fr.json et en.json :
+  - `common` (7 clés nouvelles)
+  - `auth` (6 clés nouvelles)
+  - `dashboard.admin` (60+ clés nouvelles)
+  - `dashboard.admin.passwordReset` (10 clés nouvelles)
+  - `userModal` (14 clés nouvelles)
+  - `teamModal` (14 clés nouvelles)
+  - Corrections sections existantes (focus, tasks, sleep, wellbeing)
+
+**Fichiers modifiés :**
+- `src/i18n/locales/fr.json` - +131 clés, suppression duplication
+- `src/i18n/locales/en.json` - +131 clés, synchronisation complète
+- `src/i18n/index.ts` - Ajout logs debug (à retirer en prod)
+- Suppression fichiers obsolètes : `src/i18n/{fr,en}.json.old`, `fr_incomplete.json`
+
+**Documentation créée :**
+- `docs/history/INCIDENT-TRADUCTIONS-10-10-2025.md` - Post-mortem complet :
+  - Analyse cause racine (ajouts incrémentaux non synchronisés)
+  - 8 préconisations (3 urgentes, 3 importantes, 2 souhaitables)
+  - Scripts validation pre-commit (husky)
+  - Tests Jest intégrité i18n
+  - Process développement ADDING-FEATURES.md
+
+**Tests effectués :**
+- Build : ✅ Validation JSON (jsonlint) des deux fichiers
+- Serveur local : ✅ http://localhost:3001
+- Traductions : ✅ 265/265 clés présentes (100%)
+- Affichage : ✅ Tous textes traduits correctement
+
+**Préconisations urgentes (à implémenter sous 7 jours) :**
+1. Script validation pre-commit avec husky
+2. Test Jest intégrité i18n automatisé
+3. Documentation process ADDING-FEATURES.md
+
+**Commit :** `0a27e67` - 🌐 FIX CRITIQUE: Correction massive traductions + Post-mortem
+
 ## 📅 Septembre 2025
 
 ### 26/09/2025 - Corrections UX, formatage et protocoles Claude (SESSION COMPLÈTE)
