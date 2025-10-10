@@ -1,4 +1,13 @@
 {
+  "common": {
+    "cancel": "Annuler",
+    "error": "Erreur",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{count}} jours"
+  },
   "app": {
     "title": "EffiZen-AI",
     "description": "Application de bien-être et productivité pour équipes"
@@ -11,9 +20,23 @@
     "success": "Un lien de connexion a été envoyé à votre adresse email.",
     "error": "Erreur lors de l'envoi du lien. Veuillez réessayer."
   },
+  "auth": {
+    "signInTitle": "Connexion",
+    "signInSubtitle": "Connectez-vous avec votre email professionnel",
+    "email": "Adresse email",
+    "emailPlaceholder": "votre@email.com",
+    "sendMagicLink": "Recevoir le lien magique",
+    "magicLinkSent": "Un lien de connexion a été envoyé à votre adresse email.",
+    "magicLinkError": "Erreur lors de l'envoi du lien. Veuillez réessayer."
+  },
   "header": {
     "dashboard": "Tableau de bord",
     "entry": "Saisie quotidienne",
+    "logout": "Déconnexion"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "entry": "Saisie",
     "logout": "Déconnexion"
   },
   "focus": {
@@ -24,13 +47,22 @@
     "totalHours": "Total heures travaillées",
     "warning": "Attention : charge de travail élevée (> 8h)",
     "fatigue": "Niveau de fatigue",
+    "energyLevel": "Niveau d'énergie",
+    "veryTired": "Très fatigué",
+    "tired": "Fatigué",
+    "neutral": "Neutre",
+    "energetic": "Énergique",
+    "veryEnergetic": "Très énergique",
+    "currentLevel": "Niveau actuel",
     "fatigueLevels": {
       "1": "Très faible",
       "2": "Faible",
       "3": "Modérée",
       "4": "Élevée",
       "5": "Très élevée"
-    }
+    },
+    "maxMorningHours": "Maximum heures matin",
+    "maxAfternoonHours": "Maximum heures après-midi"
   },
   "tasks": {
     "title": "Répartition des tâches",
@@ -41,28 +73,66 @@
     "lowValue": "Faible valeur",
     "totalDuration": "Durée totale",
     "hvRatio": "Ratio haute valeur",
+    "noTasks": "Aucune tâche",
+    "clickToAdd": "Cliquez pour ajouter",
     "tips": {
       "good": "Bravo ! Vous consacrez la majorité de votre temps à des tâches à forte valeur ajoutée.",
       "low": "Essayez d'augmenter la part de tâches à haute valeur pour plus d'impact.",
       "overwork": "Attention à la surcharge de travail (> 8h/jour) !"
-    }
+    },
+    "delete": "Supprimer",
+    "distribution": "Répartition",
+    "highValueShort": "HV",
+    "lowValueShort": "BV",
+    "taskType": "Type de tâche"
   },
   "wellbeing": {
     "title": "Bien-être & Activités",
     "meditations": {
       "title": "Méditation",
       "am": "Matin",
-      "pm": "Après-midi"
+      "pm": "Après-midi",
+      "morning": "Méditation matin",
+      "midday": "Méditation midi",
+      "noon": "Méditation midi",
+      "afternoon": "Méditation après-midi",
+      "evening": "Méditation soir"
     },
+    "meditationsPauses": "Méditations & Pauses",
     "breaks": "Pauses dans la journée (%)",
     "sportHours": "Heures de sport",
+    "sportLeisureHours": "Heures sport/loisirs",
     "manualHours": "Heures d'activité manuelle",
     "energy": "Énergie actuelle",
+    "socialInteraction": "Interaction sociale",
+    "socialInteractionText": "Interaction sociale du jour",
     "tips": {
       "meditation": "La méditation régulière aide à réduire le stress.",
       "breaks": "Prendre des pauses régulières améliore la concentration.",
       "activity": "Une activité physique ou manuelle par jour est recommandée."
-    }
+    },
+    "meditationsHelp": "Cochez les moments où vous avez médité",
+    "sportHelp": "Durée totale d'activité physique",
+    "socialHelp": "Avez-vous eu des interactions sociales positives ?",
+    "summary": {
+      "meditationsPauses": "Méditations & Pauses",
+      "sportLeisure": "Sport & Loisirs",
+      "social": "Social"
+    },
+    "quality": {
+      "suboptimal": "Sous-optimal",
+      "inactive": "Inactif",
+      "isolated": "Isolé",
+      "excellent": "Excellent",
+      "good": "Bon",
+      "fair": "Correct",
+      "toImprove": "À améliorer",
+      "veryActive": "Très actif",
+      "active": "Actif",
+      "lessActive": "Peu actif",
+      "connected": "Connecté"
+    },
+    "sportsHelp": "Durée totale d'activité sportive"
   },
   "sleep": {
     "title": "Sommeil",
@@ -70,16 +140,30 @@
     "wakeTime": "Heure du réveil",
     "insomniaDuration": "Durée d'insomnie (min)",
     "duration": "Durée totale de sommeil (h)",
+    "hours": "heures de sommeil",
+    "quality": "Qualité du sommeil",
+    "excellent": "Excellent sommeil",
+    "good": "Bon sommeil",
+    "fair": "Sommeil correct",
+    "poor": "Sommeil insuffisant",
     "tips": {
       "good": "Votre sommeil est optimal.",
-      "improve": "Essayez de dormir au moins 7h par nuit pour un meilleur bien-être."
-    }
+      "improve": "Essayez de dormir au moins 7h par nuit pour un meilleur bien-être.",
+      "short": "Sommeil trop court",
+      "long": "Sommeil très long"
+    },
+    "insufficient": "Sommeil insuffisant"
   },
   "entry": {
+    "title": "Saisie quotidienne",
     "save": "Sauvegarder",
     "saved": "Données sauvegardées !",
+    "saving": "Enregistrement...",
     "continue": "Sauvegarder et continuer",
-    "dashboard": "Voir le tableau de bord"
+    "dashboard": "Voir le tableau de bord",
+    "seeDashboard": "Voir mon tableau de bord",
+    "wellbeingScore": "Score bien-être",
+    "lastSaved": "Dernière sauvegarde"
   },
   "notifications": {
     "saveSuccess": "Données sauvegardées avec succès !",
@@ -100,7 +184,45 @@
         "sleepTrend": "Évolution sommeil & fatigue",
         "meditationBars": "Méditations & pauses"
       },
-      "aiTip": "Conseil IA"
+      "aiTip": "Conseil IA",
+      "categoryHealth": "Santé",
+      "categoryOrganization": "Organisation",
+      "scientificSources": "Sources scientifiques",
+      "learnMore": "En savoir plus",
+      "expertDiagnosis": "Diagnostic expert",
+      "practicalAdvice": "Conseils pratiques",
+      "basedOnAnalysis": "Basé sur l'analyse de {{days}} jours de données",
+      "wellbeingSection": "Vue d'ensemble du bien-être",
+      "wellbeingOverview": "Suivi de votre bien-être et productivité au quotidien",
+      "subtitle": "Suivi de votre bien-être et productivité au quotidien",
+      "wellbeingProfile": "Profil bien-être",
+      "wellbeingEvolution": "Évolution du bien-être",
+      "optimizationSection": "Optimisation du temps",
+      "optimizationDescription": "Analyse de votre répartition du temps et des tâches à forte valeur ajoutée",
+      "optimizationScore": "Score d'optimisation",
+      "highValueTasksRatio": "Ratio tâches haute valeur",
+      "goodOptimization": "Excellente optimisation",
+      "taskDistribution": "Répartition des tâches",
+      "optimizationEvolution": "Évolution de l'optimisation",
+      "sleepLine": "Sommeil",
+      "energyLine": "Énergie",
+      "fatigueLine": "Fatigue",
+      "pauseLine": "Pauses",
+      "pausesLine": "Pauses",
+      "optimizationLine": "Optimisation",
+      "wellbeingScoreLabel": "Score bien-être",
+      "score": "Score",
+      "sleep": "Sommeil",
+      "energy": "Énergie",
+      "balance": "Équilibre",
+      "highValueTasksTime": "Temps tâches haute valeur",
+      "excellentOptimization": "Excellente optimisation",
+      "insufficientOptimization": "Optimisation insuffisante",
+      "criticalDispersion": "Dispersion critique",
+      "customPeriod": "Période personnalisée",
+      "noData": "Aucune donnée",
+      "noDataAvailable": "Aucune donnée disponible pour cette période",
+      "daysWithData": "jours avec données"
     },
     "manager": {
       "title": "Tableau de bord manager",
@@ -114,6 +236,120 @@
       "hvRatio": "Ratio haute valeur",
       "participants": "Participants",
       "heatmap": "Carte des risques"
+    },
+    "admin": {
+      "title": "Tableau de bord administrateur",
+      "subtitle": "Gestion des utilisateurs et des équipes",
+      "overview": "Vue d'ensemble",
+      "users": "Utilisateurs",
+      "teams": "Équipes",
+      "systemHealth": "Santé du système",
+      "systemAlerts": "Alertes système",
+      "totalUsers": "Utilisateurs totaux",
+      "activeUsers": "Utilisateurs actifs",
+      "inactiveUsers": "Utilisateurs inactifs",
+      "entries": "Saisies",
+      "entriesToday": "Saisies aujourd'hui",
+      "searchUsers": "Rechercher un utilisateur",
+      "newUser": "Nouvel utilisateur",
+      "newTeam": "Nouvelle équipe",
+      "email": "Email",
+      "role": "Rôle",
+      "team": "Équipe",
+      "status": "Statut",
+      "lastEntry": "Dernière saisie",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "deactivate": "Désactiver",
+      "resetPassword": "Réinitialiser mot de passe",
+      "viewDetails": "Voir détails",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "never": "Jamais",
+      "employee": "Employé",
+      "employees": "Employés",
+      "manager": "Manager",
+      "managers": "Managers",
+      "administrator": "Administrateur",
+      "administrators": "Administrateurs",
+      "allRoles": "Tous les rôles",
+      "members": "membres",
+      "confirmDeactivateUser": "Êtes-vous sûr de vouloir désactiver cet utilisateur ?",
+      "confirmDeactivateTeam": "Êtes-vous sûr de vouloir désactiver cette équipe ?",
+      "excellentHealth": "Excellente santé",
+      "criticalHealth": "Santé critique",
+      "excellentEngagement": "Excellent engagement",
+      "lowEngagement": "Faible engagement",
+      "globalExport": "Export global",
+      "passwordReset": {
+        "title": "Réinitialisation du mot de passe",
+        "resetFor": "Réinitialiser pour {{name}}",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "passwordPlaceholder": "Entrez le nouveau mot de passe",
+        "confirmPlaceholder": "Confirmez le mot de passe",
+        "generate": "Générer un mot de passe",
+        "reset": "Réinitialiser",
+        "success": "Mot de passe réinitialisé avec succès",
+        "error": "Erreur lors de la réinitialisation",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+        "generated": "Mot de passe généré",
+        "passwordCopied": "Mot de passe copié dans le presse-papier"
+      }
     }
+  },
+  "assistant": {
+    "title": "Assistant EffiZen-AI",
+    "subtitle": "Votre coach personnel pour le bien-être au travail",
+    "back": "Retour",
+    "comingSoon": "Bientôt disponible !",
+    "description": "Notre assistant intelligent est actuellement en cours d'entraînement. Il sera bientôt capable de vous accompagner personnellement dans la mise en place de vos recommandations et leur intégration dans votre planning.",
+    "feature1Title": "Vulgarisation des concepts",
+    "feature1Description": "L'assistant vous expliquera les concepts scientifiques de manière simple et accessible.",
+    "feature2Title": "Accompagnement personnalisé",
+    "feature2Description": "Recevez des conseils adaptés à votre situation et vos objectifs personnels.",
+    "feature3Title": "Intégration au planning",
+    "feature3Description": "L'assistant vous aidera à intégrer les recommandations dans votre emploi du temps.",
+    "feature4Title": "Suivi et ajustements",
+    "feature4Description": "Bénéficiez d'un suivi continu et d'ajustements basés sur vos progrès.",
+    "statusTitle": "En cours de développement",
+    "statusDescription": "Nous travaillons activement sur cette fonctionnalité pour vous offrir la meilleure expérience possible. Restez connecté pour être informé de sa mise en ligne !"
+  },
+  "userModal": {
+    "createTitle": "Créer un nouvel utilisateur",
+    "editTitle": "Modifier l'utilisateur",
+    "viewTitle": "Détails de l'utilisateur",
+    "email": "Email",
+    "role": "Rôle",
+    "team": "Équipe",
+    "isActive": "Actif",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "close": "Fermer",
+    "create": "Créer",
+    "sendInvitation": "Envoyer une invitation",
+    "createdOn": "Créé le",
+    "lastEntry": "Dernière saisie",
+    "entriesCount": "Nombre de saisies",
+    "noTeam": "Aucune équipe"
+  },
+  "teamModal": {
+    "createTitle": "Créer une nouvelle équipe",
+    "editTitle": "Modifier l'équipe",
+    "viewTitle": "Détails de l'équipe",
+    "teamName": "Nom de l'équipe",
+    "description": "Description",
+    "responsibleManager": "Manager responsable",
+    "isActive": "Active",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "close": "Fermer",
+    "create": "Créer",
+    "createdOn": "Créée le",
+    "lastModified": "Dernière modification",
+    "membersCount": "Nombre de membres",
+    "teamMembers": "Membres de l'équipe",
+    "noManager": "Aucun manager"
   }
 } 
