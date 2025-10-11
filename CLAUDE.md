@@ -5,7 +5,7 @@
 **EffiZen-AI** - Application React/TypeScript de bien-être au travail
 - **Production :** https://effizen-ai-prod.vercel.app
 - **Admin :** jbgerberon@gmail.com (ID: 8ac44380-8445-49a8-b4a9-16f602d0e7d4)
-- **Status :** ✅ Traductions i18n complètes (100% couverture) - Incident 10/10/2025 résolu
+- **Status :** ✅ Dashboard amélioré (double conseils + persistance) + Page Assistant + Format HH:MM - Déployé 11/10/2025
 
 ## 📁 DOCUMENTATION COMPLÈTE
 
@@ -52,14 +52,17 @@ npm run dev
 
 ### ✅ Opérationnel
 - Dashboard admin avec récupération données CSV
-- Système de conseils intelligent
+- **Système de conseils double (Santé + Organisation)**
+- **Page Assistant avec conseils détaillés**
+- **Persistance état Dashboard (période + dates)**
+- **Format temps HH:MM (durées lisibles)**
 - Export CSV complet
 - Reset password (3 solutions)
 - **Traductions i18n complètes (265/265 clés - 100%)**
 
 ### 🔧 En cours
 - Optimisation performances
-- Extension système conseils
+- Contenu page Assistant
 
 ### 📝 TODO Prioritaires
 Voir [`docs/features/TODO.md`](docs/features/TODO.md)
@@ -71,8 +74,8 @@ Voir [`docs/features/TODO.md`](docs/features/TODO.md)
 - **Historique ?** → [`docs/history/CHANGELOG.md`](docs/history/CHANGELOG.md)
 
 ---
-**Dernière mise à jour :** 2025-10-10
-**Version :** 8.1 - Traductions i18n complètes + Préconisations validation
+**Dernière mise à jour :** 2025-10-11
+**Version :** 9.0 - Dashboard amélioré + Page Assistant + Format HH:MM + Persistance état
 - to memorize : lorsque je te dirais d'effectuer une sauvegarde, tu devras suivre le process suivant : Pour sauvegarder les éléments d'une session :
 
   1. Pendant la session : Documentez dans le fichier approprié selon le type :
