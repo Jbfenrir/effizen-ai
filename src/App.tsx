@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import './i18n';
+import './i18n/index'; // Forcer le chemin explicite
 import './index.css';
 
 // Composants de base
@@ -13,6 +13,7 @@ import DashboardEmployee from './pages/DashboardEmployee';
 import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
+import Assistant from './pages/Assistant';
 
 // Import du vrai hook d'authentification
 import { useAuth } from './hooks/useAuth';
@@ -66,15 +67,21 @@ function App() {
                 )
               } 
             />
-            <Route 
-              path="/entry" 
+            <Route
+              path="/entry"
               element={
                 isAuthenticated ? <EntryForm /> : <Navigate to="/login" replace />
-              } 
+              }
             />
-            <Route 
-              path="/" 
-              element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} 
+            <Route
+              path="/assistant"
+              element={
+                isAuthenticated ? <Assistant /> : <Navigate to="/login" replace />
+              }
+            />
+            <Route
+              path="/"
+              element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
             />
           </Routes>
         </main>

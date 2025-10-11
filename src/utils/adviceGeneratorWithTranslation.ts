@@ -8,6 +8,14 @@ export interface SmartAdvice {
   recommendation: string;
   color: string;
   icon: string;
+  category: 'health' | 'organization'; // Santé ou Organisation
+  scientificSources?: string[]; // Sources scientifiques
+  learnMoreUrl?: string; // URL pour en savoir plus (assistant)
+}
+
+export interface AdvicePair {
+  health: SmartAdvice;
+  organization: SmartAdvice;
 }
 
 // Traductions des conseils IA
@@ -36,6 +44,14 @@ const adviceTranslations = {
     excellent: {
       diagnosis: "Behavioral analysis: Excellent overall balance with optimal performance maintained.",
       recommendation: "• Continue your good habits to maintain this balance\n• Share your best practices with your team\n• Experiment with advanced optimization techniques\n• Monitor early warning signals to prevent decline"
+    },
+    healthGood: {
+      diagnosis: "Health analysis: Your well-being indicators are excellent.",
+      recommendation: "Your sleep, energy, and breaks are optimal. Keep up these good habits that allow you to maintain your health and vitality at work."
+    },
+    organizationGood: {
+      diagnosis: "Organization analysis: Your time management is excellent.",
+      recommendation: "You dedicate most of your time to high-value tasks. Continue with this prioritization strategy that maximizes your impact."
     }
   },
   fr: {
@@ -62,12 +78,58 @@ const adviceTranslations = {
     excellent: {
       diagnosis: "Analyse comportementale : Excellent équilibre général avec performance optimale maintenue.",
       recommendation: "• Continuez vos bonnes habitudes pour maintenir cet équilibre\n• Partagez vos meilleures pratiques avec votre équipe\n• Expérimentez des techniques d'optimisation avancées\n• Surveillez les signaux faibles pour prévenir toute baisse"
+    },
+    healthGood: {
+      diagnosis: "Analyse santé : Vos indicateurs de bien-être sont excellents.",
+      recommendation: "Votre sommeil, votre énergie et vos pauses sont optimaux. Continuez ces bonnes habitudes qui vous permettent de maintenir votre santé et votre vitalité au travail."
+    },
+    organizationGood: {
+      diagnosis: "Analyse organisation : Votre gestion du temps est excellente.",
+      recommendation: "Vous consacrez la majorité de votre temps aux tâches à forte valeur ajoutée. Poursuivez cette stratégie de priorisation qui maximise votre impact."
     }
   }
 };
 
 /**
- * Générateur de conseils intelligent avec traduction
+ * Générateur de paire de conseils (Santé + Organisation)
+ */
+export const generateAdvicePair = async (
+  entries: DailyEntry[],
+  analytics: AnalyticsData
+): Promise<AdvicePair> => {
+  // Forcer la langue basée sur i18n.language, avec fallback sur 'fr'
+  const detectedLang = i18n.language || 'fr';
+  const lang = (detectedLang.startsWith('fr') ? 'fr' : detectedLang.startsWith('en') ? 'en' : 'fr') as 'en' | 'fr';
+  console.log('🌍 generateAdvicePair - Langue détectée:', i18n.language, '→ Langue utilisée:', lang);
+  const translations = adviceTranslations[lang] || adviceTranslations.fr;
+
+  // Si pas de données, conseils par défaut
+  if (!analytics.dataAvailable) {
+    return {
+      health: {
+        diagnosis: translations.noData.diagnosis,
+        recommendation: translations.noData.recommendation,
+        color: 'bg-blue-100 border-l-4 border-blue-500',
+        icon: '📊',
+        category: 'health',
+        learnMoreUrl: '/assistant'
+      },
+      organization: {
+        diagnosis: translations.noData.diagnosis,
+        recommendation: translations.noData.recommendation,
+        color: 'bg-blue-100 border-l-4 border-blue-500',
+        icon: '📊',
+        category: 'organization',
+        learnMoreUrl: '/assistant'
+      }
+    };
+  }
+
+  return generateAdvicePairFallback(analytics, lang);
+};
+
+/**
+ * LEGACY: Générateur de conseils intelligent avec traduction (garde pour compatibilité)
  */
 export const generateSmartAdvice = async (
   entries: DailyEntry[],
@@ -83,7 +145,9 @@ export const generateSmartAdvice = async (
       diagnosis: translations.noData.diagnosis,
       recommendation: translations.noData.recommendation,
       color: 'bg-blue-100 border-l-4 border-blue-500',
-      icon: '📊'
+      icon: '📊',
+      category: 'organization',
+      learnMoreUrl: '/assistant'
     };
   }
 
@@ -99,7 +163,10 @@ export const generateSmartAdvice = async (
         diagnosis: expertAdvice.diagnosis,
         recommendation: expertAdvice.recommendation,
         color: expertAdvice.color || 'bg-yellow-100 border-l-4 border-yellow-500',
-        icon: expertAdvice.icon || '💡'
+        icon: expertAdvice.icon || '💡',
+        category: (expertAdvice as any).category || 'health',
+        scientificSources: (expertAdvice as any).scientificSources || [],
+        learnMoreUrl: '/assistant'
       };
     }
   } catch (error) {
@@ -133,7 +200,13 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
     return {
       ...translations.excellent,
       color: 'bg-green-100 border-l-4 border-green-500',
-      icon: '🌟'
+      icon: '🌟',
+      category: 'organization',
+      scientificSources: [
+        'Bakker & Demerouti (2017) - Job Demands-Resources Theory',
+        'Fredrickson (2001) - Broaden-and-build theory of positive emotions'
+      ],
+      learnMoreUrl: '/assistant'
     };
   }
 
@@ -145,7 +218,14 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
           return {
             ...translations.lowSleep,
             color: 'bg-purple-100 border-l-4 border-purple-500',
-            icon: '😴'
+            icon: '😴',
+            category: 'health',
+            scientificSources: [
+              'Walker, M. (2017) - Why We Sleep: Unlocking the Power of Sleep and Dreams',
+              'National Sleep Foundation (2015) - Sleep Duration Recommendations',
+              'Harvard Medical School (2019) - Sleep and Mental Health'
+            ],
+            learnMoreUrl: '/assistant'
           };
         }
         break;
@@ -155,7 +235,14 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
           return {
             ...translations.lowEnergy,
             color: 'bg-blue-100 border-l-4 border-blue-500',
-            icon: '⚡'
+            icon: '⚡',
+            category: 'health',
+            scientificSources: [
+              'Cirillo, F. (2006) - The Pomodoro Technique',
+              'Loehr & Schwartz (2003) - The Power of Full Engagement',
+              'WHO (2020) - Physical activity guidelines'
+            ],
+            learnMoreUrl: '/assistant'
           };
         }
         break;
@@ -165,7 +252,14 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
           return {
             ...translations.poorBalance,
             color: 'bg-teal-100 border-l-4 border-teal-500',
-            icon: '⚖️'
+            icon: '⚖️',
+            category: 'health',
+            scientificSources: [
+              'Maslach & Leiter (2016) - Understanding Burnout',
+              'Kabat-Zinn (1990) - Full Catastrophe Living: Using Mindfulness',
+              'APA (2019) - Stress in the Workplace'
+            ],
+            learnMoreUrl: '/assistant'
           };
         }
         break;
@@ -175,7 +269,14 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
           return {
             ...translations.lowOptimization,
             color: 'bg-orange-100 border-l-4 border-orange-500',
-            icon: '🎯'
+            icon: '🎯',
+            category: 'organization',
+            scientificSources: [
+              'Eisenhower, D. (1954) - Eisenhower Matrix',
+              'Newport, C. (2016) - Deep Work: Rules for Focused Success',
+              'Allen, D. (2001) - Getting Things Done: The Art of Stress-Free Productivity'
+            ],
+            learnMoreUrl: '/assistant'
           };
         }
         break;
@@ -191,7 +292,130 @@ const generateEnhancedFallbackAdvice = (analytics: AnalyticsData, lang: 'en' | '
       ? `• Priority: Focus on the lowest score area\n• Method: Apply one technique at a time\n• Tracking: Note your progress daily\n• Support: Consult a professional if symptoms persist`
       : `• Priorité : Focus sur le domaine au score le plus faible\n• Méthode : Appliquer une technique à la fois\n• Suivi : Noter vos progrès quotidiennement\n• Support : Consulter un professionnel si les symptômes persistent`,
     color: 'bg-yellow-100 border-l-4 border-yellow-500',
-    icon: '💡'
+    icon: '💡',
+    category: 'health',
+    scientificSources: [
+      'Seligman, M. (2011) - Flourish: A Visionary New Understanding of Happiness',
+      'Deci & Ryan (2000) - Self-Determination Theory'
+    ],
+    learnMoreUrl: '/assistant'
+  };
+};
+
+/**
+ * Génération de paire de conseils (Santé + Organisation) - Fallback
+ */
+const generateAdvicePairFallback = (analytics: AnalyticsData, lang: 'en' | 'fr' = 'fr'): AdvicePair => {
+  const { sleepScore, energyScore, breaksScore, optimizationScore } = analytics;
+  const translations = adviceTranslations[lang] || adviceTranslations.fr;
+
+  // Calcul score santé (moyenne sommeil, énergie, pauses)
+  const healthScore = (sleepScore + energyScore + breaksScore) / 3;
+
+  // CONSEIL SANTÉ
+  let healthAdvice: SmartAdvice;
+  if (healthScore >= 70) {
+    // Santé excellente
+    healthAdvice = {
+      ...translations.healthGood,
+      color: 'bg-green-100 border-l-4 border-green-500',
+      icon: '💚',
+      category: 'health',
+      scientificSources: [
+        'WHO (2020) - Guidelines on physical activity and sedentary behaviour',
+        'Walker, M. (2017) - Why We Sleep'
+      ],
+      learnMoreUrl: '/assistant'
+    };
+  } else {
+    // Trouver le problème santé principal
+    const healthScores = [
+      { domain: 'sleep', score: sleepScore },
+      { domain: 'energy', score: energyScore },
+      { domain: 'balance', score: breaksScore }
+    ];
+    const lowestHealthScore = Math.min(...healthScores.map(s => s.score));
+    const criticalHealthDomain = healthScores.find(s => s.score === lowestHealthScore);
+
+    switch (criticalHealthDomain?.domain) {
+      case 'sleep':
+        healthAdvice = {
+          ...translations.lowSleep,
+          color: 'bg-purple-100 border-l-4 border-purple-500',
+          icon: '😴',
+          category: 'health',
+          scientificSources: [
+            'Walker, M. (2017) - Why We Sleep: Unlocking the Power of Sleep and Dreams',
+            'National Sleep Foundation (2015) - Sleep Duration Recommendations',
+            'Harvard Medical School (2019) - Sleep and Mental Health'
+          ],
+          learnMoreUrl: '/assistant'
+        };
+        break;
+      case 'energy':
+        healthAdvice = {
+          ...translations.lowEnergy,
+          color: 'bg-blue-100 border-l-4 border-blue-500',
+          icon: '⚡',
+          category: 'health',
+          scientificSources: [
+            'Cirillo, F. (2006) - The Pomodoro Technique',
+            'Loehr & Schwartz (2003) - The Power of Full Engagement',
+            'WHO (2020) - Physical activity guidelines'
+          ],
+          learnMoreUrl: '/assistant'
+        };
+        break;
+      default:
+        healthAdvice = {
+          ...translations.poorBalance,
+          color: 'bg-teal-100 border-l-4 border-teal-500',
+          icon: '⚖️',
+          category: 'health',
+          scientificSources: [
+            'Maslach & Leiter (2016) - Understanding Burnout',
+            'Kabat-Zinn (1990) - Full Catastrophe Living: Using Mindfulness',
+            'APA (2019) - Stress in the Workplace'
+          ],
+          learnMoreUrl: '/assistant'
+        };
+    }
+  }
+
+  // CONSEIL ORGANISATION
+  let organizationAdvice: SmartAdvice;
+  if (optimizationScore >= 70) {
+    // Organisation excellente
+    organizationAdvice = {
+      ...translations.organizationGood,
+      color: 'bg-green-100 border-l-4 border-green-500',
+      icon: '🎯',
+      category: 'organization',
+      scientificSources: [
+        'Bakker & Demerouti (2017) - Job Demands-Resources Theory',
+        'Newport, C. (2016) - Deep Work: Rules for Focused Success'
+      ],
+      learnMoreUrl: '/assistant'
+    };
+  } else {
+    // Organisation à améliorer
+    organizationAdvice = {
+      ...translations.lowOptimization,
+      color: 'bg-orange-100 border-l-4 border-orange-500',
+      icon: '📊',
+      category: 'organization',
+      scientificSources: [
+        'Eisenhower, D. (1954) - Eisenhower Matrix',
+        'Newport, C. (2016) - Deep Work: Rules for Focused Success',
+        'Allen, D. (2001) - Getting Things Done: The Art of Stress-Free Productivity'
+      ],
+      learnMoreUrl: '/assistant'
+    };
+  }
+
+  return {
+    health: healthAdvice,
+    organization: organizationAdvice
   };
 };
 

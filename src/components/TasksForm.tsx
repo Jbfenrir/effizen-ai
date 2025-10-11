@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Target, Clock, AlertTriangle } from 'lucide-react';
 import TaskAutocomplete from './TaskAutocomplete';
 import { useTaskHistory } from '../hooks/useTaskHistory';
+import { hoursToHHMM } from '../utils/timeFormat';
 import type { Task } from '../types';
 
 interface TasksFormProps {
@@ -123,9 +124,9 @@ const TasksForm: React.FC<TasksFormProps> = ({
         ) : (
           tasks.map((task, index) => (
             <div key={task.id} data-task-id={task.id} className="border border-light-gray rounded-lg p-4">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                {/* Nom de la tâche */}
-                <div className="md:col-span-4">
+              <div className="flex flex-col space-y-4">
+                {/* Nom de la tâche - Full width on all screens */}
+                <div className="w-full">
                   <label className="form-label text-sm">
                     {t('tasks.taskName')} #{index + 1}
                   </label>
@@ -138,76 +139,79 @@ const TasksForm: React.FC<TasksFormProps> = ({
                   />
                 </div>
 
-                {/* Durée */}
-                <div className="md:col-span-2">
-                  <label className="form-label text-sm">
-                    {t('tasks.duration')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="12"
-                      step="0.5"
-                      value={task.duration}
-                      onChange={(e) => updateTask(task.id, 'duration', parseFloat(e.target.value) || 0)}
-                      className="form-input pr-8"
-                      disabled={disabled}
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-metallic-gray text-sm">
-                      h
-                    </span>
+                {/* Row 2: Duration + Task Type + Delete button */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+                  {/* Durée */}
+                  <div className="lg:col-span-3">
+                    <label className="form-label text-sm">
+                      {t('tasks.duration')}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        max="12"
+                        step="0.5"
+                        value={task.duration}
+                        onChange={(e) => updateTask(task.id, 'duration', parseFloat(e.target.value) || 0)}
+                        className="form-input pr-8 w-full"
+                        disabled={disabled}
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-metallic-gray text-sm">
+                        h
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Haute valeur */}
-                <div className="md:col-span-3">
-                  <label className="form-label text-sm">
-                    {t('tasks.taskType')}
-                  </label>
-                  <div className="flex space-x-2">
+                  {/* Haute valeur */}
+                  <div className="lg:col-span-6">
+                    <label className="form-label text-sm">
+                      {t('tasks.taskType')}
+                    </label>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => updateTask(task.id, 'isHighValue', true)}
+                        disabled={disabled}
+                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                          task.isHighValue
+                            ? 'bg-lime-green text-white'
+                            : 'bg-light-gray text-dark-blue hover:bg-gray-200'
+                        }`}
+                      >
+                        {t('tasks.highValue')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateTask(task.id, 'isHighValue', false)}
+                        disabled={disabled}
+                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                          !task.isHighValue
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-light-gray text-dark-blue hover:bg-gray-200'
+                        }`}
+                      >
+                        {t('tasks.lowValue')}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="lg:col-span-3 flex items-end">
                     <button
                       type="button"
-                      onClick={() => updateTask(task.id, 'isHighValue', true)}
+                      onClick={() => removeTask(task.id)}
                       disabled={disabled}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                        task.isHighValue
-                          ? 'bg-lime-green text-white'
-                          : 'bg-light-gray text-dark-blue hover:bg-gray-200'
-                      }`}
+                      className="btn-secondary flex items-center justify-center space-x-1 text-red-600 hover:text-red-700 w-full"
                     >
-                      {t('tasks.highValue')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateTask(task.id, 'isHighValue', false)}
-                      disabled={disabled}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                        !task.isHighValue
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-light-gray text-dark-blue hover:bg-gray-200'
-                      }`}
-                    >
-                      {t('tasks.lowValue')}
+                      <Trash2 size={16} />
+                      <span>{t('tasks.delete')}</span>
                     </button>
                   </div>
-                </div>
-
-                {/* Actions */}
-                <div className="md:col-span-2 flex items-end">
-                  <button
-                    type="button"
-                    onClick={() => removeTask(task.id)}
-                    disabled={disabled}
-                    className="btn-secondary flex items-center space-x-1 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 size={16} />
-                    <span>{t('tasks.delete')}</span>
-                  </button>
                 </div>
 
                 {/* Indicateur visuel */}
-                <div className="md:col-span-1 flex justify-center">
+                <div className="flex justify-start">
                   <div className={`w-4 h-4 rounded-full ${
                     task.isHighValue ? 'bg-lime-green' : 'bg-red-400'
                   }`} />
@@ -233,7 +237,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
               <div className={`text-2xl font-bold ${
                 totalDuration > 8 ? 'text-red-600' : 'text-dark-blue'
               }`}>
-                {totalDuration.toFixed(1)} h
+                {hoursToHHMM(totalDuration)}
               </div>
               {totalDuration > 8 && (
                 <p className="text-red-600 text-xs mt-1 flex items-center justify-center space-x-1">
@@ -255,7 +259,7 @@ const TasksForm: React.FC<TasksFormProps> = ({
                 {hvRatio.toFixed(0)}%
               </div>
               <p className="text-xs text-metallic-gray mt-1">
-                {highValueDuration.toFixed(1)}h / {totalDuration.toFixed(1)}h
+                {hoursToHHMM(highValueDuration)} / {hoursToHHMM(totalDuration)}
               </p>
             </div>
 
@@ -267,11 +271,11 @@ const TasksForm: React.FC<TasksFormProps> = ({
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
                   <span className="text-lime-green">{t('tasks.highValueShort')}</span>
-                  <span>{highValueDuration.toFixed(1)}h</span>
+                  <span>{hoursToHHMM(highValueDuration)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-red-600">{t('tasks.lowValueShort')}</span>
-                  <span>{(totalDuration - highValueDuration).toFixed(1)}h</span>
+                  <span>{hoursToHHMM(totalDuration - highValueDuration)}</span>
                 </div>
               </div>
             </div>

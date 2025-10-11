@@ -1,20 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart3, TrendingUp, Activity, Target, Clock, Heart, Calendar, ChevronDown } from 'lucide-react';
+import { BarChart3, TrendingUp, Activity, Target, Clock, Heart, Calendar, ChevronDown, BookOpen, ExternalLink } from 'lucide-react';
 import EnergyBar from '../components/EnergyBar';
 import DateRangePicker from '../components/DateRangePicker';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { getDateRangeForPeriod, formatDateRange, type PeriodType, type DateRange } from '../utils/dateUtils';
 import { calculateAnalyticsForPeriod, getAllEntries, type AnalyticsData } from '../utils/dataAnalytics';
-import { generateSmartAdvice, type SmartAdvice } from '../utils/adviceGeneratorWithTranslation';
+import { generateAdvicePair, type AdvicePair, type SmartAdvice } from '../utils/adviceGeneratorWithTranslation';
 import DataMigration from '../utils/dataMigration';
 import DataIntegrityAlert from '../components/DataIntegrityAlert';
 
 
 const DashboardEmployee: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('week');
-  const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
+
+  // Restaurer la période depuis l'URL ou localStorage
+  const getInitialPeriod = (): PeriodType => {
+    const params = new URLSearchParams(window.location.search);
+    const periodParam = params.get('period');
+    if (periodParam && ['today', 'week', 'month', 'custom'].includes(periodParam)) {
+      return periodParam as PeriodType;
+    }
+    const savedPeriod = localStorage.getItem('dashboardPeriod');
+    if (savedPeriod && ['today', 'week', 'month', 'custom'].includes(savedPeriod)) {
+      return savedPeriod as PeriodType;
+    }
+    return 'week';
+  };
+
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>(getInitialPeriod());
+
+  // Restaurer customDateRange depuis localStorage
+  const getInitialCustomRange = (): DateRange | null => {
+    const savedRange = localStorage.getItem('dashboardCustomRange');
+    if (savedRange) {
+      try {
+        const parsed = JSON.parse(savedRange);
+        // Convertir les strings en objets Date
+        if (parsed && parsed.start && parsed.end) {
+          return {
+            start: new Date(parsed.start),
+            end: new Date(parsed.end)
+          } as DateRange;
+        }
+      } catch (e) {
+        console.warn('Erreur parsing dashboardCustomRange:', e);
+        localStorage.removeItem('dashboardCustomRange'); // Nettoyer la valeur corrompue
+      }
+    }
+    return null;
+  };
+
+  const [customDateRange, setCustomDateRange] = useState<DateRange | null>(getInitialCustomRange());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     wellbeingScore: 0,
@@ -30,8 +67,8 @@ const DashboardEmployee: React.FC = () => {
     dataAvailable: false,
     daysWithData: 0
   });
-  
-  const [smartAdvice, setSmartAdvice] = useState<SmartAdvice | null>(null);
+
+  const [advicePair, setAdvicePair] = useState<AdvicePair | null>(null);
 
   // Exposer DataMigration globalement pour debugging
   useEffect(() => {
@@ -50,13 +87,13 @@ const DashboardEmployee: React.FC = () => {
         const analyticsData = calculateAnalyticsForPeriod(entries, dateRange);
         setAnalytics(analyticsData);
         
-        // Générer les conseils intelligents
+        // Générer les conseils intelligents (paire Santé + Organisation)
         try {
-          const advice = await generateSmartAdvice(entries, analyticsData);
-          setSmartAdvice(advice);
+          const advice = await generateAdvicePair(entries, analyticsData);
+          setAdvicePair(advice);
         } catch (error) {
           console.warn('Erreur génération conseils:', error);
-          setSmartAdvice(null);
+          setAdvicePair(null);
         }
       } catch (error) {
         console.error('Erreur chargement données:', error);
@@ -75,10 +112,10 @@ const DashboardEmployee: React.FC = () => {
           dataAvailable: false,
           daysWithData: 0
         });
-        setSmartAdvice(null);
+        setAdvicePair(null);
       }
     };
-    
+
     loadAnalyticsAndAdvice();
   }, [selectedPeriod, customDateRange]);
 
@@ -88,12 +125,17 @@ const DashboardEmployee: React.FC = () => {
     } else {
       setSelectedPeriod(period);
       setCustomDateRange(null);
+      // Sauvegarder dans localStorage pour persistance
+      localStorage.setItem('dashboardPeriod', period);
     }
   };
 
   const handleCustomDateRange = (range: DateRange) => {
     setCustomDateRange(range);
     setSelectedPeriod('custom');
+    // Sauvegarder dans localStorage pour persistance
+    localStorage.setItem('dashboardPeriod', 'custom');
+    localStorage.setItem('dashboardCustomRange', JSON.stringify(range));
   };
 
   const getCurrentDateRange = () => {
@@ -406,35 +448,129 @@ const DashboardEmployee: React.FC = () => {
           </div>
         </div>
 
-        {/* Conseils intelligents avec diagnostic et recommandations */}
-        {smartAdvice && (
-          <div className={`mt-8 rounded-lg ${smartAdvice.color}`}>
-            <div className="p-6">
-              <div className="flex items-start space-x-4">
-                <div className="text-3xl">{smartAdvice.icon}</div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-dark-blue text-lg mb-3">
-                    {t('dashboard.employee.expertDiagnosis')}
-                  </h3>
-                  <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
-                    <p className="text-dark-blue font-medium">{smartAdvice.diagnosis}</p>
-                  </div>
-                  
-                  <h3 className="font-bold text-dark-blue text-lg mb-3">
-                    {t('dashboard.employee.practicalAdvice')}
-                  </h3>
-                  <div className="bg-white bg-opacity-50 rounded-lg p-4">
-                    <div className="text-dark-blue whitespace-pre-line">{smartAdvice.recommendation}</div>
-                  </div>
-                  
-                  {dataAvailable && (
-                    <div className="mt-4 text-sm text-dark-blue opacity-75">
-                      {t('dashboard.employee.basedOnAnalysis', { days: daysWithData })}
-                    </div>
-                  )}
+        {/* Conseils intelligents avec diagnostic et recommandations - 2 BLOCS */}
+        {advicePair && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            {/* BLOC 1: SANTÉ */}
+            <div className={`rounded-lg ${advicePair.health.color}`}>
+              <div className="p-6">
+                {/* En-tête avec catégorie */}
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="text-3xl">{advicePair.health.icon}</div>
+                  <span className="px-3 py-1 bg-white bg-opacity-70 rounded-full text-xs font-semibold text-dark-blue">
+                    {t('dashboard.employee.categoryHealth')}
+                  </span>
                 </div>
+
+                {/* Diagnostic */}
+                <h3 className="font-bold text-dark-blue text-lg mb-3">
+                  {t('dashboard.employee.expertDiagnosis')}
+                </h3>
+                <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                  <p className="text-dark-blue font-medium">{advicePair.health.diagnosis}</p>
+                </div>
+
+                {/* Conseils */}
+                <h3 className="font-bold text-dark-blue text-lg mb-3">
+                  {t('dashboard.employee.practicalAdvice')}
+                </h3>
+                <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                  <div className="text-dark-blue whitespace-pre-line">{advicePair.health.recommendation}</div>
+                </div>
+
+                {/* Sources scientifiques */}
+                {advicePair.health.scientificSources && advicePair.health.scientificSources.length > 0 && (
+                  <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                    <div className="flex items-start space-x-2 mb-2">
+                      <BookOpen size={16} className="text-dark-blue mt-1 flex-shrink-0" />
+                      <h4 className="font-semibold text-dark-blue text-sm">
+                        {t('dashboard.employee.scientificSources')}
+                      </h4>
+                    </div>
+                    <ul className="text-xs text-dark-blue space-y-1 ml-6">
+                      {advicePair.health.scientificSources.map((source, index) => (
+                        <li key={index} className="opacity-80">• {source}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Bouton En savoir plus */}
+                {advicePair.health.learnMoreUrl && (
+                  <a
+                    href={advicePair.health.learnMoreUrl}
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-70 hover:bg-opacity-90 text-dark-blue font-medium rounded-lg transition-all duration-200"
+                  >
+                    <ExternalLink size={16} />
+                    <span>{t('dashboard.employee.learnMore')}</span>
+                  </a>
+                )}
               </div>
             </div>
+
+            {/* BLOC 2: ORGANISATION */}
+            <div className={`rounded-lg ${advicePair.organization.color}`}>
+              <div className="p-6">
+                {/* En-tête avec catégorie */}
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="text-3xl">{advicePair.organization.icon}</div>
+                  <span className="px-3 py-1 bg-white bg-opacity-70 rounded-full text-xs font-semibold text-dark-blue">
+                    {t('dashboard.employee.categoryOrganization')}
+                  </span>
+                </div>
+
+                {/* Diagnostic */}
+                <h3 className="font-bold text-dark-blue text-lg mb-3">
+                  {t('dashboard.employee.expertDiagnosis')}
+                </h3>
+                <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                  <p className="text-dark-blue font-medium">{advicePair.organization.diagnosis}</p>
+                </div>
+
+                {/* Conseils */}
+                <h3 className="font-bold text-dark-blue text-lg mb-3">
+                  {t('dashboard.employee.practicalAdvice')}
+                </h3>
+                <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                  <div className="text-dark-blue whitespace-pre-line">{advicePair.organization.recommendation}</div>
+                </div>
+
+                {/* Sources scientifiques */}
+                {advicePair.organization.scientificSources && advicePair.organization.scientificSources.length > 0 && (
+                  <div className="bg-white bg-opacity-50 rounded-lg p-4 mb-4">
+                    <div className="flex items-start space-x-2 mb-2">
+                      <BookOpen size={16} className="text-dark-blue mt-1 flex-shrink-0" />
+                      <h4 className="font-semibold text-dark-blue text-sm">
+                        {t('dashboard.employee.scientificSources')}
+                      </h4>
+                    </div>
+                    <ul className="text-xs text-dark-blue space-y-1 ml-6">
+                      {advicePair.organization.scientificSources.map((source, index) => (
+                        <li key={index} className="opacity-80">• {source}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Bouton En savoir plus */}
+                {advicePair.organization.learnMoreUrl && (
+                  <a
+                    href={advicePair.organization.learnMoreUrl}
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-70 hover:bg-opacity-90 text-dark-blue font-medium rounded-lg transition-all duration-200"
+                  >
+                    <ExternalLink size={16} />
+                    <span>{t('dashboard.employee.learnMore')}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Note basée sur l'analyse */}
+        {dataAvailable && advicePair && (
+          <div className="mt-4 text-center text-sm text-metallic-gray">
+            {t('dashboard.employee.basedOnAnalysis', { days: daysWithData })}
           </div>
         )}
         

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import './i18n';
+import './i18n/index'; // Forcer le chemin explicite
 import './index.css';
 
 // Composants de base
@@ -12,6 +12,7 @@ import DashboardEmployee from './pages/DashboardEmployee';
 import DashboardManager from './pages/DashboardManager';
 import DashboardAdmin from './pages/DashboardAdmin';
 import EntryForm from './pages/EntryForm';
+import Assistant from './pages/Assistant';
 import TestLoadingPage from './pages/TestLoadingPage';
 import AdviceEngineTest from './components/AdviceEngineTest';
 
@@ -176,10 +177,13 @@ function AppRouter() {
         
         {/* Formulaire d'entrée - uniquement si authentifié */}
         {isAuthenticated && currentPath === '/entry' && <EntryForm />}
-        
+
+        {/* Page Assistant - uniquement si authentifié */}
+        {isAuthenticated && currentPath === '/assistant' && <Assistant />}
+
         {/* Page de test du bouton d'urgence */}
         {currentPath === '/test-loading' && <TestLoadingPage />}
-        
+
         {/* Test du moteur de conseils - accessible en développement */}
         {currentPath === '/test-advice' && <AdviceEngineTest />}
       </main>
