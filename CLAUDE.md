@@ -5,7 +5,7 @@
 **EffiZen-AI** - Application React/TypeScript de bien-être au travail
 - **Production :** https://effizen-ai-prod.vercel.app
 - **Admin :** jbgerberon@gmail.com (ID: 8ac44380-8445-49a8-b4a9-16f602d0e7d4)
-- **Status :** ✅ Dashboard amélioré (double conseils + persistance) + Page Assistant + Format HH:MM - Déployé 11/10/2025
+- **Status :** ✅ Corrections exports CSV + Trigger auto-sync Auth/Profiles - En attente exécution SQL (16/10/2025)
 
 ## 📁 DOCUMENTATION COMPLÈTE
 
@@ -56,11 +56,13 @@ npm run dev
 - **Page Assistant avec conseils détaillés**
 - **Persistance état Dashboard (période + dates)**
 - **Format temps HH:MM (durées lisibles)**
-- Export CSV complet
+- **Export CSV personnel et global (robustes JSONB)**
 - Reset password (3 solutions)
-- **Traductions i18n complètes (265/265 clés - 100%)**
+- **Traductions i18n complètes (277/277 clés - 100%)**
 
-### 🔧 En cours
+### 🔧 En cours / Attente utilisateur
+- **Trigger auto-sync Auth ↔ Profiles** (script SQL prêt, à exécuter dans Supabase Dashboard)
+- Infrastructure Phase 2 (dashboards multi-vues : Personnel/Équipe/Tous)
 - Optimisation performances
 - Contenu page Assistant
 
@@ -74,8 +76,8 @@ Voir [`docs/features/TODO.md`](docs/features/TODO.md)
 - **Historique ?** → [`docs/history/CHANGELOG.md`](docs/history/CHANGELOG.md)
 
 ---
-**Dernière mise à jour :** 2025-10-11
-**Version :** 9.0 - Dashboard amélioré + Page Assistant + Format HH:MM + Persistance état
+**Dernière mise à jour :** 2025-10-16
+**Version :** 9.1 - Corrections exports CSV + Trigger auto-sync Auth/Profiles + Infrastructure dashboards multi-vues
 - to memorize : lorsque je te dirais d'effectuer une sauvegarde, tu devras suivre le process suivant : Pour sauvegarder les éléments d'une session :
 
   1. Pendant la session : Documentez dans le fichier approprié selon le type :

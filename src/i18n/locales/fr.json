@@ -281,6 +281,7 @@
       "excellentEngagement": "Excellent engagement",
       "lowEngagement": "Faible engagement",
       "globalExport": "Export global",
+      "noDataToExport": "Aucune donnée à exporter",
       "passwordReset": {
         "title": "Réinitialisation du mot de passe",
         "resetFor": "Réinitialiser pour {{name}}",
@@ -351,5 +352,17 @@
     "membersCount": "Nombre de membres",
     "teamMembers": "Membres de l'équipe",
     "noManager": "Aucun manager"
+  },
+  "viewSelector": {
+    "viewLabel": "Vue",
+    "myData": "Mes données",
+    "myTeam": "Mon équipe",
+    "allUsers": "Tous les utilisateurs",
+    "selectTeam": "Sélectionner une équipe",
+    "allTeams": "Toutes les équipes",
+    "personalMode": "Mode personnel",
+    "teamMode": "Mode équipe (anonymisé)",
+    "globalMode": "Mode global (anonymisé)",
+    "anonymizedData": "Données agrégées et anonymisées"
   }
 } 

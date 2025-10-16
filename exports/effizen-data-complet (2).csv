@@ -1,0 +1,36 @@
+Date;Sommeil (h);Fatigue;Energie;Pauses;Bien-être;Score d'optimisation;Tâches
+2025-07-11;7.5;;4;0;40;0;
+2025-07-12;6.5;;3;0;36;0;
+2025-07-13;8;;5;0;41;0;
+2025-07-14;7;;4;0;38;0;
+2025-07-15;7.5;;5;0;40;0;
+2025-08-01;6;;2;0;34;0;
+2025-08-02;7.5;;4;0;40;0;
+2025-08-11;8;2;50;0;53;0;App (1h) | Recherche (2h) | Veille (3h) | Prep Rdv (2h)
+2025-08-12;7;4;50;0;40;0;Recherche (3h) | Admin (2h) | Veille (3h)
+2025-08-13;8;4;50;0;43;0;App (2h) | Veille (2h) | Prep Rdv (1h) | Recherche (3h)
+2025-08-14;0;5;50;0;13;0;App (1h) | Recherche (5h) | Prep rdv (0.5h)
+2025-08-18;8.5;3;50;0;48;0;Veille (3h) | Prep forma (1.5h) | Recherche (2.5h) | App (1.5h)
+2025-08-19;8;3;50;0;48;0;Prep forma (3h) | Networking (6h) | Transport (1.5h)
+2025-08-20;7.5;3;50;0;46;0;Rdv (1h) | Mails (1.5h) | Prep rdv (2h) | Transport (1.5h)
+2025-08-22;7.5;4;50;0;41;0;Rdv (2.5h) | prep froma (6h)
+2025-08-25;8.5;5;50;0;38;0;Recherche (2.5h) | Partenariat (0.5h) | mails (1h) | Admin (0.5h) | prep forma (3.5h)
+2025-08-26;8;5;50;0;38;0;admin (1h) | forma (4.5h) | Transport (1.5h)
+2025-08-27;7.25;4;50;0;40;0;prep forma (0.5h) | app (3h) | rdv (1.5h) | Admin (2h)
+2025-08-28;7.5;4;50;0;41;0;rdv (0.5h) | partenariat (4h) | App (2h) | Networking (4h)
+2025-08-29;8.5;3;50;0;48;0;Admin (3.5h) | rdv (1h) | prep forma (2h)
+2025-09-01;6.5;3;50;0;43;0;partenariat (4.5h) | app (1h) | Mails (1h) | Admin (1h)
+2025-09-02;8.5;3;50;0;48;0;Transport (2.5h) | rdv perso (1h) | Networking (4h)
+2025-09-03;0;3;50;0;23;0;Rdv (2h) | prep forma (7h) | Networking (1h) | admin (1h)
+2025-09-04;8;4;50;0;43;0;prep forma (6h) | rdv (2.5h) | mails (0.5h)
+2025-09-05;0;5;50;0;13;0;Admin (1h) | prep forma (7h) | rdv (1h) | mails (0.5h)
+2025-09-08;8;5;50;0;38;0;prep forma (11h)
+2025-09-09;7;4;50;0;40;0;forma (7.5h) | Transport (2h)
+2025-09-10;8;4;50;0;43;0;mails (2h) | rdv (0.5h) | prep forma (5h) | App (1.5h)
+2025-09-11;6;4;50;0;36;0;Strategic (4.5h) | mails (2h) | App (1.5h)
+2025-09-12;7.5;5;50;0;36;0;
+2025-09-15;7.666666666666667;4;50;0;42;0;Veille (3h) | Mails (1h) | prep forma (2h) | prep rdv (1h) | admin (1.5h)
+2025-09-16;7.333333333333333;4;50;0;41;0;Admin (1.5h) | Networking (3.5h) | prep rdv (1h) | Transports (1h)
+2025-09-17;8.333333333333334;5;50;0;38;0;prep forma (3.5h) | rdv (0.5h)
+2025-09-22;8.333333333333334;2;50;0;53;0;orga (1h) | mails (0.5h) | rdv (1h) | admin (4h) | prep forma (2h)
+2025-09-23;7.833333333333333;3;50;0;47;0;

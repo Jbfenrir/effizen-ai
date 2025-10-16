@@ -36,11 +36,28 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   // Fonction d'export CSV
   const exportData = async () => {
     try {
-      // Import dynamique pour éviter les erreurs
-      const { getAllEntries } = await import('../utils/dataAnalytics');
-      
-      // Récupérer toutes les entrées depuis la source appropriée
-      const entries = await getAllEntries();
+      // Import dynamique de la fonction correcte
+      const { supabase } = await import('../services/supabase');
+
+      // Récupérer l'utilisateur connecté
+      const { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+      if (userError || !authUser) {
+        alert('Erreur : utilisateur non connecté');
+        return;
+      }
+
+      // Récupérer toutes les entrées de l'utilisateur depuis Supabase
+      const { data: entries, error } = await supabase
+        .from('daily_entries')
+        .select('*')
+        .eq('user_id', authUser.id)
+        .order('entry_date', { ascending: true });
+
+      if (error) {
+        console.error('Erreur récupération données:', error);
+        alert('Erreur lors de la récupération des données.');
+        return;
+      }
     
     if (entries.length === 0) {
       alert('Aucune donnée à exporter.');
@@ -132,10 +149,21 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
       // Compter les pauses actives
       const pausesActive = e.wellbeing?.meditationsPauses ? [
         e.wellbeing.meditationsPauses.morning,
-        e.wellbeing.meditationsPauses.noon, 
+        e.wellbeing.meditationsPauses.noon,
         e.wellbeing.meditationsPauses.afternoon,
         e.wellbeing.meditationsPauses.evening
       ].filter(Boolean).length : 0;
+
+      // Gérer tasks qui peut être un tableau ou null/undefined
+      let tasksString = '';
+      try {
+        if (e.tasks && Array.isArray(e.tasks)) {
+          tasksString = e.tasks.map((t: any) => `${t.name} (${t.duration}h)`).join(' | ');
+        }
+      } catch (err) {
+        console.warn('Erreur parsing tasks:', err);
+        tasksString = '';
+      }
 
       return [
         e.entry_date,
@@ -145,7 +173,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
         pausesActive,
         wellbeingScore,
         optimizationScore,
-        (e.tasks || []).map(t => `${t.name} (${t.duration}h)`).join(' | ')
+        tasksString
       ];
     });
     

@@ -184,6 +184,151 @@ const DashboardAdmin: React.FC = () => {
     loadDashboardData();
   };
 
+  // Export global CSV de toutes les données
+  const handleGlobalExport = async () => {
+    try {
+      // Récupérer toutes les entrées de tous les utilisateurs
+      const { data: allEntries, error } = await adminService.getAllEntries();
+
+      if (error || !allEntries || allEntries.length === 0) {
+        alert(t('dashboard.admin.noDataToExport') || 'Aucune donnée à exporter.');
+        return;
+      }
+
+      // Fonctions de calcul des scores (réutilisées depuis dataAnalytics)
+      const calculateSleepScore = (sleepData: any): number => {
+        if (!sleepData || sleepData.duration === undefined) return 0;
+        return Math.min((sleepData.duration / 8) * 100, 100);
+      };
+
+      const calculateEnergyScore = (wellbeingData: any): number => {
+        if (!wellbeingData || wellbeingData.energy === undefined) return 0;
+        return wellbeingData.energy;
+      };
+
+      const calculateBreaksScore = (wellbeingData: any): number => {
+        if (!wellbeingData) return 0;
+
+        let pausesScore = 0;
+        if (wellbeingData.meditationsPauses) {
+          const pausesCount = [
+            wellbeingData.meditationsPauses.morning,
+            wellbeingData.meditationsPauses.noon,
+            wellbeingData.meditationsPauses.afternoon,
+            wellbeingData.meditationsPauses.evening
+          ].filter(Boolean).length;
+          pausesScore = (pausesCount / 4) * 40;
+        }
+
+        let sportScore = 0;
+        if (wellbeingData.sportLeisureHours !== undefined) {
+          sportScore = Math.min((wellbeingData.sportLeisureHours / 1) * 40, 40);
+        }
+
+        let socialScore = 0;
+        if (wellbeingData.socialInteraction === true) {
+          socialScore = 20;
+        }
+
+        return Math.round(pausesScore + sportScore + socialScore);
+      };
+
+      const calculateOptimizationScore = (tasksData: any[], focusData: any): number => {
+        if (!tasksData?.length || !focusData) return 0;
+
+        const totalHours = focusData.morningHours + focusData.afternoonHours;
+        if (totalHours === 0) return 0;
+
+        const highValueTasks = tasksData.filter((task: any) => task.isHighValue);
+        const highValueHours = highValueTasks.reduce((sum: number, task: any) => sum + task.duration, 0);
+
+        const efficiency = (highValueHours / totalHours) * 100;
+        const fatigueBonus = Math.max(0, (5 - focusData.fatigue) * 5);
+
+        return Math.min(efficiency + fatigueBonus, 100);
+      };
+
+      const calculateFatigueScore = (focusData: any): number => {
+        if (!focusData || focusData.fatigue === undefined) return 60;
+        return (5 - focusData.fatigue) * 20;
+      };
+
+      // Générer le CSV
+      const headers = [
+        'User ID',
+        'Email',
+        'Team',
+        'Date',
+        'Sommeil (h)',
+        'Fatigue',
+        'Energie',
+        'Pauses',
+        'Bien-être',
+        'Score d\'optimisation',
+        'Tâches'
+      ];
+
+      const rows = await Promise.all(allEntries.map(async (entry: any) => {
+        // Récupérer les infos utilisateur
+        const user = users.find(u => u.id === entry.user_id);
+
+        const sleepScore = Math.round(calculateSleepScore(entry.sleep));
+        const energyScore = Math.round(calculateEnergyScore(entry.wellbeing));
+        const breaksScore = Math.round(calculateBreaksScore(entry.wellbeing));
+        const optimizationScore = Math.round(calculateOptimizationScore(entry.tasks, entry.focus));
+        const fatigueScore = calculateFatigueScore(entry.focus);
+        const wellbeingScore = Math.round((sleepScore + energyScore + fatigueScore + breaksScore) / 4);
+
+        const pausesActive = entry.wellbeing?.meditationsPauses ? [
+          entry.wellbeing.meditationsPauses.morning,
+          entry.wellbeing.meditationsPauses.noon,
+          entry.wellbeing.meditationsPauses.afternoon,
+          entry.wellbeing.meditationsPauses.evening
+        ].filter(Boolean).length : 0;
+
+        // Gérer tasks qui peut être un tableau ou null/undefined
+        let tasksString = '';
+        try {
+          if (entry.tasks && Array.isArray(entry.tasks)) {
+            tasksString = entry.tasks.map((t: any) => `${t.name} (${t.duration}h)`).join(' | ');
+          }
+        } catch (e) {
+          console.warn('Erreur parsing tasks:', e);
+          tasksString = '';
+        }
+
+        return [
+          entry.user_id,
+          user?.email || 'Unknown',
+          user?.team_name || 'No team',
+          entry.entry_date,
+          entry.sleep?.duration ?? '',
+          entry.focus?.fatigue ?? '',
+          energyScore,
+          pausesActive,
+          wellbeingScore,
+          optimizationScore,
+          tasksString
+        ];
+      }));
+
+      const csv = headers.join(';') + '\n' + rows.map(r => r.join(';')).join('\n');
+
+      // Télécharger le fichier
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `effizen-export-global-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Erreur lors de l\'export global:', error);
+      alert(t('common.error') + ': ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-off-white flex items-center justify-center">
@@ -216,7 +361,10 @@ const DashboardAdmin: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <button className="btn-success flex items-center space-x-2">
+              <button
+                onClick={handleGlobalExport}
+                className="btn-success flex items-center space-x-2"
+              >
                 <Download size={16} />
                 <span>{t('dashboard.admin.globalExport') || 'Export Global'}</span>
               </button>

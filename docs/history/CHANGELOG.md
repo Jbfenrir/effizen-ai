@@ -2,6 +2,54 @@
 
 ## 📅 Octobre 2025
 
+### 16/10/2025 - FIX : Corrections exports CSV + Trigger auto-synchronisation Auth ↔ Profiles (SESSION EN COURS)
+**Problèmes résolus :**
+- ✅ **Export CSV personnel défaillant** : Erreur `(entry.tasks || []).map is not a function`
+- ✅ **Export CSV global admin défaillant** : Même erreur + utilisateurs "Unknown"
+- ✅ **Désynchronisation Auth/Profiles** : Utilisateurs Auth sans profil (ex: erikagerberon@gmail.com)
+
+**Corrections appliquées :**
+1. **Gestion robuste champ tasks JSONB** :
+   - `src/components/Header.tsx` (lignes 157-166) : Vérification Array.isArray() + try/catch
+   - `src/pages/DashboardAdmin.tsx` (lignes 289-298) : Même protection
+   - Erreur `.map()` éliminée pour exports personnels et globaux
+
+2. **Synchronisation automatique Auth ↔ Profiles** :
+   - Création `supabase_trigger_auto_profile.sql` (90 lignes)
+   - Fonction PostgreSQL `handle_new_user()` avec SECURITY DEFINER
+   - Trigger `on_auth_user_created` sur table `auth.users`
+   - Script correction manuelle pour erikagerberon@gmail.com (UUID: fd437374-5043-45d5-abac-c0f596fd66bc)
+   - Script bulk sync pour TOUS les utilisateurs Auth sans profil
+
+**Tests effectués :**
+- ✅ Export personnel : Fichier `effizen-data-complet (2).csv` généré avec succès
+- ✅ Export global admin : Fichier `effizen-export-global-2025-10-16.csv` généré avec succès
+- ⏳ Trigger SQL : Script prêt, en attente d'exécution utilisateur dans Supabase Dashboard
+
+**Infrastructure Phase 2 créée (non déployée) :**
+- `src/services/dataAggregationService.ts` (250 lignes) : Service agrégation multi-niveaux
+- `src/components/ViewSelector.tsx` (110 lignes) : Sélecteur de vue (Personnel/Équipe/Tous)
+- Traductions complètes FR/EN pour viewSelector (12 clés)
+- `TEST_GUIDE.md` : Guide complet pour tests Phase 1 et intégration Phase 2
+
+**Prochaines étapes :**
+1. Utilisateur doit exécuter `supabase_trigger_auto_profile.sql` dans Supabase Dashboard
+2. Vérifier que erikagerberon@gmail.com n'apparaît plus comme "Unknown"
+3. Décider si déploiement Phase 1 ou intégration Phase 2 (dashboards multi-vues)
+
+**Fichiers modifiés :**
+- `src/components/Header.tsx` - Fix export personnel
+- `src/pages/DashboardAdmin.tsx` - Fix export global
+- `supabase_trigger_auto_profile.sql` - Script synchronisation (nouveau)
+- `TEST_GUIDE.md` - Guide tests (nouveau)
+- `src/services/dataAggregationService.ts` - Service agrégation (nouveau, non intégré)
+- `src/components/ViewSelector.tsx` - Composant sélecteur (nouveau, non intégré)
+- `src/i18n/locales/fr.json` + `en.json` - Traductions viewSelector
+
+**Commit en attente :** Après confirmation exécution SQL par utilisateur
+
+---
+
 ### 11/10/2025 - FEATURES : Nouvelles fonctionnalités Dashboard Employee + Page Assistant (SESSION COMPLÈTE)
 **Fonctionnalités implémentées :**
 - ✅ **Système de conseils double :** Paire Santé + Organisation (AdvicePair) avec catégorisation

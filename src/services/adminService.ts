@@ -378,6 +378,27 @@ export class AdminService {
   }
 
   /**
+   * Récupère toutes les entrées de tous les utilisateurs (admin uniquement)
+   */
+  async getAllEntries(): Promise<{ data: DailyEntry[]; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_entries')
+        .select('*')
+        .order('entry_date', { ascending: true });
+
+      if (error) throw error;
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return {
+        data: [],
+        error: error instanceof Error ? error.message : 'Erreur lors de la récupération des entrées'
+      };
+    }
+  }
+
+  /**
    * Récupère les métriques globales du système
    */
   async getAdminMetrics(): Promise<AdminMetrics> {

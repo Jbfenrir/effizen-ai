@@ -84,6 +84,71 @@
 **Problème :** Colonnes manquantes et bien-être vide
 **Solution :** Ajout colonnes calculées avec mêmes formules que dashboard
 
+### 5. Export CSV personnel et global défaillants + Utilisateur "Unknown" (16/10/2025)
+**Symptômes :**
+- Export personnel (menu utilisateur) : Erreur `(entry.tasks || []).map is not a function`
+- Export global admin : Même erreur + certains utilisateurs apparaissent comme "Unknown"
+- Utilisateur `erikagerberon@gmail.com` (UUID: fd437374-5043-45d5-abac-c0f596fd66bc) affiche "Unknown" dans CSV
+
+**Causes racines :**
+1. **Erreur .map()** : Champ `tasks` en JSONB dans Supabase n'est pas toujours un tableau
+   - Code assumait que `(entry.tasks || [])` créerait un tableau
+   - JSONB peut retourner objets, null, ou autres types
+2. **"Unknown" dans export** : Désynchronisation auth.users ↔ profiles
+   - Utilisateur existe dans `auth.users` mais PAS dans table `profiles`
+   - Export fait `users.find()` sur profiles → retourne undefined → affiche "Unknown"
+   - Utilisateur créé directement via Supabase Auth UI (bypass app)
+
+**Solutions appliquées :**
+1. **Correction gestion tasks** (2 fichiers modifiés) :
+   - `src/components/Header.tsx` (lignes 157-166) : Check Array.isArray() + try/catch
+   - `src/pages/DashboardAdmin.tsx` (lignes 289-298) : Même fix
+   ```typescript
+   let tasksString = '';
+   try {
+     if (entry.tasks && Array.isArray(entry.tasks)) {
+       tasksString = entry.tasks.map((t: any) => `${t.name} (${t.duration}h)`).join(' | ');
+     }
+   } catch (err) {
+     console.warn('Erreur parsing tasks:', err);
+     tasksString = '';
+   }
+   ```
+
+2. **Synchronisation Auth ↔ Profiles** :
+   - Création script SQL `supabase_trigger_auto_profile.sql` avec :
+     - Fonction `handle_new_user()` pour auto-création profil
+     - Trigger `on_auth_user_created` sur `auth.users` AFTER INSERT
+     - Correction manuelle pour erikagerberon@gmail.com
+     - Script bulk sync pour TOUS les users Auth sans profil
+   ```sql
+   CREATE OR REPLACE FUNCTION public.handle_new_user()
+   RETURNS TRIGGER AS $$
+   BEGIN
+     INSERT INTO public.profiles (id, email, role, team, is_active)
+     VALUES (
+       NEW.id,
+       NEW.email,
+       COALESCE(NEW.raw_user_meta_data->>'role', 'employee'),
+       (NEW.raw_user_meta_data->>'team')::uuid,
+       true
+     )
+     ON CONFLICT (id) DO NOTHING;
+     RETURN NEW;
+   END;
+   $$ LANGUAGE plpgsql SECURITY DEFINER;
+   ```
+
+**Résultats tests utilisateur :**
+- ✅ Export personnel : Fonctionne, fichier `effizen-data-complet (2).csv` créé
+- ✅ Export global admin : Fonctionne, fichier `effizen-export-global-2025-10-16.csv` créé
+- ⏳ Trigger SQL : Script prêt, en attente d'exécution par utilisateur dans Supabase Dashboard
+
+**Impact :**
+- Exports CSV robustes face à données JSONB variées
+- Synchronisation automatique future entre Auth et Profiles
+- Plus d'utilisateurs "Unknown" dans exports après exécution script SQL
+
 ## 🔧 Solutions aux problèmes récurrents
 
 ### npm not found
