@@ -46,7 +46,11 @@
 - `src/components/ViewSelector.tsx` - Composant sélecteur (nouveau, non intégré)
 - `src/i18n/locales/fr.json` + `en.json` - Traductions viewSelector
 
-**Commit en attente :** Après confirmation exécution SQL par utilisateur
+**Commit :** `beecdf3` - 📝 SESSION: 16/10/2025 - Corrections exports CSV + Trigger auto-sync Auth/Profiles
+
+**Déploiement :** ✅ Production mise à jour (HTTP 200)
+
+**Prochaine session :** Phase 2 - Intégration dashboards multi-vues (instructions dans `PHASE_2_INSTRUCTIONS.md`)
 
 ---
 
